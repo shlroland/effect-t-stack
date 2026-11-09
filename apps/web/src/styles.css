@@ -1,0 +1,202 @@
+:root {
+  color-scheme: light;
+  --bg-0: #0f1c18;
+  --bg-1: #163028;
+  --bg-2: #1e3d33;
+  --ink: #f2f7f4;
+  --muted: #a9c0b6;
+  --accent: #6ee7b7;
+  --accent-2: #34d399;
+  --danger: #fb7185;
+  --line: color-mix(in oklab, var(--ink) 14%, transparent);
+  --shadow: 0 24px 60px color-mix(in oklab, black 35%, transparent);
+  font-family: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+  background:
+    radial-gradient(1200px 700px at 10% -10%, #245344 0%, transparent 55%),
+    radial-gradient(900px 500px at 100% 0%, #0b3d4a 0%, transparent 45%),
+    linear-gradient(160deg, var(--bg-0), var(--bg-1) 45%, var(--bg-2));
+  color: var(--ink);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  min-height: 100vh;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+}
+
+.app-shell {
+  width: min(920px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 3.5rem 0 4rem;
+  animation: rise 700ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.brand {
+  font-size: clamp(2.4rem, 6vw, 4.2rem);
+  letter-spacing: -0.04em;
+  font-weight: 700;
+  line-height: 0.95;
+  margin: 0 0 0.75rem;
+}
+
+.lede {
+  max-width: 38rem;
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1.55;
+  margin: 0 0 2rem;
+}
+
+.panel {
+  border: 1px solid var(--line);
+  background: color-mix(in oklab, var(--bg-0) 55%, transparent);
+  backdrop-filter: blur(10px);
+  padding: 1.25rem;
+  box-shadow: var(--shadow);
+  animation: fade-in 900ms 120ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.composer {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.composer input {
+  border: 1px solid var(--line);
+  background: color-mix(in oklab, black 25%, transparent);
+  color: var(--ink);
+  padding: 0.85rem 1rem;
+  outline: none;
+}
+
+.composer input:focus {
+  border-color: color-mix(in oklab, var(--accent) 55%, white);
+}
+
+.composer button,
+.todo-actions button {
+  border: 0;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #06281c;
+  font-weight: 600;
+  padding: 0.85rem 1.1rem;
+  cursor: pointer;
+  transition: transform 160ms ease, filter 160ms ease;
+}
+
+.composer button:hover,
+.todo-actions button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+.todo-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.todo-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.85rem;
+  align-items: center;
+  padding: 0.85rem 0.9rem;
+  border: 1px solid var(--line);
+  background: color-mix(in oklab, white 3%, transparent);
+  animation: rise 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.todo-item.done .todo-title {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+.todo-title {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.95rem;
+}
+
+.todo-actions {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.todo-actions button.ghost {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  padding: 0.45rem 0.7rem;
+}
+
+.todo-actions button.danger {
+  background: color-mix(in oklab, var(--danger) 85%, white);
+  color: #3f0d18;
+}
+
+.status {
+  margin-top: 1rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.status.error {
+  color: var(--danger);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .composer {
+    grid-template-columns: 1fr;
+  }
+
+  .todo-item {
+    grid-template-columns: auto 1fr;
+  }
+
+  .todo-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+  }
+}

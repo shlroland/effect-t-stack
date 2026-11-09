@@ -1,0 +1,23 @@
+{
+  "name": "@ets/server",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun --hot src/main.ts",
+    "start": "bun src/main.ts",
+    "check-types": "tsc --noEmit -p tsconfig.json",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@effect/platform-bun": "^4.1.2",
+    "@ets/db": "workspace:*",
+    "@ets/domain": "workspace:*",
+    "@ets/protocol": "workspace:*",
+    "effect": "^4.1.2"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5.9.2"
+  }
+}

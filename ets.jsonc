@@ -1,0 +1,16 @@
+{
+  // effect-t-stack project fingerprint (Phase 1a golden base)
+  // Agents and future `create-effect-t-stack add` use this to recognize the stack.
+  "version": 1,
+  "name": "effect-t-stack",
+  "effect": "v4",
+  "runtime": "bun",
+  "api": "httpapi",
+  "database": "sqlite",
+  "orm": "drizzle",
+  "auth": "none",
+  "frontend": "tanstack-router",
+  "addons": ["turborepo"],
+  "examples": ["todo"],
+  "packageManager": "bun"
+}

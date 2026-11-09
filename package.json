@@ -1,0 +1,25 @@
+{
+  "name": "effect-t-stack",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Effect v4 golden base template for effect-t-stack (Phase 1a).",
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "dev:server": "turbo run dev --filter=@ets/server",
+    "dev:web": "turbo run dev --filter=@ets/web",
+    "check-types": "turbo run check-types",
+    "test": "turbo run test",
+    "check": "bun run check-types && bun run test",
+    "db:generate": "turbo run db:generate --filter=@ets/db"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.4",
+    "typescript": "^5.9.2"
+  },
+  "packageManager": "bun@1.4.4"
+}

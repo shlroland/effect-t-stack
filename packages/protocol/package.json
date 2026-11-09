@@ -1,0 +1,20 @@
+{
+  "name": "@ets/protocol",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@ets/domain": "workspace:*",
+    "effect": "^4.1.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2"
+  }
+}
