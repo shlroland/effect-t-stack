@@ -11,7 +11,7 @@
   "orm": "drizzle",
   "auth": "none",
   "frontend": "tanstack-router",
-  "addons": ["turborepo", "skills"],
+  "addons": ["turborepo", "skills", "repos"],
   "addonOptions": {
     // Agent-friendly: Effect-TS/skills + companion wiring from effect-ts skill.
     // Reproduce:
@@ -30,6 +30,26 @@
       ],
       "rootEffectDevDependency": true,
       "agentsMdLearningSection": true
+    },
+    // Vendor Effect source via git subtree so agents read real APIs/patterns.
+    // See: https://effect.website/blog/the-one-weird-git-trick-that-makes-coding-agents-more-effect-ive
+    // Reproduce:
+    //   git subtree add --prefix=repos/effect https://github.com/Effect-TS/effect.git main --squash
+    // Update:
+    //   git subtree pull --prefix=repos/effect https://github.com/Effect-TS/effect.git main --squash
+    "repos": {
+      "dir": "repos",
+      "editorExclude": true,
+      "selections": [
+        {
+          "name": "effect",
+          "prefix": "repos/effect",
+          "url": "https://github.com/Effect-TS/effect.git",
+          "ref": "main",
+          "squash": true,
+          "readFirst": ["repos/effect/LLMS.md"]
+        }
+      ]
     }
   },
   "examples": ["todo"],
