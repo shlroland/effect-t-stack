@@ -1,7 +1,7 @@
-import { migrate } from "drizzle-orm/bun-sqlite/migrator"
+import { migrate } from "drizzle-orm/effect-sqlite-bun/migrator"
 import { Context, Effect, Layer } from "effect"
 import { fileURLToPath } from "node:url"
-import { Database } from "./Database.ts"
+import { Database, mapDatabaseError } from "./Database.ts"
 
 const defaultMigrationsFolder = fileURLToPath(new URL("../drizzle", import.meta.url))
 
@@ -12,9 +12,12 @@ export class Migrations extends Context.Service<Migrations, {
     Layer.effect(
       Migrations,
       Effect.gen(function*() {
-        const database = yield* Database
+        const db = yield* Database
 
-        yield* database.use("migrations.run", (db) => migrate(db, { migrationsFolder }))
+        yield* mapDatabaseError(
+          "migrations.run",
+          migrate(db, { migrationsFolder })
+        )
 
         return Migrations.of({
           ready: Effect.void

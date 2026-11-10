@@ -8,7 +8,18 @@
   "runtime": "bun",
   "api": "httpapi",
   "database": "sqlite",
+  // Drizzle 1.0 RC is required for official Effect drivers (`drizzle-orm/effect-sqlite-bun`).
+  // Reproduce (@ets/db):
+  //   bun add drizzle-orm@1.0.0-rc.5 @effect/sql-sqlite-bun@^4.1.3 effect@^4.1.3
+  //   bun add -D drizzle-kit@1.0.0-rc.5
   "orm": "drizzle",
+  "ormOptions": {
+    "package": "drizzle-orm",
+    "version": "1.0.0-rc.5",
+    "kit": "drizzle-kit@1.0.0-rc.5",
+    "effectDriver": "drizzle-orm/effect-sqlite-bun",
+    "sqlClient": "@effect/sql-sqlite-bun"
+  },
   "auth": "none",
   "frontend": "tanstack-router",
   "addons": ["turborepo", "skills", "repos", "language-service", "mcp", "effect-style"],

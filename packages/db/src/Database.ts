@@ -1,48 +1,31 @@
-import { Database as BunSqlite } from "bun:sqlite"
-import { drizzle } from "drizzle-orm/bun-sqlite"
+import * as SqliteClient from "@effect/sql-sqlite-bun/SqliteClient"
+import * as SqliteDrizzle from "drizzle-orm/effect-sqlite-bun"
 import { Context, Effect, Layer, Schema } from "effect"
 
-type Db = ReturnType<typeof drizzle>
+export type AppDatabase = SqliteDrizzle.EffectSQLiteBunDatabase & {
+  readonly $client: SqliteClient.SqliteClient
+}
 
 export class DatabaseError extends Schema.TaggedError<DatabaseError>()("DatabaseError", {
   operation: Schema.String,
   cause: Schema.Unknown
 }) {}
 
-export class Database extends Context.Service<Database, {
-  readonly use: <A>(
-    operation: string,
-    f: (db: Db) => A | Promise<A>
-  ) => Effect.Effect<A, DatabaseError>
-  readonly ping: Effect.Effect<void, DatabaseError>
-}>()("@ets/db/Database") {
-  static readonly layer = (databaseUrl: string) =>
-    Layer.effect(
-      Database,
-      Effect.gen(function*() {
-        const client = yield* Effect.acquireRelease(
-          Effect.sync(() => new BunSqlite(databaseUrl)),
-          (c) => Effect.sync(() => c.close())
-        )
-        const db = drizzle(client)
+export const mapDatabaseError = <A, E, R>(
+  operation: string,
+  effect: Effect.Effect<A, E, R>
+): Effect.Effect<A, DatabaseError, R> =>
+  effect.pipe(
+    Effect.mapError((cause) => new DatabaseError({ operation, cause }))
+  )
 
-        const use = <A>(
-          operation: string,
-          f: (db: Db) => A | Promise<A>
-        ): Effect.Effect<A, DatabaseError> =>
-          Effect.tryPromise({
-            try: () => Promise.resolve(f(db)),
-            catch: (cause) => new DatabaseError({ operation, cause })
-          })
+export const ping = (db: AppDatabase): Effect.Effect<void, DatabaseError> =>
+  mapDatabaseError("database.ping", db.run("select 1")).pipe(Effect.asVoid)
 
-        const ping = Effect.try({
-          try: () => {
-            client.query("select 1").get()
-          },
-          catch: (cause) => new DatabaseError({ operation: "database.ping", cause })
-        })
-
-        return Database.of({ use, ping })
-      })
+export class Database extends Context.Service<Database, AppDatabase>()("@ets/db/Database") {
+  static readonly layer = (filename: string) =>
+    Layer.effect(Database, SqliteDrizzle.makeWithDefaults()).pipe(
+      Layer.provide(SqliteClient.layer({ filename })),
+      Layer.orDie
     )
 }

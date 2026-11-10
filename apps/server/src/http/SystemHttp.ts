@@ -1,4 +1,4 @@
-import { Database, Migrations } from "@ets/db"
+import { Database, Migrations, ping } from "@ets/db"
 import { HealthResponse, ReadyResponse } from "@ets/domain"
 import { Api } from "@ets/protocol"
 import { Effect } from "effect"
@@ -17,7 +17,7 @@ export const SystemApiHandlers = HttpApiBuilder.group(
       .handle("ready", () =>
         mapReadinessError(
           migrations.ready.pipe(
-            Effect.andThen(database.ping),
+            Effect.andThen(ping(database)),
             Effect.as(new ReadyResponse({ status: "ready" }))
           )
         ))

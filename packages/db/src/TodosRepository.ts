@@ -1,7 +1,7 @@
 import { Todo, type TodoId, type TodoTitle } from "@ets/domain"
 import { eq } from "drizzle-orm"
 import { Context, Effect, Layer, Schema } from "effect"
-import { Database, type DatabaseError } from "./Database.ts"
+import { Database, type DatabaseError, mapDatabaseError } from "./Database.ts"
 import { todos } from "./schema.ts"
 
 const decodeTodo = Schema.decodeUnknownEffect(Todo)
@@ -37,24 +37,27 @@ export class TodosRepository extends Context.Service<TodosRepository, {
   static readonly layerNoDeps = Layer.effect(
     TodosRepository,
     Effect.gen(function*() {
-      const database = yield* Database
+      const db = yield* Database
 
       const all = Effect.fn("TodosRepository.all")(function*() {
-        const rows = yield* database.use("todos.all", (db) => db.select().from(todos).all())
+        const rows = yield* mapDatabaseError("todos.all", db.select().from(todos))
         return yield* Effect.forEach(rows, (row) => decodePersistedTodo("todos.all.decode", row))
       })
 
       const findById = Effect.fn("TodosRepository.findById")(function*(id: TodoId) {
-        const row = yield* database.use(
+        const row = yield* mapDatabaseError(
           "todos.findById",
-          (db) => db.select().from(todos).where(eq(todos.id, id)).limit(1).get()
+          db.select().from(todos).where(eq(todos.id, id)).limit(1).get()
         )
         if (!row) return undefined
         return yield* decodePersistedTodo("todos.findById.decode", row)
       })
 
       const create = Effect.fn("TodosRepository.create")(function*(title: TodoTitle) {
-        const row = yield* database.use("todos.create", (db) => db.insert(todos).values({ title }).returning().get())
+        const row = yield* mapDatabaseError(
+          "todos.create",
+          db.insert(todos).values({ title }).returning().get()
+        )
         return yield* decodePersistedTodo("todos.create.decode", row)
       })
 
@@ -71,18 +74,18 @@ export class TodosRepository extends Context.Service<TodosRepository, {
         if (Object.keys(values).length === 0) {
           return yield* findById(id)
         }
-        const row = yield* database.use(
+        const row = yield* mapDatabaseError(
           "todos.update",
-          (db) => db.update(todos).set(values).where(eq(todos.id, id)).returning().get()
+          db.update(todos).set(values).where(eq(todos.id, id)).returning().get()
         )
         if (!row) return undefined
         return yield* decodePersistedTodo("todos.update.decode", row)
       })
 
       const remove = Effect.fn("TodosRepository.remove")(function*(id: TodoId) {
-        const deleted = yield* database.use(
+        const deleted = yield* mapDatabaseError(
           "todos.remove",
-          (db) => db.delete(todos).where(eq(todos.id, id)).returning({ id: todos.id }).all()
+          db.delete(todos).where(eq(todos.id, id)).returning({ id: todos.id })
         )
         return deleted.length > 0
       })
