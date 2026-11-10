@@ -1,6 +1,6 @@
 import type { Todo } from "@ets/domain"
 import { createFileRoute } from "@tanstack/react-router"
-import { useEffect, useState, useTransition, type FormEvent } from "react"
+import { type FormEvent, useEffect, useState, useTransition } from "react"
 import { api } from "../lib/api.ts"
 
 export const Route = createFileRoute("/")({
@@ -49,8 +49,8 @@ function TodosPage() {
     <>
       <h1 className="brand">effect-t-stack</h1>
       <p className="lede">
-        Effect v4 HttpApi 金样基础模板。共享 protocol 契约，服务端 Layers
-        组装，前端 TanStack Router 调用同源类型客户端。
+        Effect v4 HttpApi 金样基础模板。共享 protocol 契约，服务端 Layers 组装，前端 TanStack Router
+        调用同源类型客户端。
       </p>
 
       <section className="panel">
@@ -81,8 +81,7 @@ function TodosPage() {
                       completed: !todo.completed
                     })
                     await refresh()
-                  })
-                }
+                  })}
                 aria-label={`完成 ${todo.title}`}
               />
               <span className="todo-title">{todo.title}</span>
@@ -94,8 +93,7 @@ function TodosPage() {
                     startTransition(async () => {
                       await api.removeTodo(todo.id)
                       await refresh()
-                    })
-                  }
+                    })}
                 >
                   删除
                 </button>

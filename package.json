@@ -14,16 +14,22 @@
     "dev:web": "turbo run dev --filter=@ets/web",
     "check-types": "turbo run check-types",
     "test": "turbo run test",
-    "check": "bun run check-types && bun run test",
+    "lint": "oxlint -c .oxlintrc.json -f unix apps packages && dprint check",
+    "lint-fix": "oxlint -c .oxlintrc.json --fix apps packages && dprint fmt",
+    "check": "bun run lint && bun run check-types && bun run test",
     "db:generate": "turbo run db:generate --filter=@ets/db",
     "effect:diagnostics": "effect-language-service diagnostics --format json",
     "effect:diagnostics:server": "effect-language-service diagnostics --project apps/server/tsconfig.json --format json",
     "effect:diagnostics:web": "effect-language-service diagnostics --project apps/web/tsconfig.json --format json",
-    "prepare": "effect-language-service patch"
+    "prepare": "effect-language-service patch && lefthook install"
   },
   "devDependencies": {
     "@effect/language-service": "0.87.5",
-    "effect": "^4.1.2",
+    "@oxlint/plugins": "^1.93.0",
+    "dprint": "^0.64.3",
+    "effect": "^4.1.3",
+    "lefthook": "^2.0.1",
+    "oxlint": "^1.93.0",
     "turbo": "^2.5.4",
     "typescript": "^5.9.2"
   },

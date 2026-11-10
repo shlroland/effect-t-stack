@@ -14,9 +14,7 @@ export class Migrations extends Context.Service<Migrations, {
       Effect.gen(function*() {
         const database = yield* Database
 
-        yield* database.use("migrations.run", (db) =>
-          migrate(db, { migrationsFolder })
-        )
+        yield* database.use("migrations.run", (db) => migrate(db, { migrationsFolder }))
 
         return Migrations.of({
           ready: Effect.void

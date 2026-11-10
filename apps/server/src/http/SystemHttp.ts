@@ -13,8 +13,7 @@ export const SystemApiHandlers = HttpApiBuilder.group(
     const migrations = yield* Migrations
 
     return handlers
-      .handle("health", () =>
-        Effect.succeed(new HealthResponse({ status: "ok" })))
+      .handle("health", () => Effect.succeed(new HealthResponse({ status: "ok" })))
       .handle("ready", () =>
         mapReadinessError(
           migrations.ready.pipe(

@@ -4,8 +4,7 @@ import { Effect } from "effect"
 import { TodosTestLive } from "../test/layers.ts"
 import { Todos } from "./Todos.ts"
 
-const run = <A, E>(effect: Effect.Effect<A, E, Todos>) =>
-  Effect.runPromise(effect.pipe(Effect.provide(TodosTestLive)))
+const run = <A, E>(effect: Effect.Effect<A, E, Todos>) => Effect.runPromise(effect.pipe(Effect.provide(TodosTestLive)))
 
 describe("Todos service", () => {
   it("creates and lists todos", async () => {

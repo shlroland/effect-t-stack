@@ -16,16 +16,13 @@ export const mapUnexpectedErrors = <A, E, R>(
   effect: Effect.Effect<A, E | DatabaseError | TodoDecodeError, R>
 ) =>
   effect.pipe(
-    Effect.catchTag("DatabaseError", (error) =>
-      failInternal("database operation failed", error)),
-    Effect.catchTag("TodoDecodeError", (error) =>
-      failInternal("persisted todo failed to decode", error))
+    Effect.catchTag("DatabaseError", (error) => failInternal("database operation failed", error)),
+    Effect.catchTag("TodoDecodeError", (error) => failInternal("persisted todo failed to decode", error))
   )
 
 export const mapReadinessError = <A, E, R>(
   effect: Effect.Effect<A, E | DatabaseError, R>
 ) =>
   effect.pipe(
-    Effect.catchTag("DatabaseError", (error) =>
-      failUnavailable("readiness check failed", error))
+    Effect.catchTag("DatabaseError", (error) => failUnavailable("readiness check failed", error))
   )

@@ -12,13 +12,9 @@ export const TodosApiHandlers = HttpApiBuilder.group(
 
     return handlers
       .handle("list", () => mapUnexpectedErrors(todos.all()))
-      .handle("create", ({ payload }) =>
-        mapUnexpectedErrors(todos.create(payload.title)))
-      .handle("getById", ({ params }) =>
-        mapUnexpectedErrors(todos.findById(params.id)))
-      .handle("update", ({ params, payload }) =>
-        mapUnexpectedErrors(todos.update(params.id, payload)))
-      .handle("remove", ({ params }) =>
-        mapUnexpectedErrors(todos.remove(params.id)))
+      .handle("create", ({ payload }) => mapUnexpectedErrors(todos.create(payload.title)))
+      .handle("getById", ({ params }) => mapUnexpectedErrors(todos.findById(params.id)))
+      .handle("update", ({ params, payload }) => mapUnexpectedErrors(todos.update(params.id, payload)))
+      .handle("remove", ({ params }) => mapUnexpectedErrors(todos.remove(params.id)))
   })
 )

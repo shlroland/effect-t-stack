@@ -3,6 +3,7 @@ name: effect-v3-to-v4
 description: Use this skill when migrating a codebase from Effect v3 to Effect
   v4, upgrading `effect` or any `@effect/*` package across the v3/v4 boundary.
 ---
+
 # Effect v3 to v4 Migration
 
 Drive an Effect v3 → v4 migration from the generated migration reference that ships in the Effect repo. Every rename, removal, and signature change is answered by upstream data — do not guess replacements.
@@ -55,7 +56,7 @@ If the origin points at `effect-smol`, or the version is not `4.x`, delete the d
 
 **This is the single most important rule in this skill.** `migration/v3-to-v4.md` is ~17,000 lines / ~350k tokens. Reading it in one pass blows the context window and takes the migration with it.
 
-Always search it and read only matched lines plus surrounding context. The file has four sections — **Import Map**, **No Counterpart Imports**, **Removed Modules**, and **API Reference** (one `` ### `<v3 module path>` `` heading per module). Entries are grep-able one-liners of the form `` - `Old.symbol` -> `New.symbol`: <rationale> ``, and removals are explicit `` -> `none` `` entries with a stated alternative.
+Always search it and read only matched lines plus surrounding context. The file has four sections — **Import Map**, **No Counterpart Imports**, **Removed Modules**, and **API Reference** (one `` ### `<v3 module path>` `` heading per module). Entries are grep-able one-liners of the form ``- `Old.symbol` -> `New.symbol`: <rationale>``, and removals are explicit `` -> `none` `` entries with a stated alternative.
 
 Concrete recipes:
 

@@ -45,17 +45,16 @@ export class TodosRepository extends Context.Service<TodosRepository, {
       })
 
       const findById = Effect.fn("TodosRepository.findById")(function*(id: TodoId) {
-        const row = yield* database.use("todos.findById", (db) =>
-          db.select().from(todos).where(eq(todos.id, id)).limit(1).get()
+        const row = yield* database.use(
+          "todos.findById",
+          (db) => db.select().from(todos).where(eq(todos.id, id)).limit(1).get()
         )
         if (!row) return undefined
         return yield* decodePersistedTodo("todos.findById.decode", row)
       })
 
       const create = Effect.fn("TodosRepository.create")(function*(title: TodoTitle) {
-        const row = yield* database.use("todos.create", (db) =>
-          db.insert(todos).values({ title }).returning().get()
-        )
+        const row = yield* database.use("todos.create", (db) => db.insert(todos).values({ title }).returning().get())
         return yield* decodePersistedTodo("todos.create.decode", row)
       })
 
@@ -72,16 +71,18 @@ export class TodosRepository extends Context.Service<TodosRepository, {
         if (Object.keys(values).length === 0) {
           return yield* findById(id)
         }
-        const row = yield* database.use("todos.update", (db) =>
-          db.update(todos).set(values).where(eq(todos.id, id)).returning().get()
+        const row = yield* database.use(
+          "todos.update",
+          (db) => db.update(todos).set(values).where(eq(todos.id, id)).returning().get()
         )
         if (!row) return undefined
         return yield* decodePersistedTodo("todos.update.decode", row)
       })
 
       const remove = Effect.fn("TodosRepository.remove")(function*(id: TodoId) {
-        const deleted = yield* database.use("todos.remove", (db) =>
-          db.delete(todos).where(eq(todos.id, id)).returning({ id: todos.id }).all()
+        const deleted = yield* database.use(
+          "todos.remove",
+          (db) => db.delete(todos).where(eq(todos.id, id)).returning({ id: todos.id }).all()
         )
         return deleted.length > 0
       })
@@ -90,6 +91,5 @@ export class TodosRepository extends Context.Service<TodosRepository, {
     })
   )
 
-  static readonly layer = (databaseUrl: string) =>
-    this.layerNoDeps.pipe(Layer.provide(Database.layer(databaseUrl)))
+  static readonly layer = (databaseUrl: string) => this.layerNoDeps.pipe(Layer.provide(Database.layer(databaseUrl)))
 }

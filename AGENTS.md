@@ -44,9 +44,24 @@ git subtree pull --prefix=repos/effect https://github.com/Effect-TS/effect.git m
 
 ## 栈指纹
 
-见根目录 `ets.jsonc`（金样构建步骤 / 选型真相源）：Effect **v4** · Bun · HttpApi · SQLite + Drizzle · auth **none** · frontend **TanStack Router** · addons `turborepo` + `skills`（`Effect-TS/skills`）+ `repos`（`repos/effect` subtree）+ `language-service`（`@effect/language-service` on TypeScript 5.x）+ `mcp`（`effect-mcp` docs server；`effect-solutions` 默认关闭）。
+见根目录 `ets.jsonc`（金样构建步骤 / 选型真相源）：Effect **v4** · Bun · HttpApi · SQLite + Drizzle · auth **none** · frontend **TanStack Router** · addons `turborepo` + `skills`（`Effect-TS/skills`）+ `repos`（`repos/effect` subtree）+ `language-service`（`@effect/language-service` on TypeScript 5.x）+ `mcp`（`effect-mcp` docs server；`effect-solutions` 默认关闭）+ `effect-style`（`dprint` + `oxlint`/`@effect/oxc`，金样默认开）。
 
 新增金样能力时，先改可跑代码，再同步写入 `ets.jsonc` 的 `addons` / `addonOptions`。
+
+## Effect style (`effect-style` addon)
+
+Golden Sample enables **`effect-style`** by default (optional in the future Option Matrix). When present:
+
+- Format with **`dprint`** (ASI, double quotes, no trailing commas, lineWidth 120 — aligned with `repos/effect/dprint.json`)
+- Lint with **`oxlint`** + **`@effect/oxc`** rules (config: `.oxlintrc.json`)
+- `bun run check` includes `lint`; pre-commit via **Lefthook** (`lefthook.yml`: staged `dprint fmt` + `oxlint --fix`)
+- Naming / modules / API conventions follow `repos/effect` + `LLMS.md` (PascalCase modules, `Context.Service`, `Schema.TaggedError`, `Effect.fn`, `.ts` import extensions, …)
+- Do **not** add competing formatters/linters (`biome`, etc.) alongside this addon
+
+`@effect/oxc` is not on npm yet; the Golden Sample loads its oxlint JS plugin from
+`repos/effect/packages/tools/oxc` (so `effect-style` currently depends on the `repos`
+addon). Lint scripts are scoped to `apps` + `packages` so oxlint does not pick up
+`repos/effect/.oxlintrc.json`.
 
 ## Effect MCP (`mcp` addon)
 
@@ -84,16 +99,16 @@ Do not disable the plugin or skip these diagnostics to “make CI green” unles
 
 ## 包边界
 
-| 包 / 目录 | 职责 | 禁止 |
-|-----------|------|------|
-| `packages/domain` | Schema、branded types、domain tagged errors | IO、HTTP、Drizzle、Layer 组装 |
-| `packages/protocol` | `HttpApi` / `HttpApiGroup` 契约与 OpenAPI 注解 | 业务规则、SQL、具体 handler |
-| `packages/db` | Drizzle schema、migrations、Repository | HTTP 映射、业务规则 |
-| `packages/client` | 从 protocol 派生的 `HttpApiClient` | 服务端 Layer |
-| `apps/server/src/services` | 业务规则（Service） | SQL 行解码、HTTP 状态码细节 |
-| `apps/server/src/http` | HttpApi handlers、HTTP 错误映射 | 业务规则、SQL |
-| `apps/server/src/layers.ts` | prod / test Layer 组装 | 新业务逻辑 |
-| `apps/web` | TanStack Router UI | 直接碰 DB / domain 私有细节之外的服务端实现 |
+| 包 / 目录                   | 职责                                           | 禁止                                        |
+| --------------------------- | ---------------------------------------------- | ------------------------------------------- |
+| `packages/domain`           | Schema、branded types、domain tagged errors    | IO、HTTP、Drizzle、Layer 组装               |
+| `packages/protocol`         | `HttpApi` / `HttpApiGroup` 契约与 OpenAPI 注解 | 业务规则、SQL、具体 handler                 |
+| `packages/db`               | Drizzle schema、migrations、Repository         | HTTP 映射、业务规则                         |
+| `packages/client`           | 从 protocol 派生的 `HttpApiClient`             | 服务端 Layer                                |
+| `apps/server/src/services`  | 业务规则（Service）                            | SQL 行解码、HTTP 状态码细节                 |
+| `apps/server/src/http`      | HttpApi handlers、HTTP 错误映射                | 业务规则、SQL                               |
+| `apps/server/src/layers.ts` | prod / test Layer 组装                         | 新业务逻辑                                  |
+| `apps/web`                  | TanStack Router UI                             | 直接碰 DB / domain 私有细节之外的服务端实现 |
 
 ## 架构不变量
 
@@ -118,7 +133,9 @@ Do not disable the plugin or skip these diagnostics to “make CI green” unles
 
 ```sh
 bun install
-bun run check                     # check-types + tests
+bun run check                     # lint + check-types + tests
+bun run lint                      # oxlint + dprint check
+bun run lint-fix                 # oxlint --fix + dprint fmt
 bun run effect:diagnostics:server # Effect LSP diagnostics as JSON
 bun run effect:diagnostics:web
 bun run dev:server                # API :3737 ，docs :3737/docs

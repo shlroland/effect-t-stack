@@ -1,5 +1,5 @@
 import { TodosRepository, type TodosRepositoryError } from "@ets/db"
-import { Todo, TodoId, TodoNotFound, TodoTitle } from "@ets/domain"
+import { type Todo, type TodoId, TodoNotFound, type TodoTitle } from "@ets/domain"
 import { Context, Effect, Layer } from "effect"
 
 export class Todos extends Context.Service<Todos, {

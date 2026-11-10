@@ -4,14 +4,14 @@ Effect **v4** 全栈脚手架的 Phase 1a 金样：可运行 monorepo，CLI 尚�
 
 ## 默认栈
 
-| 维度 | 选择 |
-|------|------|
-| Runtime | Bun |
-| API | Effect HttpApi |
+| 维度     | 选择             |
+| -------- | ---------------- |
+| Runtime  | Bun              |
+| API      | Effect HttpApi   |
 | DB / ORM | SQLite + Drizzle |
-| Auth | none |
-| Frontend | TanStack Router |
-| Monorepo | turborepo |
+| Auth     | none             |
+| Frontend | TanStack Router  |
+| Monorepo | turborepo        |
 
 ## 快速开始
 

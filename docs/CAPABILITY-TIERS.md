@@ -15,6 +15,7 @@ Formal todos for对标 Better-T-Stack. Implement **strictly L1 → L6**; do not 
 > **L0 is not exit-complete.** `bun run check` passing means runnable, not “ready to freeze as the canonical template.” Do **not** start L1 Scaffold Product until **L0 exit criteria** below are met (or explicitly waived in an ADR).
 
 ### Baseline present (necessary but not sufficient)
+
 - [x] Runnable monorepo: Bun · HttpApi · SQLite+Drizzle · auth none · TanStack Router · turborepo
 - [x] Fingerprint `ets.jsonc` (v1 — expect schema churn; see Fingerprint hygiene)
 - [x] Packages: domain · protocol · db · client · config
@@ -26,19 +27,23 @@ Formal todos for对标 Better-T-Stack. Implement **strictly L1 → L6**; do not 
 - [x] Dev CORS middleware; HTTP boundary `Effect.logError` mapping
 
 ### Golden Sample quality debt (active L0 work)
+
 From review vs `AGENTS.md` / `repos/effect` / `LLMS.md` (2026-11-10). Clear or ADR-waive before L1.
 
 **P0 — boundaries**
+
 - [ ] `apps/server/src/http/SystemHttp.ts` must not `yield*` `Database`/`Migrations`; add `System` Service; HTTP stays thin
 - [ ] Narrow `layers.ts` so HTTP layers see Services only, not raw `Database`/`Migrations`
 
 **P1 — rules & coverage**
+
 - [ ] Move empty-patch `update` behavior from `TodosRepository` into `Todos` Service
 - [ ] HttpApi tests: `/health` `/ready` (+ 503 on DB fail); Todo 404 paths; infra → 500/503 via `Errors.ts`
 - [ ] Repository tests: decode failure, missing row, empty update after rule move
 - [ ] Decide `@ets/config`: move Effect `AppConfig` into `packages/config` (today only tsconfig) **or** ADR that `config` = tsconfig-only and rename fingerprint story
 
 **P2 — Effect idiom & web DX**
+
 - [ ] Drop pure pass-through `Effect.fn` wrappers in `Todos` (`all`/`create`); name Http handler spans (`Effect.fn("…")`)
 - [ ] Clarify `Migrations.ready` API vs real DB ping (rename or dedicated check)
 - [ ] Web: TanStack Router `loader` instead of `useEffect` fetch; use `/ready` for connected status; mutation error handling; empty state
@@ -47,21 +52,24 @@ From review vs `AGENTS.md` / `repos/effect` / `LLMS.md` (2026-11-10). Clear or A
 - [ ] Stop re-exporting Drizzle `schema` from `@ets/db` public barrel (keep internal)
 
 **P3 — polish (may waive)**
+
 - [ ] Optional: Health/Ready DTOs live in protocol vs domain; http module naming closer to Effect fixtures
 - [ ] Optional: client/web smoke tests; one integration test with `makeAppLive`
-- [ ] Apply **`effect-style`** once implemented; Dependency Catalog + bump (see below)
+- [x] Apply **`effect-style`** once implemented; Dependency Catalog + bump (see below)
 
 - [ ] Freeze short **L0 known-issues** (or empty) at exit sign-off
 
 ### L0 exit criteria (gate for L1)
+
 - [ ] Quality debt items above resolved or waived via ADR
-- [ ] `effect-style` enabled in Golden Sample and `check` includes lint
+- [x] `effect-style` enabled in Golden Sample and `check` includes lint
 - [ ] Dependency Catalog in place; intentional lags documented
 - [ ] `ets.jsonc` reviewed for v1 → tidy shape (no stale comments/options)
 - [ ] AGENTS.md invariants match actual code
 - [ ] Explicit maintainer sign-off: “Golden Sample may be copied by CLI”
 
 ### Effect Core invariants (document + keep true in Golden Sample / templates)
+
 - [ ] Codify in `AGENTS.md` / future project-structure docs: always `domain | protocol | db | client | config` (not BTS `packages/api`)
 - [ ] HTTP error-mapping invariant: domain `Schema.TaggedError` (+ `httpApiStatus`); Service yields domain errors; `http/Errors.ts` maps only infra (e.g. `DatabaseError`, decode)
 - [ ] Import / TS layout: `.ts` extensions in imports; package `exports` pointing at `./src/*.ts`; align with Effect Preserve-style module settings where applicable
@@ -71,6 +79,7 @@ From review vs `AGENTS.md` / `repos/effect` / `LLMS.md` (2026-11-10). Clear or A
 - [ ] `engines` / minimum runtime fields on golden root `package.json`
 
 ### Dependency currency (ongoing — 对标 BTS “latest dependencies”)
+
 - [ ] One-time bump of Golden Sample deps to current stable (Vite/TanStack/turbo/react/effect/drizzle/…); **TypeScript stays on 5.x** + `@effect/language-service` until an ADR opts into TS 7 / `@effect/tsgo`
 - [ ] Central **Dependency Catalog** (single source of version pins for Golden Sample and later templates — BTS-style `dependencyVersionMap`)
 - [ ] Document which packages may lag on purpose (today: TypeScript major, anything with peer-range locks)
@@ -81,22 +90,25 @@ From review vs `AGENTS.md` / `repos/effect` / `LLMS.md` (2026-11-10). Clear or A
 See [ADR-0002](./adr/0002-dependency-currency.md).
 
 ### Style gate — addon `effect-style` (optional in matrix; **on by default in Golden Sample**)
+
 Fingerprint: listed under `addons` + detailed under `addonOptions.effect-style` in `ets.jsonc`.
 
-- [ ] Implement addon **`effect-style`**: mirror Effect repo toolchain
-  - [ ] `dprint` (ASI, double quotes, no trailing commas, lineWidth 120 — align with `repos/effect/dprint.json`)
-  - [ ] `oxlint` + `@effect/oxc` Effect rules where compatible with TS 5.x golden base
-  - [ ] Wire `lint` / `lint-fix` scripts; include lint (+ existing `effect:diagnostics` policy) in `bun run check` when addon is enabled
-  - [ ] Pre-commit / CI gate when addon is enabled
-  - [ ] `AGENTS.md` (and generated projects): naming/modules/API conventions follow `repos/effect` + `LLMS.md` (PascalCase modules, `Context.Service`, `Schema.TaggedError`, `Effect.fn`, readonly options, `.ts` imports, …)
-- [ ] Golden Sample: **`effect-style` in `addons` by default** with `addonOptions` documenting versions/scripts/reproduce steps
+- [x] Implement addon **`effect-style`**: mirror Effect repo toolchain
+  - [x] `dprint` (ASI, double quotes, no trailing commas, lineWidth 120 — align with `repos/effect/dprint.json`)
+  - [x] `oxlint` + `@effect/oxc` Effect rules via vendored `repos/effect/.../oxc` JS plugin (not on npm yet; requires `repos` addon)
+  - [x] Wire `lint` / `lint-fix` scripts; include lint in `bun run check` when addon is enabled
+  - [x] Pre-commit via **Lefthook** (`lefthook.yml`: staged `dprint fmt` + `oxlint --fix`; not husky/lint-staged)
+  - [ ] CI workflow gate when addon is enabled (no `.github` workflows yet)
+  - [x] `AGENTS.md`: naming/modules/API conventions follow `repos/effect` + `LLMS.md` (PascalCase modules, `Context.Service`, `Schema.TaggedError`, `Effect.fn`, readonly options, `.ts` imports, …)
+- [x] Golden Sample: **`effect-style` in `addons` by default** with `addonOptions` documenting versions/scripts/reproduce steps
 - [ ] CLI Option Matrix: `effect-style` is **optional** (`create` / `add` can omit it); default prompt/`--yes` follows Golden Sample (enabled)
-- [ ] Mutual exclusion: `effect-style` conflicts with alternate formatters/linters (`biome`, `ultracite`, plain `oxlint`-only) unless an ADR says otherwise
-- [ ] Without `effect-style`: no dprint/oxlint gate required (language-service may still apply if that addon is present)
+- [x] Mutual exclusion: `effect-style` conflicts with alternate formatters/linters (`biome`, `ultracite`, plain `oxlint`-only) unless an ADR says otherwise
+- [x] Without `effect-style`: no dprint/oxlint gate required (language-service may still apply if that addon is present)
 
 See [ADR-0003](./adr/0003-effect-style-addon.md).
 
 ### Fingerprint hygiene (`ets.jsonc` lifecycle)
+
 `ets.jsonc` will grow with every addon/stage. Treat it as a **versioned, periodically compacted** contract — not an append-only junk drawer.
 
 - [ ] Document field classes: **stack dims** (runtime/api/db/…) · **addons[]** · **addonOptions** · **meta** (`version`, `createdAt`, `reproducibleCommand`, `cliVersion`)
@@ -114,10 +126,12 @@ See [ADR-0005](./adr/0005-l0-exit-and-fingerprint-hygiene.md).
 ## L1 — Scaffold MVP
 
 ### Repo shape
+
 - [ ] Scaffold Product layout: `apps/cli` + Golden Sample under `examples/golden` (or equivalent)
 - [ ] Root workspace wires CLI; Golden Sample remains source of truth until templates extract
 
 ### `create` command
+
 - [ ] Interactive prompts
 - [ ] `--yes` / `-y` default stack
 - [ ] Whole-tree copy of Golden Sample + project/package rename (no conditional `.hbs` yet)
@@ -138,12 +152,14 @@ See [ADR-0005](./adr/0005-l0-exit-and-fingerprint-hygiene.md).
 - [ ] Windows / WSL / CI notes (SQLite paths, long paths, PM matrix)
 
 ### Scaffold testing (对标 BTS three-tier)
+
 - [ ] **Contract tests**: CLI option parsing / compatibility — never assert raw copied template string equality
 - [ ] **Generated-builds**: sample catalog + per-sample `checks`, filter env, shardable; prove install/typecheck/test on generated trees
 - [ ] **Live** pre-release smoke (manual or gated CI)
 - [ ] ADR / AGENTS: compile/boot probes are the proof, not snapshot diffs of generated file text
 
 ### Scaffold-repo governance
+
 - [ ] Contributing guide (`apps/cli` later, which test tier to run, conventional commits)
 - [ ] `SECURITY.md` · optional `CODEOWNERS`
 
@@ -152,6 +168,7 @@ See [ADR-0005](./adr/0005-l0-exit-and-fingerprint-hygiene.md).
 ## L2 — Fingerprint, `add`, agent contract
 
 ### Fingerprint
+
 - [ ] `ets.jsonc` fields: `$schema` · `version` · `createdAt` · `reproducibleCommand` · `addonOptions` · `dbSetupOptions` · deploy fields
 - [ ] **Version semantics:** `ets.jsonc.version` = fingerprint **schema** version; CLI release stamped via `reproducibleCommand` / optional `cliVersion` field — not the same number
 - [ ] In-repo JSON Schema first; optional hosted CDN schema later for editor/`$schema` UX
@@ -159,6 +176,7 @@ See [ADR-0005](./adr/0005-l0-exit-and-fingerprint-hygiene.md).
 - [ ] CLI ↔ generated versioning: publish `create-effect-t-stack@x.y.z`; generated apps do **not** auto-track CLI releases
 
 ### Commands
+
 - [ ] `add` (addons into existing project)
 - [ ] `add --package <name>` scaffold empty workspace package (manifest + `src/index.ts` + tsconfig)
 - [ ] `add-json` · `create-json`
@@ -166,6 +184,7 @@ See [ADR-0005](./adr/0005-l0-exit-and-fingerprint-hygiene.md).
 - [ ] `history` (`--limit` · `--json` · `--clear`) — **local only**, documented paths, no upload; privacy note in help
 
 ### Validation & upgrade
+
 - [ ] Compatibility engine: reject illegal combinations at create/add
 - [ ] Documented Effect-specific rules + illegal combo catalog (e.g. `database=none`+drizzle; payments without better-auth; `frontend=none` API-only shape)
 - [ ] Validation order (enums → combinations → auth/addons → examples) documented for agents
@@ -178,15 +197,18 @@ See [ADR-0005](./adr/0005-l0-exit-and-fingerprint-hygiene.md).
 Introduce `packages/template-generator` + `.hbs` when combinations explode (expected during this tier).
 
 ### API
+
 - [ ] `api=httpapi` only (default; locked until a future ADR reopens L6c)
 
 ### Runtime (`--runtime`)
+
 - [ ] `bun` (default)
 - [ ] `node`
 - [ ] `workers`
 - [ ] `none` (only where a combination requires it)
 
 ### Database (`--database`)
+
 - [ ] `sqlite` (default)
 - [ ] `postgres`
 - [ ] `mysql`
@@ -194,12 +216,14 @@ Introduce `packages/template-generator` + `.hbs` when combinations explode (expe
 - [ ] `none`
 
 ### ORM (`--orm`)
+
 - [ ] `drizzle` (default)
 - [ ] `prisma`
 - [ ] `mongoose` (with mongodb)
 - [ ] `none`
 
 ### Auth (`--auth`) — full surface
+
 - [ ] `none` (Golden Sample default)
 - [ ] `better-auth`
   - [ ] Server wiring (Layer / HttpApi group)
@@ -219,10 +243,12 @@ Introduce `packages/template-generator` + `.hbs` when combinations explode (expe
   - [ ] clerk × supported frontend/runtime matrix
 
 ### Payments (`--payments`)
+
 - [ ] `none`
 - [ ] `polar` (requires better-auth)
 
 ### Frontend — web (`--frontend`)
+
 - [ ] `tanstack-router` (default)
 - [ ] `react-router`
 - [ ] `tanstack-start`
@@ -234,20 +260,23 @@ Introduce `packages/template-generator` + `.hbs` when combinations explode (expe
 - [ ] `none` (API-only)
 
 ### Frontend — native
+
 - [ ] `native-bare`
 - [ ] `native-uniwind`
 - [ ] `native-unistyles`
 - [ ] Web + native multi-frontend
 
 ### Examples (`--examples`)
+
 - [ ] `todo` (default)
 - [ ] `ai`
 - [ ] `none`
 
 ### Addons (`--addons`)
+
 - [ ] Task runners: `turborepo` (have) · `nx` · `vite-plus` (mutually exclusive)
 - [ ] Lint/format: `biome` · `oxlint` · `ultracite`
-- [ ] Git hooks: `lefthook` · `husky`
+- [x] Git hooks: `lefthook` (Golden Sample default via `effect-style`) · `husky` (optional alternate; mutually exclusive)
 - [ ] Docs apps: `starlight` · `fumadocs`
 - [ ] Desktop / extension: `pwa` · `tauri` · `electrobun` · `wxt` · `opentui`
 - [ ] Agent: `skills` (have) · `mcp` (have: coding-agent `effect-docs`；`effect-solutions` optional/off)
@@ -255,10 +284,12 @@ Introduce `packages/template-generator` + `.hbs` when combinations explode (expe
 - [ ] ETS-specific: `repos` · `language-service` · **`effect-style`** (default on in Golden Sample; optional at create/add)
 
 ### Presets
+
 - [ ] `--template` `none`
 - [ ] Effect-oriented presets (optional analogues of mern/pern/t3 — names TBD)
 
 ### Template engine
+
 - [ ] `packages/template-generator` (in-memory VFS; Handlebars helpers; post-processors: scope rename, turbo scripts, README, `reproducibleCommand`)
 - [ ] Handlebars templates + helpers (`eq` / `ne` / `and` / `or` / `includes`)
 - [ ] **Golden Sample → templates sync script** (edit golden first; regenerate templates; never hand-pin versions outside Dependency Catalog)
@@ -270,6 +301,7 @@ Introduce `packages/template-generator` + `.hbs` when combinations explode (expe
 ## L4 — Generated-project ops & UX
 
 ### Env
+
 - [ ] Per-app `.env.example`
 - [ ] **L0/default:** Effect `Config` (as today’s server `AppConfig`) — keep as golden path
 - [ ] **L4 optional:** typed env codegen (Varlock **or** Effect Schema generate) + `env:generate` when chosen
@@ -277,6 +309,7 @@ Introduce `packages/template-generator` + `.hbs` when combinations explode (expe
 - [ ] CORS: dev allowlist; prod from env; document placeholder rate-limit / security-headers (off by default)
 
 ### DB setup (`--db-setup`)
+
 - [ ] `none`
 - [ ] `docker` (+ compose)
 - [ ] `turso` · `d1` (sqlite)
@@ -286,11 +319,13 @@ Introduce `packages/template-generator` + `.hbs` when combinations explode (expe
 - [ ] `dbSetupOptions`: `alchemy` | `auto` | `manual`
 
 ### Deploy
+
 - [ ] `--web-deploy`: `none` · `docker` · `vercel` · `cloudflare` · `prisma`/Alchemy
 - [ ] `--server-deploy`: same set, constrained by runtime
 - [ ] `packages/infra` when Alchemy/cloud infra is selected
 
 ### UI / app chrome
+
 - [ ] Shared `packages/ui` for React family (shadcn or chosen system) — **not** in L0 golden
 - [ ] Login / dashboard routes when auth ≠ none
 - [ ] Optional CI workflow templates for generated repos (`check`, optional smoke)
@@ -323,18 +358,18 @@ Introduce `packages/template-generator` + `.hbs` when combinations explode (expe
 
 ## Tracking notes
 
-| BTS concept | ETS stance |
-|-------------|------------|
-| `backend` hono/express/… | Separate Server + Effect; L6b shell only |
-| `api` trpc/orpc | HttpApi only |
-| `auth` better-auth/clerk/none | Full L3 surface; Golden Sample stays `none` |
-| `bts.jsonc` | `ets.jsonc` |
-| Convex / self | Non-goals |
-| Biome / oxlint addons | Prefer **`effect-style`** (default on); mutual exclusion |
-| Analytics default-on | ETS telemetry **opt-in** |
-| Template string snapshots | Forbidden; use generated-build probes |
-| `packages/api` | Use `protocol` + `client` instead |
-| i18n / realtime examples | Non-goals unless explicitly reopened |
-| Scaffold `migrate` | Non-goal; `add` only |
+| BTS concept                   | ETS stance                                               |
+| ----------------------------- | -------------------------------------------------------- |
+| `backend` hono/express/…      | Separate Server + Effect; L6b shell only                 |
+| `api` trpc/orpc               | HttpApi only                                             |
+| `auth` better-auth/clerk/none | Full L3 surface; Golden Sample stays `none`              |
+| `bts.jsonc`                   | `ets.jsonc`                                              |
+| Convex / self                 | Non-goals                                                |
+| Biome / oxlint addons         | Prefer **`effect-style`** (default on); mutual exclusion |
+| Analytics default-on          | ETS telemetry **opt-in**                                 |
+| Template string snapshots     | Forbidden; use generated-build probes                    |
+| `packages/api`                | Use `protocol` + `client` instead                        |
+| i18n / realtime examples      | Non-goals unless explicitly reopened                     |
+| Scaffold `migrate`            | Non-goal; `add` only                                     |
 
 See also: [ADR-0001](./adr/0001-effect-core-and-capability-tiers.md) · [ADR-0002](./adr/0002-dependency-currency.md) · [ADR-0003](./adr/0003-effect-style-addon.md) · [ADR-0004](./adr/0004-scaffold-defaults-and-invariants.md) · [ADR-0005](./adr/0005-l0-exit-and-fingerprint-hygiene.md)

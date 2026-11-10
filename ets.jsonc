@@ -11,8 +11,52 @@
   "orm": "drizzle",
   "auth": "none",
   "frontend": "tanstack-router",
-  "addons": ["turborepo", "skills", "repos", "language-service", "mcp"],
+  "addons": ["turborepo", "skills", "repos", "language-service", "mcp", "effect-style"],
   "addonOptions": {
+    // Effect-aligned format + lint gate (optional in Option Matrix; on by default here).
+    // Mirrors repos/effect: dprint (ASI, double quotes, no trailing commas, width 120)
+    // + oxlint + @effect/oxc rules. Mutually exclusive with biome / ultracite / plain-oxlint-only.
+    // Note: @effect/oxc is not on npm yet. Golden Sample loads the JS plugin from
+    // repos/effect/packages/tools/oxc (requires `repos` addon). Do not `extends` configs
+    // under repos/effect — oxlint would pick up that tree's .oxlintrc. Scope lint to
+    // `apps packages`. App code may use public `effect` barrels (checkPatterns empty).
+    // Reproduce:
+    //   bun add -D dprint@^0.64.3 oxlint@^1.93.0 @oxlint/plugins@^1.93.0 lefthook@^2.0.1
+    //   # write dprint.json, .oxlintrc.json, lefthook.yml
+    //   bunx lefthook install
+    //   bun run lint-fix && bun run check
+    "effect-style": {
+      "formatter": "dprint",
+      "dprint": {
+        "version": "^0.64.3",
+        "config": "dprint.json",
+        "alignWith": "repos/effect/dprint.json"
+      },
+      "linter": "oxlint",
+      "oxlint": {
+        "version": "^1.93.0",
+        "config": ".oxlintrc.json",
+        "paths": ["apps", "packages"],
+        "alignWith": "repos/effect/packages/tools/oxc/oxlintrc.json"
+      },
+      "effectOxc": {
+        "package": "@effect/oxc",
+        "published": false,
+        "jsPlugin": "./repos/effect/packages/tools/oxc/src/oxlint/index.ts",
+        "requiresAddon": "repos",
+        "runtimeDep": "@oxlint/plugins@^1.93.0",
+        "note": "Load plugin from vendored Effect source until @effect/oxc is published. Relative index barrels stay banned; package-name barrel bans are off for app code."
+      },
+      "conflictsWith": ["biome", "ultracite", "oxlint-only", "husky"],
+      "scripts": ["lint", "lint-fix"],
+      "checkIncludesLint": true,
+      "preCommit": {
+        "tool": "lefthook",
+        "config": "lefthook.yml",
+        "note": "Replaces husky + lint-staged; staged oxlint --fix + dprint fmt with stage_fixed. Mutually exclusive with husky."
+      },
+      "prepare": "effect-language-service patch && lefthook install"
+    },
     // Agent-friendly: Effect-TS/skills + companion wiring from effect-ts skill.
     // Reproduce:
     //   npx skills add Effect-TS/skills --skill effect-ts --skill effect-v3-to-v4 -y
