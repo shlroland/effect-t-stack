@@ -5,6 +5,7 @@
     "": {
       "name": "effect-t-stack",
       "devDependencies": {
+        "effect": "^4.1.2",
         "turbo": "^2.5.4",
         "typescript": "^5.9.2",
       },

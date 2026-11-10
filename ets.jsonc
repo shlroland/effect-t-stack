@@ -1,6 +1,7 @@
 {
   // effect-t-stack project fingerprint (Phase 1a golden base)
   // Agents and future `create-effect-t-stack add` use this to recognize the stack.
+  // Every golden-base setup step should be reflected here (addons + addonOptions).
   "version": 1,
   "name": "effect-t-stack",
   "effect": "v4",
@@ -10,7 +11,27 @@
   "orm": "drizzle",
   "auth": "none",
   "frontend": "tanstack-router",
-  "addons": ["turborepo"],
+  "addons": ["turborepo", "skills"],
+  "addonOptions": {
+    // Agent-friendly: Effect-TS/skills + companion wiring from effect-ts skill.
+    // Reproduce:
+    //   npx skills add Effect-TS/skills --skill effect-ts --skill effect-v3-to-v4 -y
+    //   bun add -D effect@^4.1.2   # root: node_modules/effect/{AGENTS.md,src}
+    //   ensure AGENTS.md contains "# Learning more about Effect"
+    "skills": {
+      "scope": "project",
+      "dir": ".agents/skills",
+      "lockfile": "skills-lock.json",
+      "selections": [
+        {
+          "source": "Effect-TS/skills",
+          "skills": ["effect-ts", "effect-v3-to-v4"]
+        }
+      ],
+      "rootEffectDevDependency": true,
+      "agentsMdLearningSection": true
+    }
+  },
   "examples": ["todo"],
   "packageManager": "bun"
 }

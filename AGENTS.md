@@ -2,9 +2,21 @@
 
 本仓库是 **effect-t-stack Phase 1a 金样基础模板**（非 CLI）。Agent 与人类协作者扩展功能时，必须遵守下列边界。
 
+# Learning more about Effect
+
+This repository uses the Effect Typescript library.
+
+Before writing any Effect code, first read `node_modules/effect/AGENTS.md`
+**completely**, and follow the links in the file when required.
+
+If you need to learn more about particular Effect apis and concepts that the
+guide doesn't cover, search through the source code in `node_modules/effect/src`.
+
 ## 栈指纹
 
-见根目录 `ets.jsonc`：Effect **v4** · Bun · HttpApi · SQLite + Drizzle · auth **none** · frontend **TanStack Router** · turborepo。
+见根目录 `ets.jsonc`（金样构建步骤 / 选型真相源）：Effect **v4** · Bun · HttpApi · SQLite + Drizzle · auth **none** · frontend **TanStack Router** · addons `turborepo` + `skills`（`Effect-TS/skills`）。
+
+新增金样能力时，先改可跑代码，再同步写入 `ets.jsonc` 的 `addons` / `addonOptions`。
 
 ## 包边界
 
