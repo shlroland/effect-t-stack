@@ -33,9 +33,21 @@ git subtree pull --prefix=repos/effect https://github.com/Effect-TS/effect.git m
 
 ## 栈指纹
 
-见根目录 `ets.jsonc`（金样构建步骤 / 选型真相源）：Effect **v4** · Bun · HttpApi · SQLite + Drizzle · auth **none** · frontend **TanStack Router** · addons `turborepo` + `skills`（`Effect-TS/skills`）+ `repos`（`repos/effect` subtree）。
+见根目录 `ets.jsonc`（金样构建步骤 / 选型真相源）：Effect **v4** · Bun · HttpApi · SQLite + Drizzle · auth **none** · frontend **TanStack Router** · addons `turborepo` + `skills`（`Effect-TS/skills`）+ `repos`（`repos/effect` subtree）+ `language-service`（`@effect/language-service` on TypeScript 5.x）。
 
 新增金样能力时，先改可跑代码，再同步写入 `ets.jsonc` 的 `addons` / `addonOptions`。
+
+## Effect language service
+
+This project uses `@effect/language-service` on **TypeScript 5.x** for Effect-specific static diagnostics and quick fixes. The golden base intentionally stays off TypeScript 7 / `@effect/tsgo` by default, because not every app/tooling chain supports TS 7 yet. Prefer upgrading a generated app to `@effect/tsgo` only when that app’s whole stack is ready for TS 7.
+
+After writing or changing Effect code, prefer this agent loop:
+
+1. Edit application code (never under `repos/`)
+2. Run machine-readable diagnostics, e.g. `bun run effect:diagnostics:server`
+3. Fix reported Effect issues (missing `yield*`, floating Effects, missing context/error, anti-patterns), then re-run
+
+Do not disable the plugin or skip these diagnostics to “make CI green” unless explicitly asked. Always use the local `effect-language-service` binary from this repo’s `node_modules`.
 
 ## 包边界
 
@@ -73,9 +85,11 @@ git subtree pull --prefix=repos/effect https://github.com/Effect-TS/effect.git m
 
 ```sh
 bun install
-bun run check          # check-types + tests
-bun run dev:server     # API :3737 ，docs :3737/docs
-bun run dev:web        # Vite :5173
+bun run check                     # check-types + tests
+bun run effect:diagnostics:server # Effect LSP diagnostics as JSON
+bun run effect:diagnostics:web
+bun run dev:server                # API :3737 ，docs :3737/docs
+bun run dev:web                   # Vite :5173
 ```
 
 ## 运行时

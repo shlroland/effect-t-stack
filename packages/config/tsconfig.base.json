@@ -1,5 +1,5 @@
 {
-  "$schema": "https://json.schemastore.org/tsconfig",
+  "$schema": "../../node_modules/@effect/language-service/schema.json",
   "compilerOptions": {
     "lib": ["ESNext"],
     "target": "ESNext",
@@ -18,6 +18,16 @@
     "noUnusedLocals": true,
     "noUnusedParameters": false,
     "isolatedModules": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "plugins": [
+      {
+        "name": "@effect/language-service",
+        // HttpApi / platform APIs are still marked unstable in Effect v4;
+        // keep the signal for agents/editors, but do not fail `tsc`.
+        "diagnosticSeverity": {
+          "unstableApiUsage": "suggestion"
+        }
+      }
+    ]
   }
 }

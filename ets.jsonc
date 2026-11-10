@@ -11,7 +11,7 @@
   "orm": "drizzle",
   "auth": "none",
   "frontend": "tanstack-router",
-  "addons": ["turborepo", "skills", "repos"],
+  "addons": ["turborepo", "skills", "repos", "language-service"],
   "addonOptions": {
     // Agent-friendly: Effect-TS/skills + companion wiring from effect-ts skill.
     // Reproduce:
@@ -50,6 +50,47 @@
           "readFirst": ["repos/effect/LLMS.md"]
         }
       ]
+    },
+    // Effect diagnostics LSP + CLI for editor and agent fix loops.
+    // Default stays on TypeScript 5.x + @effect/language-service so the golden
+    // base remains compatible with ecosystems that do not yet support TS 7.
+    // For TS 7+ projects, swap to @effect/tsgo (same plugin name) instead.
+    // See: https://github.com/Effect-TS/language-service
+    //      https://github.com/Effect-TS/tsgo
+    // Reproduce:
+    //   bun add -D @effect/language-service@0.87.5 typescript@^5.9.2
+    //   # plugin in packages/config/tsconfig.base.json
+    //   # prepare: effect-language-service patch
+    // Agent loop:
+    //   bun run effect:diagnostics:server
+    // Note: always invoke the local binary from node_modules/.bin
+    // (or `bunx --bun effect-language-service` after install). Do not use a bare
+    // unscoped `npx/bunx effect-language-service` without the package installed.
+    "language-service": {
+      "package": "@effect/language-service",
+      "version": "0.87.5",
+      "typescript": "^5.9.2",
+      "typescriptMajor": 5,
+      "plugin": "@effect/language-service",
+      "tsconfig": "packages/config/tsconfig.base.json",
+      "prepare": "effect-language-service patch",
+      "vscodeUseTsgo": false,
+      "diagnosticSeverity": {
+        "unstableApiUsage": "suggestion"
+      },
+      "cli": {
+        "diagnostics": "effect-language-service diagnostics --format json",
+        "scripts": [
+          "effect:diagnostics",
+          "effect:diagnostics:server",
+          "effect:diagnostics:web"
+        ]
+      },
+      "optionalTs7": {
+        "package": "@effect/tsgo",
+        "typescript": "7.0.2",
+        "note": "Use only when the whole app stack supports TypeScript 7."
+      }
     }
   },
   "examples": ["todo"],

@@ -37,8 +37,7 @@ describe("Todos HTTP API", () => {
       const after = yield* client.todos.list({})
       expect(after.some((t) => t.id === created.id)).toBe(false)
     }).pipe(
-      Effect.provide(TodosHandlersLive),
-      Effect.provide(BunHttpServer.layerTest),
+      Effect.provide(Layer.mergeAll(TodosHandlersLive, BunHttpServer.layerTest)),
       Effect.scoped,
       Effect.runPromise
     )
