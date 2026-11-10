@@ -11,7 +11,7 @@
   "orm": "drizzle",
   "auth": "none",
   "frontend": "tanstack-router",
-  "addons": ["turborepo", "skills", "repos", "language-service"],
+  "addons": ["turborepo", "skills", "repos", "language-service", "mcp"],
   "addonOptions": {
     // Agent-friendly: Effect-TS/skills + companion wiring from effect-ts skill.
     // Reproduce:
@@ -90,6 +90,41 @@
         "package": "@effect/tsgo",
         "typescript": "7.0.2",
         "note": "Use only when the whole app stack supports TypeScript 7."
+      }
+    },
+    // Coding-agent Effect docs MCP (tim-smart/effect-mcp).
+    // Complements repos/effect (source truth) + skills + language-service:
+    // searchable official docs via effect_docs_search / get_effect_doc.
+    // Distinct from Scaffold Product L5 "Local MCP" (create/plan surfaces).
+    // Reproduce:
+    //   write .cursor/mcp.json with the effect-docs server below
+    //   # optional Claude Code (user scope):
+    //   claude mcp add-json effect-docs '{"command":"npx","args":["-y","effect-mcp@latest"],"env":{}}' -s user
+    // Optional: set effectSolutions.enabled true for kitlangton/effect-solutions CLI
+    // (secondary patterns only — never overrides repos/effect + AGENTS.md).
+    "mcp": {
+      "cursorMcpJson": ".cursor/mcp.json",
+      "servers": {
+        "effect-docs": {
+          "package": "effect-mcp",
+          "source": "https://github.com/tim-smart/effect-mcp",
+          "command": "npx",
+          "args": ["-y", "effect-mcp@latest"],
+          "tools": ["effect_docs_search", "get_effect_doc"]
+        }
+      },
+      "effectSolutions": {
+        "enabled": false,
+        "package": "effect-solutions",
+        "source": "https://github.com/kitlangton/effect-solutions",
+        "site": "https://www.effect.solutions",
+        "authority": "secondary",
+        "cli": "bunx effect-solutions@latest",
+        "commands": {
+          "list": "bunx effect-solutions@latest list",
+          "show": "bunx effect-solutions@latest show <topic>"
+        },
+        "note": "Opinionated field manual. Enable only when you want scenario patterns via CLI; on conflict prefer repos/effect/LLMS.md and this repo's AGENTS.md (ETS layering, Drizzle, etc.)."
       }
     }
   },

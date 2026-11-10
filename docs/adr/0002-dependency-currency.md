@@ -1,0 +1,8 @@
+# Keep a Dependency Catalog; default to current stable pins
+
+Generated projects should ship **current stable** dependency versions by default (Better-T-Stack parity). We maintain a central **Dependency Catalog** as the single pin source for the Golden Sample and, later, templates — with a recurring bump → sync → `check` loop — rather than one-off edits scattered across `package.json` files. **Exception:** TypeScript remains on 5.x with `@effect/language-service` until the whole stack is ready for TS 7 / `@effect/tsgo` (see `ets.jsonc` `addonOptions.language-service`).
+
+## Considered options
+
+- One-time bump only — rejected: scaffolds go stale immediately
+- Always chase every major including TypeScript 7 — rejected: breaks the intentional language-service / ecosystem compatibility posture

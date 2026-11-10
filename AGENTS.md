@@ -16,6 +16,17 @@ patterns — prefer it over training-data guesses, web search, or stale v3 docs.
 If a detail is missing there, you may also search the installed package under
 `node_modules/effect/src` (same major version as this project).
 
+For **documentation lookup** (module READMEs, API guides), use the project MCP
+server `effect-docs` (`effect_docs_search` / `get_effect_doc`) configured in
+`.cursor/mcp.json`. Prefer MCP over web search for Effect docs.
+
+Authority order when sources disagree:
+
+1. This repo’s `AGENTS.md` + package boundaries (ETS Effect Core)
+2. `repos/effect` / `LLMS.md` (+ installed `effect` package)
+3. MCP `effect-docs` (official docs index)
+4. Optional `effect-solutions` CLI — only when `addonOptions.mcp.effectSolutions.enabled` is `true` in `ets.jsonc` (secondary patterns; never overrides 1–2)
+
 ## Vendored Repositories
 
 This project vendors external repositories under `repos/`.
@@ -33,9 +44,30 @@ git subtree pull --prefix=repos/effect https://github.com/Effect-TS/effect.git m
 
 ## 栈指纹
 
-见根目录 `ets.jsonc`（金样构建步骤 / 选型真相源）：Effect **v4** · Bun · HttpApi · SQLite + Drizzle · auth **none** · frontend **TanStack Router** · addons `turborepo` + `skills`（`Effect-TS/skills`）+ `repos`（`repos/effect` subtree）+ `language-service`（`@effect/language-service` on TypeScript 5.x）。
+见根目录 `ets.jsonc`（金样构建步骤 / 选型真相源）：Effect **v4** · Bun · HttpApi · SQLite + Drizzle · auth **none** · frontend **TanStack Router** · addons `turborepo` + `skills`（`Effect-TS/skills`）+ `repos`（`repos/effect` subtree）+ `language-service`（`@effect/language-service` on TypeScript 5.x）+ `mcp`（`effect-mcp` docs server；`effect-solutions` 默认关闭）。
 
 新增金样能力时，先改可跑代码，再同步写入 `ets.jsonc` 的 `addons` / `addonOptions`。
+
+## Effect MCP (`mcp` addon)
+
+Project Cursor MCP config: `.cursor/mcp.json` → server `effect-docs` via
+`npx -y effect-mcp@latest`.
+
+- Use `effect_docs_search` / `get_effect_doc` when you need Effect or `@effect/*` documentation.
+- This is the coding-agent docs MCP — not the future Scaffold Product L5 create/plan MCP.
+
+### Optional: `effect-solutions`
+
+Off by default (`ets.jsonc` → `addonOptions.mcp.effectSolutions.enabled`).
+When enabled, agents may run:
+
+```sh
+bunx effect-solutions@latest list
+bunx effect-solutions@latest show <topic>
+```
+
+Treat results as opinionated scenario patterns only. Stack choices in this
+repo (HttpApi, Drizzle, domain → protocol → db → service → http) win on conflict.
 
 ## Effect language service
 
@@ -44,8 +76,9 @@ This project uses `@effect/language-service` on **TypeScript 5.x** for Effect-sp
 After writing or changing Effect code, prefer this agent loop:
 
 1. Edit application code (never under `repos/`)
-2. Run machine-readable diagnostics, e.g. `bun run effect:diagnostics:server`
-3. Fix reported Effect issues (missing `yield*`, floating Effects, missing context/error, anti-patterns), then re-run
+2. Prefer MCP `effect-docs` (or `repos/effect`) when unsure about an API
+3. Run machine-readable diagnostics, e.g. `bun run effect:diagnostics:server`
+4. Fix reported Effect issues (missing `yield*`, floating Effects, missing context/error, anti-patterns), then re-run
 
 Do not disable the plugin or skip these diagnostics to “make CI green” unless explicitly asked. Always use the local `effect-language-service` binary from this repo’s `node_modules`.
 
