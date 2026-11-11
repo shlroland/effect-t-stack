@@ -15,15 +15,15 @@
     "test": "bun test"
   },
   "dependencies": {
-    "@effect/platform-bun": "^4.1.2",
+    "@effect/platform-bun": "catalog:",
     "@ets/config": "workspace:*",
     "@ets/db": "workspace:*",
     "@ets/domain": "workspace:*",
     "@ets/protocol": "workspace:*",
-    "effect": "^4.1.2"
+    "effect": "catalog:"
   },
   "devDependencies": {
-    "@types/bun": "latest",
-    "typescript": "^5.9.2"
+    "@types/bun": "catalog:",
+    "typescript": "catalog:"
   }
 }

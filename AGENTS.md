@@ -46,7 +46,16 @@ git subtree pull --prefix=repos/effect https://github.com/Effect-TS/effect.git m
 
 见根目录 `ets.jsonc`（金样构建步骤 / 选型真相源）：Effect **v4** · Bun · HttpApi · SQLite + **Drizzle 1.0 RC**（默认：`drizzle-orm/effect-sqlite-bun` + `@effect/sql-sqlite-bun`；第二选项：Effect SQL via `@ets/db/effect-sql`）· auth **none** · frontend **TanStack Start** · backend **self**（HttpApi 由 Start 同源托管；独立 `apps/server` BunHttpServer 为第二选项）· env `@ets/config`（`ServerEnv` / `loadServerEnv`）· addons `turborepo` + `skills`（`Effect-TS/skills`）+ `repos`（`repos/effect` subtree）+ `language-service`（`@effect/language-service` on TypeScript 5.x）+ `mcp`（`effect-mcp` docs server；`effect-solutions` 默认关闭）+ `effect-style`（`dprint` + `oxlint`/`@effect/oxc`，金样默认开）。
 
-新增金样能力时，先改可跑代码，再同步写入 `ets.jsonc` 的 `addons` / `addonOptions`。
+新增金样能力时，先改可跑代码，再同步写入 `ets.jsonc` 的 `addons` / `addonOptions`。指纹字段分类见 `docs/fingerprint.md`；共享版本钉在根 `package.json` `workspaces.catalog`（`docs/DEPENDENCY-CATALOG.md`）。
+
+## Effect Core invariants
+
+- **Package set** — always `domain | protocol | db | client | config`（不是 BTS `packages/api`）。`apps/server` 持 Services / HTTP / Rpc / Layers；`apps/web` 为 UI + Start mount。
+- **HTTP 错误映射** — domain 用 `Schema.TaggedError`（可带 `httpApiStatus`）；Service 只抛 domain / 已映射的 `DatabaseError`；`apps/server/src/http/Errors.ts` 只把 infra（`DatabaseError`、decode 等）映到 HTTP。
+- **Import / TS layout** — 应用代码 import 带 `.ts` 扩展名；包 `exports` 指向 `./src/*.ts`；`packages/config/tsconfig.base.json` 用 Effect Preserve 风格（`module: Preserve`、`moduleResolution: bundler`、`verbatimModuleSyntax`）。
+- **测试模式** — Todo 为参考：Repository / Service / HttpApiTest；prod 组装用 `makeAppLive`（见 `apps/server/src/layers.integration.test.ts`）；内存 SQLite 或 temp 文件。
+- **`prepare`** — 由 `language-service` + `effect-style` 拥有：`effect-language-service patch && lefthook install`。
+- **Web UI** — 金样自定义 CSS 即可；**shadcn / `packages/ui` 延到 L4**。
 
 ## Effect style (`effect-style` addon)
 
@@ -54,7 +63,7 @@ Golden Sample enables **`effect-style`** by default (optional in the future Opti
 
 - Format with **`dprint`** (ASI, double quotes, no trailing commas, lineWidth 120 — aligned with `repos/effect/dprint.json`)
 - Lint with **`oxlint`** + **`@effect/oxc`** rules (config: `.oxlintrc.json`)
-- `bun run check` includes `lint`; pre-commit via **Lefthook** (`lefthook.yml`: staged `dprint fmt` + `oxlint --fix`)
+- `bun run check` includes `lint`; pre-commit via **Lefthook** (`lefthook.yml`: staged `dprint fmt` + `oxlint --fix`); CI via `.github/workflows/check.yml`
 - Naming / modules / API conventions follow `repos/effect` + `LLMS.md` (PascalCase modules, `Context.Service`, `Schema.TaggedError`, `Effect.fn`, `.ts` import extensions, …)
 - **Named exports only** — do not use `export default` / default imports in application code. Prefer `export const X` / `export { X }` and matching named imports. Exceptions only when a tool or framework contract requires a default export (enforced by oxlint `import/no-default-export`), currently:
   - Effect SQL file migrations (`packages/db/effect-sql-migrations/**`) — `SqliteMigrator.fromFileSystem` loads the default export
@@ -135,7 +144,7 @@ Do not disable the plugin or skip these diagnostics to “make CI green” unles
 4. `apps/server/src/services`：Service + `layerNoDeps`
 5. `apps/server/src/http`：`HttpApiBuilder.group` handlers + 错误映射（Rpc 则写 `src/rpc`）
 6. `apps/server/src/layers.ts`：接入 Layer
-7. 测试：Repository / Service / HttpApiTest
+7. 测试：Repository / Service / HttpApiTest（可选：`makeAppLive` 集成）
 8. 可选：`apps/web` 用 `@ets/client/http-api` 或 `@ets/client/rpc`
 
 ## 命令

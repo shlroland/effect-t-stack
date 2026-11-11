@@ -12,7 +12,7 @@ Formal todos for对标 Better-T-Stack. Implement **strictly L1 → L6**; do not 
 
 ## L0 — Golden Sample
 
-> **L0 is not exit-complete.** `bun run check` passing means runnable, not “ready to freeze as the canonical template.” Do **not** start L1 Scaffold Product until **L0 exit criteria** below are met (or explicitly waived in an ADR).
+> **L0 exit gates are implemented; maintainer sign-off is still open.** Do **not** start L1 Scaffold Product until the sign-off checkbox below is ticked (or explicitly waived in an ADR). Known issues: [`docs/L0-KNOWN-ISSUES.md`](./L0-KNOWN-ISSUES.md).
 
 ### Baseline present (necessary but not sufficient)
 
@@ -55,36 +55,36 @@ From review vs `AGENTS.md` / `repos/effect` / `LLMS.md` (2026-11-10). Clear or A
 **P3 — polish (may waive)**
 
 - [x] Optional: Health/Ready DTOs live in protocol vs domain; http module naming closer to Effect fixtures (`System/http.ts`, `Todos/http.ts`, `SystemApi`)
-- [ ] Optional: client/web smoke tests; one integration test with `makeAppLive`
+- [x] Optional: client/web smoke tests; one integration test with `makeAppLive`
 - [x] Apply **`effect-style`** once implemented; Dependency Catalog + bump (see below)
 
-- [ ] Freeze short **L0 known-issues** (or empty) at exit sign-off
+- [x] Freeze short **L0 known-issues** (or empty) at exit sign-off — [`docs/L0-KNOWN-ISSUES.md`](./L0-KNOWN-ISSUES.md)
 
 ### L0 exit criteria (gate for L1)
 
-- [ ] Quality debt items above resolved or waived via ADR
+- [x] Quality debt items above resolved or waived via ADR
 - [x] `effect-style` enabled in Golden Sample and `check` includes lint
-- [ ] Dependency Catalog in place; intentional lags documented
-- [ ] `ets.jsonc` reviewed for v1 → tidy shape (no stale comments/options)
-- [ ] AGENTS.md invariants match actual code
+- [x] Dependency Catalog in place; intentional lags documented — [`docs/DEPENDENCY-CATALOG.md`](./DEPENDENCY-CATALOG.md)
+- [x] `ets.jsonc` reviewed for v1 → tidy shape (no stale comments/options)
+- [x] AGENTS.md invariants match actual code
 - [ ] Explicit maintainer sign-off: “Golden Sample may be copied by CLI”
 
 ### Effect Core invariants (document + keep true in Golden Sample / templates)
 
-- [ ] Codify in `AGENTS.md` / future project-structure docs: always `domain | protocol | db | client | config` (not BTS `packages/api`)
-- [ ] HTTP error-mapping invariant: domain `Schema.TaggedError` (+ `httpApiStatus`); Service yields domain errors; `http/Errors.ts` maps only infra (e.g. `DatabaseError`, decode)
-- [ ] Import / TS layout: `.ts` extensions in imports; package `exports` pointing at `./src/*.ts`; align with Effect Preserve-style module settings where applicable
-- [ ] Test pattern checklist: `test/layers.ts`, in-memory SQLite, Repository / Service / HttpApiTest layers (Todo as reference)
-- [ ] Post-install: `prepare` + `effect-language-service patch` owned by `language-service` addon
-- [ ] L0 web UI stance: custom CSS OK; **shadcn / `packages/ui` deferred to L4** (not required in Golden Sample)
+- [x] Codify in `AGENTS.md` / future project-structure docs: always `domain | protocol | db | client | config` (not BTS `packages/api`)
+- [x] HTTP error-mapping invariant: domain `Schema.TaggedError` (+ `httpApiStatus`); Service yields domain errors; `http/Errors.ts` maps only infra (e.g. `DatabaseError`, decode)
+- [x] Import / TS layout: `.ts` extensions in imports; package `exports` pointing at `./src/*.ts`; align with Effect Preserve-style module settings where applicable
+- [x] Test pattern checklist: `test/layers.ts`, in-memory SQLite, Repository / Service / HttpApiTest layers (Todo as reference)
+- [x] Post-install: `prepare` + `effect-language-service patch` owned by `language-service` addon
+- [x] L0 web UI stance: custom CSS OK; **shadcn / `packages/ui` deferred to L4** (not required in Golden Sample)
 - [x] `engines` / minimum runtime fields on golden root `package.json`
 
 ### Dependency currency (ongoing — 对标 BTS “latest dependencies”)
 
-- [ ] One-time bump of Golden Sample deps to current stable (Vite/TanStack/turbo/react/effect/drizzle/…); **TypeScript stays on 5.x** + `@effect/language-service` until an ADR opts into TS 7 / `@effect/tsgo`
-- [ ] Central **Dependency Catalog** (single source of version pins for Golden Sample and later templates — BTS-style `dependencyVersionMap`)
-- [ ] Document which packages may lag on purpose (today: TypeScript major, anything with peer-range locks)
-- [ ] Recurring upgrade loop: bump catalog → sync Golden Sample (and templates when they exist) → `bun run check` (+ later generated-build tests)
+- [x] One-time bump of Golden Sample deps to current stable (Vite/TanStack/turbo/react/effect/drizzle/…); **TypeScript stays on 5.x** + `@effect/language-service` until an ADR opts into TS 7 / `@effect/tsgo`
+- [x] Central **Dependency Catalog** (single source of version pins for Golden Sample and later templates — Bun `workspaces.catalog`)
+- [x] Document which packages may lag on purpose (today: TypeScript major, anything with peer-range locks)
+- [x] Recurring upgrade loop: bump catalog → sync Golden Sample (and templates when they exist) → `bun run check` (+ later generated-build tests) — documented in DEPENDENCY-CATALOG.md
 - [ ] Optional CI: outdated check / Dependabot-or-Renovate scoped to the catalog
 - [ ] When L3 extracts `.hbs`, templates consume the catalog — never hand-pin versions in scattered template files
 
@@ -99,7 +99,7 @@ Fingerprint: listed under `addons` + detailed under `addonOptions.effect-style` 
   - [x] `oxlint` + `@effect/oxc` Effect rules via vendored `repos/effect/.../oxc` JS plugin (not on npm yet; requires `repos` addon)
   - [x] Wire `lint` / `lint-fix` scripts; include lint in `bun run check` when addon is enabled
   - [x] Pre-commit via **Lefthook** (`lefthook.yml`: staged `dprint fmt` + `oxlint --fix`; not husky/lint-staged)
-  - [ ] CI workflow gate when addon is enabled (no `.github` workflows yet)
+  - [x] CI workflow gate when addon is enabled (`.github/workflows/check.yml`)
   - [x] `AGENTS.md`: naming/modules/API conventions follow `repos/effect` + `LLMS.md` (PascalCase modules, `Context.Service`, `Schema.TaggedError`, `Effect.fn`, readonly options, `.ts` imports, …)
 - [x] Golden Sample: **`effect-style` in `addons` by default** with `addonOptions` documenting versions/scripts/reproduce steps
 - [ ] CLI Option Matrix: `effect-style` is **optional** (`create` / `add` can omit it); default prompt/`--yes` follows Golden Sample (enabled)
@@ -112,13 +112,13 @@ See [ADR-0003](./adr/0003-effect-style-addon.md).
 
 `ets.jsonc` will grow with every addon/stage. Treat it as a **versioned, periodically compacted** contract — not an append-only junk drawer.
 
-- [ ] Document field classes: **stack dims** (runtime/api/db/…) · **addons[]** · **addonOptions** · **meta** (`version`, `createdAt`, `reproducibleCommand`, `cliVersion`)
-- [ ] **Schema bumps:** raising `ets.jsonc.version` requires a short migration note in `docs/adr/` or `docs/fingerprint/`; CLI `add`/`create` must understand N and N-1 (or refuse with upgrade message)
-- [ ] **Per-tier compact:** at each Capability Tier exit (especially L0→L1, L2 fingerprint work, L3 matrix), prune obsolete `addonOptions`, collapse comments into docs links, dedupe reproduce steps
-- [ ] **Single write path:** only CLI/`add` (and documented manual golden edits) mutate fingerprint; agents must not invent ad-hoc top-level keys
-- [ ] **Options budget:** prefer `addonOptions.<addon>` nested objects over new root keys; root stays the Option Matrix
-- [ ] **Golden vs generated:** golden may omit `createdAt`/`reproducibleCommand`; generated apps must include them once CLI exists
-- [ ] Keep a human “how to read `ets.jsonc`” page (L2/L5); comments in-file stay short
+- [x] Document field classes: **stack dims** (runtime/api/db/…) · **addons[]** · **addonOptions** · **meta** (`version`, `createdAt`, `reproducibleCommand`, `cliVersion`) — [`docs/fingerprint.md`](./fingerprint.md)
+- [x] **Schema bumps:** raising `ets.jsonc.version` requires a short migration note in `docs/adr/` or `docs/fingerprint/`; CLI `add`/`create` must understand N and N-1 (or refuse with upgrade message)
+- [x] **Per-tier compact:** at each Capability Tier exit (especially L0→L1, L2 fingerprint work, L3 matrix), prune obsolete `addonOptions`, collapse comments into docs links, dedupe reproduce steps — L0 compact done
+- [x] **Single write path:** only CLI/`add` (and documented manual golden edits) mutate fingerprint; agents must not invent ad-hoc top-level keys
+- [x] **Options budget:** prefer `addonOptions.<addon>` nested objects over new root keys; root stays the Option Matrix
+- [x] **Golden vs generated:** golden may omit `createdAt`/`reproducibleCommand`; generated apps must include them once CLI exists
+- [x] Keep a human “how to read `ets.jsonc`” page (L2/L5); comments in-file stay short — baseline at [`docs/fingerprint.md`](./fingerprint.md); richer UX deferred
 
 See [ADR-0005](./adr/0005-l0-exit-and-fingerprint-hygiene.md).
 

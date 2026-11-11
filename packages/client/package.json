@@ -9,13 +9,15 @@
     "./rpc": "./src/rpc/index.ts"
   },
   "scripts": {
-    "check-types": "tsc --noEmit -p tsconfig.json"
+    "check-types": "tsc --noEmit -p tsconfig.json",
+    "test": "bun test"
   },
   "dependencies": {
     "@ets/protocol": "workspace:*",
-    "effect": "^4.1.2"
+    "effect": "catalog:"
   },
   "devDependencies": {
-    "typescript": "^5.9.2"
+    "@types/bun": "catalog:",
+    "typescript": "catalog:"
   }
 }

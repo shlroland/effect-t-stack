@@ -1,14 +1,13 @@
 {
-  // effect-t-stack project fingerprint (Phase 1a golden base)
-  // Agents and future `create-effect-t-stack add` use this to recognize the stack.
-  // Every golden-base setup step should be reflected here (addons + addonOptions).
+  // Fingerprint (v1). Field classes: stack dims · addons[] · addonOptions · meta.
+  // See docs/fingerprint.md and docs/adr/0005-l0-exit-and-fingerprint-hygiene.md.
+  // Pins: root package.json workspaces.catalog → docs/DEPENDENCY-CATALOG.md
   "version": 1,
   "name": "effect-t-stack",
   "effect": "v4",
   "runtime": "bun",
   "api": "httpapi",
-  // Primary: Effect HttpApi under `/api` (OpenAPI + Scalar docs).
-  // Secondary: Effect Rpc under `/rpc` (HTTP + NDJSON; see `@ets/protocol/rpc`).
+  // Primary HttpApi `/api`; secondary Effect Rpc `/rpc` (NDJSON).
   "apiOptions": {
     "prefix": "/api",
     "import": "@ets/protocol/http-api",
@@ -23,37 +22,31 @@
       "group": "AppRpcs",
       "import": "@ets/protocol/rpc",
       "client": "@ets/client/rpc",
-      "note": "Same Todos/System services; separate protocol/client/server folders from HttpApi."
+      "note": "Same Services; separate protocol/client/server folders from HttpApi."
     }
   },
   "database": "sqlite",
-  // Default ORM: Drizzle 1.0 RC (`drizzle-orm/effect-sqlite-bun` + `@effect/sql-sqlite-bun`).
-  // Secondary option: Effect SQL (`@ets/db/effect-sql`, SqlClient + SqliteMigrator + SqlSchema).
-  // Reproduce (@ets/db):
-  //   bun add drizzle-orm@1.0.0-rc.5 @effect/sql-sqlite-bun@^4.1.3 effect@^4.1.3
-  //   bun add -D drizzle-kit@1.0.0-rc.5
-  //   # secondary also needs: @effect/platform-bun (FileSystem/Path for fromFileSystem migrator)
+  // Default: Drizzle 1.0 RC + effect-sqlite-bun. Secondary: @ets/db/effect-sql.
   "orm": "drizzle",
   "ormOptions": {
     "package": "drizzle-orm",
-    "version": "1.0.0-rc.5",
-    "kit": "drizzle-kit@1.0.0-rc.5",
+    "version": "catalog:",
+    "kit": "drizzle-kit",
     "effectDriver": "drizzle-orm/effect-sqlite-bun",
     "sqlClient": "@effect/sql-sqlite-bun",
+    "catalog": "docs/DEPENDENCY-CATALOG.md",
     "secondary": {
       "orm": "effect-sql",
       "package": "@effect/sql-sqlite-bun",
-      "version": "^4.1.3",
       "modules": ["SqlClient", "SqlSchema", "SqliteMigrator"],
       "import": "@ets/db/effect-sql",
       "migrations": "packages/db/effect-sql-migrations",
-      "note": "Swap Database/Migrations/TodosRepository layers; shared TodosRepository service tag."
+      "note": "Swap Database/Migrations/TodosRepository layers; shared service tag."
     }
   },
   "auth": "none",
   "frontend": "tanstack-start",
-  // Primary: TanStack Start mounts separate HttpApi + Rpc web handlers (`apps/web/src/server.ts`).
-  // Secondary: standalone Bun server template (`apps/server` + BunHttpServer on :3737).
+  // Primary: Start mounts HttpApi+Rpc. Secondary: apps/server BunHttpServer :3737.
   "backend": "self",
   "backendOptions": {
     "mount": "apps/web/src/server.ts",
@@ -66,17 +59,10 @@
       "app": "apps/server",
       "runtime": "bun",
       "port": 3737,
-      "note": "Same Services; merges HttpApiRoutes + RpcRoutes in main.ts. Set VITE_API_URL=http://localhost:3737."
+      "note": "Set VITE_API_URL=http://localhost:3737 for standalone server."
     }
   },
-  // Shared Effect Schema/Config env in `@ets/config` (also hosts tsconfig.base.json).
-  // Runtime: AppConfig Layer via serverEnvConfig + makeServerEnvProvider
-  //   (process env > optional .env via fromDotEnvContents > Config.withDefault).
-  // Tooling: loadServerEnv() (e.g. packages/db/drizzle.config.ts → apps/server/.env).
-  // Primary Start loads `apps/web/.env`; secondary Bun server loads `apps/server/.env`.
-  // Reproduce:
-  //   bun add effect@^4.1.3
-  //   # packages/config/src/ServerEnv.ts — Schema + Config + sync loader
+  // @ets/config ServerEnv / loadServerEnv. See packages/config/src/ServerEnv.ts.
   "env": {
     "package": "@ets/config",
     "module": "ServerEnv",
@@ -88,32 +74,19 @@
     },
     "webEnvFile": "apps/web/.env",
     "serverEnvFile": "apps/server/.env",
-    "note": "HttpApi Layers live in @ets/server; @ets/config owns Schema/Config/loadServerEnv only."
+    "note": "HttpApi Layers in @ets/server; @ets/config owns Schema/Config only."
   },
   "addons": ["turborepo", "skills", "repos", "language-service", "mcp", "effect-style"],
   "addonOptions": {
-    // Effect-aligned format + lint gate (optional in Option Matrix; on by default here).
-    // Mirrors repos/effect: dprint (ASI, double quotes, no trailing commas, width 120)
-    // + oxlint + @effect/oxc rules. Mutually exclusive with biome / ultracite / plain-oxlint-only.
-    // Note: @effect/oxc is not on npm yet. Golden Sample loads the JS plugin from
-    // repos/effect/packages/tools/oxc (requires `repos` addon). Do not `extends` configs
-    // under repos/effect — oxlint would pick up that tree's .oxlintrc. Scope lint to
-    // `apps packages`. App code may use public `effect` barrels (checkPatterns empty).
-    // Reproduce:
-    //   bun add -D dprint@^0.64.3 oxlint@^1.93.0 @oxlint/plugins@^1.93.0 lefthook@^2.0.1
-    //   # write dprint.json, .oxlintrc.json, lefthook.yml
-    //   bunx lefthook install
-    //   bun run lint-fix && bun run check
+    // ADR-0003. Versions from workspaces.catalog. Optional in future Option Matrix.
     "effect-style": {
       "formatter": "dprint",
       "dprint": {
-        "version": "^0.64.3",
         "config": "dprint.json",
         "alignWith": "repos/effect/dprint.json"
       },
       "linter": "oxlint",
       "oxlint": {
-        "version": "^1.93.0",
         "config": ".oxlintrc.json",
         "paths": ["apps", "packages"],
         "alignWith": "repos/effect/packages/tools/oxc/oxlintrc.json"
@@ -123,24 +96,22 @@
         "published": false,
         "jsPlugin": "./repos/effect/packages/tools/oxc/src/oxlint/index.ts",
         "requiresAddon": "repos",
-        "runtimeDep": "@oxlint/plugins@^1.93.0",
-        "note": "Load plugin from vendored Effect source until @effect/oxc is published. Relative index barrels stay banned; package-name barrel bans are off for app code."
+        "note": "Vendored until @effect/oxc publishes."
       },
       "conflictsWith": ["biome", "ultracite", "oxlint-only", "husky"],
       "scripts": ["lint", "lint-fix"],
       "checkIncludesLint": true,
       "preCommit": {
         "tool": "lefthook",
-        "config": "lefthook.yml",
-        "note": "Replaces husky + lint-staged; staged oxlint --fix + dprint fmt with stage_fixed. Mutually exclusive with husky."
+        "config": "lefthook.yml"
       },
-      "prepare": "effect-language-service patch && lefthook install"
+      "ci": {
+        "workflow": ".github/workflows/check.yml",
+        "command": "bun run check"
+      },
+      "prepare": "effect-language-service patch && lefthook install",
+      "catalog": "docs/DEPENDENCY-CATALOG.md"
     },
-    // Agent-friendly: Effect-TS/skills + companion wiring from effect-ts skill.
-    // Reproduce:
-    //   npx skills add Effect-TS/skills --skill effect-ts --skill effect-v3-to-v4 -y
-    //   bun add -D effect@^4.1.2   # root: node_modules/effect/{AGENTS.md,src}
-    //   ensure AGENTS.md contains "# Learning more about Effect"
     "skills": {
       "scope": "project",
       "dir": ".agents/skills",
@@ -154,12 +125,6 @@
       "rootEffectDevDependency": true,
       "agentsMdLearningSection": true
     },
-    // Vendor Effect source via git subtree so agents read real APIs/patterns.
-    // See: https://effect.website/blog/the-one-weird-git-trick-that-makes-coding-agents-more-effect-ive
-    // Reproduce:
-    //   git subtree add --prefix=repos/effect https://github.com/Effect-TS/effect.git main --squash
-    // Update:
-    //   git subtree pull --prefix=repos/effect https://github.com/Effect-TS/effect.git main --squash
     "repos": {
       "dir": "repos",
       "editorExclude": true,
@@ -174,25 +139,9 @@
         }
       ]
     },
-    // Effect diagnostics LSP + CLI for editor and agent fix loops.
-    // Default stays on TypeScript 5.x + @effect/language-service so the golden
-    // base remains compatible with ecosystems that do not yet support TS 7.
-    // For TS 7+ projects, swap to @effect/tsgo (same plugin name) instead.
-    // See: https://github.com/Effect-TS/language-service
-    //      https://github.com/Effect-TS/tsgo
-    // Reproduce:
-    //   bun add -D @effect/language-service@0.87.5 typescript@^5.9.2
-    //   # plugin in packages/config/tsconfig.base.json
-    //   # prepare: effect-language-service patch
-    // Agent loop:
-    //   bun run effect:diagnostics:server
-    // Note: always invoke the local binary from node_modules/.bin
-    // (or `bunx --bun effect-language-service` after install). Do not use a bare
-    // unscoped `npx/bunx effect-language-service` without the package installed.
+    // TS 5.x + language-service (intentional lag; see DEPENDENCY-CATALOG.md).
     "language-service": {
       "package": "@effect/language-service",
-      "version": "0.87.5",
-      "typescript": "^5.9.2",
       "typescriptMajor": 5,
       "plugin": "@effect/language-service",
       "tsconfig": "packages/config/tsconfig.base.json",
@@ -211,20 +160,11 @@
       },
       "optionalTs7": {
         "package": "@effect/tsgo",
-        "typescript": "7.0.2",
-        "note": "Use only when the whole app stack supports TypeScript 7."
-      }
+        "note": "Only when the whole app stack supports TypeScript 7."
+      },
+      "catalog": "docs/DEPENDENCY-CATALOG.md"
     },
-    // Coding-agent Effect docs MCP (tim-smart/effect-mcp).
-    // Complements repos/effect (source truth) + skills + language-service:
-    // searchable official docs via effect_docs_search / get_effect_doc.
-    // Distinct from Scaffold Product L5 "Local MCP" (create/plan surfaces).
-    // Reproduce:
-    //   write .cursor/mcp.json with the effect-docs server below
-    //   # optional Claude Code (user scope):
-    //   claude mcp add-json effect-docs '{"command":"npx","args":["-y","effect-mcp@latest"],"env":{}}' -s user
-    // Optional: set effectSolutions.enabled true for kitlangton/effect-solutions CLI
-    // (secondary patterns only — never overrides repos/effect + AGENTS.md).
+    // Coding-agent docs MCP (not Scaffold L5 create/plan MCP).
     "mcp": {
       "cursorMcpJson": ".cursor/mcp.json",
       "servers": {
@@ -239,15 +179,9 @@
       "effectSolutions": {
         "enabled": false,
         "package": "effect-solutions",
-        "source": "https://github.com/kitlangton/effect-solutions",
-        "site": "https://www.effect.solutions",
         "authority": "secondary",
         "cli": "bunx effect-solutions@latest",
-        "commands": {
-          "list": "bunx effect-solutions@latest list",
-          "show": "bunx effect-solutions@latest show <topic>"
-        },
-        "note": "Opinionated field manual. Enable only when you want scenario patterns via CLI; on conflict prefer repos/effect/LLMS.md and this repo's AGENTS.md (ETS layering, Drizzle, etc.)."
+        "note": "Enable for scenario patterns only; AGENTS.md + repos/effect win on conflict."
       }
     }
   },
