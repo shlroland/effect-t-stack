@@ -1,4 +1,4 @@
-import { HealthResponse, ReadyResponse, TodoTitle } from "@ets/domain"
+import { TodoTitle } from "@ets/domain"
 import { AppRpcs } from "@ets/protocol/rpc"
 import { describe, expect, it } from "bun:test"
 import { Effect, Layer } from "effect"
@@ -10,8 +10,8 @@ import { AppRpcHandlers } from "./AppRpcHandlers.ts"
 const SystemTest = Layer.succeed(
   System,
   System.of({
-    health: () => Effect.succeed(new HealthResponse({ status: "ok" })),
-    ready: () => Effect.succeed(new ReadyResponse({ status: "ready" }))
+    health: () => Effect.void,
+    ready: () => Effect.void
   })
 )
 

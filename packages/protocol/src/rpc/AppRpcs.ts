@@ -1,6 +1,7 @@
-import { HealthResponse, ReadyResponse, Todo, TodoId, TodoNotFound, TodoTitle } from "@ets/domain"
+import { Todo, TodoId, TodoNotFound, TodoTitle } from "@ets/domain"
 import { Schema } from "effect"
 import { Rpc, RpcGroup } from "effect/rpc"
+import { HealthResponse, ReadyResponse } from "../Health.ts"
 
 /**
  * Mount path for Effect Rpc (HTTP + NDJSON).

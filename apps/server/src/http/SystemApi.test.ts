@@ -1,25 +1,24 @@
 import { BunHttpServer } from "@effect/platform-bun"
 import { DatabaseError } from "@ets/db"
-import { HealthResponse, ReadyResponse } from "@ets/domain"
-import { Api } from "@ets/protocol"
+import { Api } from "@ets/protocol/http-api"
 import { describe, expect, it } from "bun:test"
 import { Effect, Layer } from "effect"
 import { HttpApiError, HttpApiTest } from "effect/http-api"
 import { System } from "../services/System.ts"
-import { SystemApiHandlers } from "./SystemHttp.ts"
+import { SystemApiHandlers } from "./System/http.ts"
 
 const SystemOkLive = Layer.succeed(
   System,
   System.of({
-    health: () => Effect.succeed(new HealthResponse({ status: "ok" })),
-    ready: () => Effect.succeed(new ReadyResponse({ status: "ready" }))
+    health: () => Effect.void,
+    ready: () => Effect.void
   })
 )
 
 const SystemUnavailableLive = Layer.succeed(
   System,
   System.of({
-    health: () => Effect.succeed(new HealthResponse({ status: "ok" })),
+    health: () => Effect.void,
     ready: () =>
       Effect.fail(
         new DatabaseError({ operation: "database.ping", cause: "unavailable" })

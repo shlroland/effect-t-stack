@@ -54,7 +54,7 @@ From review vs `AGENTS.md` / `repos/effect` / `LLMS.md` (2026-11-10). Clear or A
 
 **P3 — polish (may waive)**
 
-- [ ] Optional: Health/Ready DTOs live in protocol vs domain; http module naming closer to Effect fixtures
+- [x] Optional: Health/Ready DTOs live in protocol vs domain; http module naming closer to Effect fixtures (`System/http.ts`, `Todos/http.ts`, `SystemApi`)
 - [ ] Optional: client/web smoke tests; one integration test with `makeAppLive`
 - [x] Apply **`effect-style`** once implemented; Dependency Catalog + bump (see below)
 

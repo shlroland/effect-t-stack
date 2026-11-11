@@ -7,7 +7,7 @@ import { Effect, Layer } from "effect"
 import { HttpApiError, HttpApiTest } from "effect/http-api"
 import { Todos } from "../services/Todos.ts"
 import { TodosTestLive } from "../test/layers.ts"
-import { TodosApiHandlers } from "./TodosHttp.ts"
+import { TodosApiHandlers } from "./Todos/http.ts"
 
 const TodosHandlersLive = TodosApiHandlers.pipe(Layer.provide(TodosTestLive))
 

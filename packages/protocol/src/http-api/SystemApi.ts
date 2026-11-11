@@ -1,7 +1,11 @@
-import { HealthResponse, ReadyResponse } from "@ets/domain"
 import { HttpApiEndpoint, HttpApiError, HttpApiGroup } from "effect/http-api"
+import { HealthResponse, ReadyResponse } from "../Health.ts"
 
-export class SystemApiGroup extends HttpApiGroup.make("system", { topLevel: true })
+/**
+ * Top-level system group (mirrors Effect HttpApi fixtures naming: `SystemApi`).
+ * Derived client exposes `client.health()` / `client.ready()`.
+ */
+export class SystemApi extends HttpApiGroup.make("system", { topLevel: true })
   .add(
     HttpApiEndpoint.get("health", "/health", {
       success: HealthResponse

@@ -1,4 +1,5 @@
 import type { DatabaseError, TodoDecodeError } from "@ets/db"
+import { HealthResponse, ReadyResponse } from "@ets/protocol"
 import { AppRpcs } from "@ets/protocol/rpc"
 import { Effect } from "effect"
 import { System } from "../services/System.ts"
@@ -23,8 +24,15 @@ export const AppRpcHandlers = AppRpcs.toLayer(
     const system = yield* System
 
     return {
-      Health: () => system.health(),
-      Ready: () => system.ready().pipe(Effect.catchTag("DatabaseError", (error) => Effect.die(error))),
+      Health: () =>
+        system.health().pipe(
+          Effect.as(new HealthResponse({ status: "ok" }))
+        ),
+      Ready: () =>
+        system.ready().pipe(
+          Effect.as(new ReadyResponse({ status: "ready" })),
+          Effect.catchTag("DatabaseError", (error) => Effect.die(error))
+        ),
       ListTodos: () => todos.all().pipe(dieUnexpected),
       CreateTodo: ({ title }) => todos.create(title).pipe(dieUnexpected),
       GetTodo: ({ id }) => todos.findById(id).pipe(dieUnexpected),

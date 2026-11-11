@@ -1,0 +1,32 @@
+import { HealthResponse, ReadyResponse } from "@ets/protocol"
+import { Api } from "@ets/protocol/http-api"
+import { Effect } from "effect"
+import { HttpApiBuilder } from "effect/http-api"
+import { System } from "../../services/System.ts"
+import { mapReadinessError } from "../Errors.ts"
+
+/**
+ * HttpApi handlers for the `system` group.
+ * Layout mirrors Effect ai-docs fixtures: `server/<Resource>/http.ts`.
+ */
+export const SystemApiHandlers = HttpApiBuilder.group(
+  Api,
+  "system",
+  Effect.fn("SystemApi")(function*(handlers) {
+    const system = yield* System
+
+    return handlers.handleAll({
+      health: Effect.fn("SystemApi.health")(function*() {
+        yield* system.health()
+        return new HealthResponse({ status: "ok" })
+      }),
+      ready: Effect.fn("SystemApi.ready")(function*() {
+        return yield* mapReadinessError(
+          system.ready().pipe(
+            Effect.as(new ReadyResponse({ status: "ready" }))
+          )
+        )
+      })
+    })
+  })
+)
