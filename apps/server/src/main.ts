@@ -1,15 +1,16 @@
 /**
- * Secondary standalone Bun HttpApi server template.
- * Primary golden path embeds the same Layers via TanStack Start (`apps/web/src/server.ts`).
+ * Secondary standalone Bun server template.
+ * Primary golden path embeds HttpApi + Rpc via TanStack Start (`apps/web/src/server.ts`).
  */
 import { BunHttpServer, BunRuntime } from "@effect/platform-bun"
 import { Effect, Layer } from "effect"
 import { HttpMiddleware, HttpRouter } from "effect/http"
 import { AppConfig } from "./config/AppConfig.ts"
-import { AllRoutes } from "./http/HttpApp.ts"
+import { HttpApiRoutes } from "./http/HttpApp.ts"
 import { AppLive } from "./layers.ts"
+import { RpcRoutes } from "./rpc/RpcApp.ts"
 
-const RoutesLive = AllRoutes.pipe(Layer.provide(AppLive))
+const RoutesLive = Layer.mergeAll(HttpApiRoutes, RpcRoutes).pipe(Layer.provide(AppLive))
 
 const ServerLive = Layer.unwrap(
   Effect.gen(function*() {

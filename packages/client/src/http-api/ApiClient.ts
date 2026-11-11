@@ -1,4 +1,4 @@
-import { Api } from "@ets/protocol"
+import { Api } from "@ets/protocol/http-api"
 import { Context, Layer } from "effect"
 import { FetchHttpClient, HttpClient, HttpClientRequest } from "effect/http"
 import { HttpApiClient } from "effect/http-api"
@@ -6,7 +6,7 @@ import { HttpApiClient } from "effect/http-api"
 export class ApiClient extends Context.Service<
   ApiClient,
   HttpApiClient.ForApi<typeof Api>
->()("@ets/client/ApiClient") {
+>()("@ets/client/http-api/ApiClient") {
   static readonly layer = (baseUrl: string) =>
     Layer.effect(
       ApiClient,

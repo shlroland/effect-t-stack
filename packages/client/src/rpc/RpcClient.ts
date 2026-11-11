@@ -1,4 +1,4 @@
-import { AppRpcs, RpcPrefix } from "@ets/protocol"
+import { AppRpcs, RpcPrefix } from "@ets/protocol/rpc"
 import { Context, Layer } from "effect"
 import { FetchHttpClient } from "effect/http"
 import { RpcClient, type RpcClientError, type RpcGroup, RpcSerialization } from "effect/rpc"
@@ -6,7 +6,7 @@ import { RpcClient, type RpcClientError, type RpcGroup, RpcSerialization } from 
 export class AppRpcClient extends Context.Service<
   AppRpcClient,
   RpcClient.RpcClient<RpcGroup.Rpcs<typeof AppRpcs>, RpcClientError.RpcClientError>
->()("@ets/client/AppRpcClient") {
+>()("@ets/client/rpc/AppRpcClient") {
   /**
    * HTTP + NDJSON client for {@link AppRpcs}.
    * @param baseUrl Origin only (e.g. `http://localhost:5173`); `/rpc` is appended.

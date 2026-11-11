@@ -10,6 +10,7 @@
     "check-types": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
+    "@ets/config": "workspace:*",
     "@ets/client": "workspace:*",
     "@ets/domain": "workspace:*",
     "@ets/protocol": "workspace:*",

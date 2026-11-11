@@ -8,9 +8,11 @@
   "runtime": "bun",
   "api": "httpapi",
   // Primary: Effect HttpApi under `/api` (OpenAPI + Scalar docs).
-  // Secondary: Effect Rpc under `/rpc` (HTTP + NDJSON; see `AppRpcs` in `@ets/protocol`).
+  // Secondary: Effect Rpc under `/rpc` (HTTP + NDJSON; see `@ets/protocol/rpc`).
   "apiOptions": {
     "prefix": "/api",
+    "import": "@ets/protocol/http-api",
+    "client": "@ets/client/http-api",
     "modules": ["HttpApi", "HttpApiBuilder", "HttpApiClient"],
     "secondary": {
       "api": "rpc",
@@ -19,9 +21,9 @@
       "serialization": "ndjson",
       "protocol": "http",
       "group": "AppRpcs",
-      "import": "@ets/protocol",
-      "client": "@ets/client/AppRpcClient",
-      "note": "Same Todos/System services; mount via RpcServer.layerHttp beside HttpApi."
+      "import": "@ets/protocol/rpc",
+      "client": "@ets/client/rpc",
+      "note": "Same Todos/System services; separate protocol/client/server folders from HttpApi."
     }
   },
   "database": "sqlite",
@@ -50,20 +52,21 @@
   },
   "auth": "none",
   "frontend": "tanstack-start",
-  // Primary: HttpApi embedded in TanStack Start (`apps/web/src/server.ts` → createApiWebHandler).
-  // All HttpApi traffic is under `/api` (see `ApiPrefix` in `@ets/protocol`).
+  // Primary: TanStack Start mounts separate HttpApi + Rpc web handlers (`apps/web/src/server.ts`).
   // Secondary: standalone Bun server template (`apps/server` + BunHttpServer on :3737).
   "backend": "self",
   "backendOptions": {
     "mount": "apps/web/src/server.ts",
     "apiPrefix": "/api",
-    "webHandler": "@ets/server/createApiWebHandler",
+    "httpApiWebHandler": "@ets/server/createHttpApiWebHandler",
+    "rpcWebHandler": "@ets/server/createRpcWebHandler",
+    "rpcPrefix": "/rpc",
     "secondary": {
       "backend": "httpapi-server",
       "app": "apps/server",
       "runtime": "bun",
       "port": 3737,
-      "note": "Same Services/HttpApi Layers under /api; run `bun run dev:server` and set VITE_API_URL=http://localhost:3737."
+      "note": "Same Services; merges HttpApiRoutes + RpcRoutes in main.ts. Set VITE_API_URL=http://localhost:3737."
     }
   },
   // Shared Effect Schema/Config env in `@ets/config` (also hosts tsconfig.base.json).

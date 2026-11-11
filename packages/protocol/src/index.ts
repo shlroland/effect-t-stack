@@ -1,4 +1,2 @@
-export * from "./Api.ts"
-export * from "./Rpc.ts"
-export * from "./SystemApi.ts"
-export * from "./TodosApi.ts"
+export * from "./http-api/index.ts"
+export * from "./rpc/index.ts"

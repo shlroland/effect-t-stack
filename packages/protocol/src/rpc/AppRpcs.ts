@@ -3,8 +3,8 @@ import { Schema } from "effect"
 import { Rpc, RpcGroup } from "effect/rpc"
 
 /**
- * Mount path for Effect Rpc (HTTP protocol).
- * Distinct from {@link ApiPrefix} (`/api`), which is HttpApi.
+ * Mount path for Effect Rpc (HTTP + NDJSON).
+ * Distinct from HttpApi {@link ApiPrefix} (`/api`).
  */
 export const RpcPrefix = "/rpc" as const
 

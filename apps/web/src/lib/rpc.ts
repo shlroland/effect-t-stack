@@ -1,4 +1,4 @@
-import { AppRpcClient } from "@ets/client"
+import { AppRpcClient } from "@ets/client/rpc"
 import { TodoId, TodoTitle } from "@ets/domain"
 import { Effect, ManagedRuntime } from "effect"
 

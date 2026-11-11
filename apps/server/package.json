@@ -4,7 +4,9 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./http-api": "./src/http/createHttpApiWebHandler.ts",
+    "./rpc": "./src/rpc/createRpcWebHandler.ts"
   },
   "scripts": {
     "dev": "bun --hot src/main.ts",

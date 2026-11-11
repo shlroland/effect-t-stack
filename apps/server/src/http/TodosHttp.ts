@@ -1,4 +1,4 @@
-import { Api } from "@ets/protocol"
+import { Api } from "@ets/protocol/http-api"
 import { Effect } from "effect"
 import { HttpApiBuilder } from "effect/http-api"
 import { Todos } from "../services/Todos.ts"

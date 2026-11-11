@@ -1,4 +1,4 @@
-import { ApiClient } from "@ets/client"
+import { ApiClient } from "@ets/client/http-api"
 import { type TodoId, TodoTitle } from "@ets/domain"
 import { Effect, ManagedRuntime } from "effect"
 

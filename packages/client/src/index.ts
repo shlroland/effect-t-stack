@@ -1,2 +1,2 @@
-export { ApiClient } from "./ApiClient.ts"
-export { AppRpcClient } from "./RpcClient.ts"
+export { ApiClient } from "./http-api/index.ts"
+export { AppRpcClient } from "./rpc/index.ts"

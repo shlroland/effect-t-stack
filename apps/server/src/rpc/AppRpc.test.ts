@@ -1,5 +1,5 @@
 import { HealthResponse, ReadyResponse, TodoTitle } from "@ets/domain"
-import { AppRpcs } from "@ets/protocol"
+import { AppRpcs } from "@ets/protocol/rpc"
 import { describe, expect, it } from "bun:test"
 import { Effect, Layer } from "effect"
 import { RpcTest } from "effect/rpc"

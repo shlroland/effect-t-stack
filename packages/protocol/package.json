@@ -5,7 +5,8 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./*": "./src/*.ts"
+    "./http-api": "./src/http-api/index.ts",
+    "./rpc": "./src/rpc/index.ts"
   },
   "scripts": {
     "check-types": "tsc --noEmit -p tsconfig.json"

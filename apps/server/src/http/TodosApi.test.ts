@@ -1,7 +1,7 @@
 import { BunHttpServer } from "@effect/platform-bun"
 import { DatabaseError, TodoDecodeError } from "@ets/db"
 import { TodoId, TodoNotFound, TodoTitle } from "@ets/domain"
-import { Api } from "@ets/protocol"
+import { Api } from "@ets/protocol/http-api"
 import { describe, expect, it } from "bun:test"
 import { Effect, Layer } from "effect"
 import { HttpApiError, HttpApiTest } from "effect/http-api"

@@ -107,13 +107,13 @@ Do not disable the plugin or skip these diagnostics to “make CI green” unles
 | --------------------------- | ------------------------------------------------------------------------------------------- | --------------------------------------------- |
 | `packages/domain`           | Schema、branded types、domain tagged errors                                                 | IO、HTTP、Drizzle、Layer 组装                 |
 | `packages/config`           | 共享 `tsconfig.base.json` + Effect Schema/Config env（`ServerEnv` / `loadServerEnv`）       | HTTP、DB、业务规则、prod Layer 组装           |
-| `packages/protocol`         | HttpApi 契约（`/api`）+ Effect `RpcGroup`（`AppRpcs` → `/rpc`）                             | 业务规则、SQL、具体 handler                   |
+| `packages/protocol`         | 契约分目录：`http-api/`（`/api`）+ `rpc/`（`AppRpcs` → `/rpc`）                             | 业务规则、SQL、具体 handler                   |
 | `packages/db`               | Drizzle migrations / Repository（默认；`schema` 包内私有）；`@ets/db/effect-sql` 为第二选项 | HTTP 映射、业务规则                           |
-| `packages/client`           | `HttpApiClient` + `AppRpcClient`                                                            | 服务端 Layer                                  |
-| `apps/server`               | Services / HttpApi+Rpc handlers / Layers（`@ets/server`）；可作独立 Bun 模板                | 前端 UI                                       |
+| `packages/client`           | 分入口：`@ets/client/http-api`（`ApiClient`）+ `@ets/client/rpc`（`AppRpcClient`）           | 服务端 Layer                                  |
+| `apps/server`               | Services / handlers / Layers（`@ets/server`）；可作独立 Bun 模板                            | 前端 UI                                       |
 | `apps/server/src/services`  | 业务规则（Service）                                                                         | SQL 行解码、HTTP 状态码细节                   |
-| `apps/server/src/http`      | HttpApi handlers、HTTP 错误映射                                                             | 业务规则、SQL                                 |
-| `apps/server/src/rpc`       | Effect Rpc handlers（`AppRpcHandlers`）                                                     | 业务规则、SQL                                 |
+| `apps/server/src/http`      | HttpApi handlers、`createHttpApiWebHandler`、HTTP 错误映射                                  | 业务规则、SQL、Rpc                            |
+| `apps/server/src/rpc`       | Effect Rpc handlers、`createRpcWebHandler`                                                  | 业务规则、SQL、HttpApi                        |
 | `apps/server/src/layers.ts` | prod / test Layer 组装                                                                      | 新业务逻辑                                    |
 | `apps/web`                  | TanStack Start UI + 同源挂载 `/api`+`/rpc`（`src/server.ts`）                               | 在页面里直接碰 DB / 绕过 `@ets/server` Layers |
 
@@ -124,19 +124,19 @@ Do not disable the plugin or skip these diagnostics to “make CI green” unles
 3. **HTTP 契约在 `protocol`** — 前后端共享同一 `Api`；不要在 web 里手写平行 DTO。
 4. **HTTP 错误映射在 server 边界** — `DatabaseError` / `TodoDecodeError` → `InternalServerError` 等只在 `apps/server/src/http`。`DatabaseError` 由 Repository / ping 把 Drizzle query 错误 / `SqlError` 等 infra 错误映射而来；不要在 handler 里直接依赖驱动错误标签。
 5. **运行时组装只在 Layers** — 入口与测试各自提供 prod / test Layer，勿在 handler 里 `new` 依赖。
-6. **默认 backend = self** — 金样用 TanStack Start `src/server.ts` 把 `createApiWebHandler()` 挂到同源；独立 `apps/server`（BunHttpServer :3737）是第二选项，需设 `VITE_API_URL`。
-7. **API 双轨** — 主路径 **HttpApi**（`/api`，OpenAPI/docs）；第二选项 **Effect Rpc**（`/rpc`，`AppRpcs` + NDJSON）。两者共用 Todos/System Services，勿把 `/rpc` 误当成 HttpApi 前缀。
+6. **默认 backend = self** — 金样用 TanStack Start `src/server.ts` 分别挂载 `createHttpApiWebHandler`（`/api`）与 `createRpcWebHandler`（`/rpc`）；独立 `apps/server`（BunHttpServer :3737）是第二选项，需设 `VITE_API_URL`。
+7. **API 双轨** — 主路径 **HttpApi**（`/api`，OpenAPI/docs）；第二选项 **Effect Rpc**（`/rpc`，`AppRpcs` + NDJSON）。契约 / handler / client 分目录；Start 上共享同一 `appLive` + `memoMap`，勿把两套 mount 混进一个 factory。
 
 ## 新增资源清单（以 Todo 为模板）
 
 1. `packages/domain`：Schema + tagged error（可带 `httpApiStatus`）
-2. `packages/protocol`：`HttpApiGroup` + 挂到 `Api`
+2. `packages/protocol/http-api`：`HttpApiGroup` + 挂到 `Api`（Rpc 则写 `protocol/rpc`）
 3. `packages/db`：表 / migration + Repository（行解码留在这里）
 4. `apps/server/src/services`：Service + `layerNoDeps`
-5. `apps/server/src/http`：`HttpApiBuilder.group` handlers + 错误映射
+5. `apps/server/src/http`：`HttpApiBuilder.group` handlers + 错误映射（Rpc 则写 `src/rpc`）
 6. `apps/server/src/layers.ts`：接入 Layer
 7. 测试：Repository / Service / HttpApiTest
-8. 可选：`apps/web` 页面调用 `@ets/client`
+8. 可选：`apps/web` 用 `@ets/client/http-api` 或 `@ets/client/rpc`
 
 ## 命令
 

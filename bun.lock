@@ -36,6 +36,7 @@
       "version": "0.0.0",
       "dependencies": {
         "@ets/client": "workspace:*",
+        "@ets/config": "workspace:*",
         "@ets/domain": "workspace:*",
         "@ets/protocol": "workspace:*",
         "@ets/server": "workspace:*",

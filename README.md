@@ -36,9 +36,9 @@ bun run dev:server
 apps/web        TanStack Start（UI + 同源挂载 `/api` HttpApi + `/rpc` Effect Rpc）
 apps/server     Services/Layers；HttpApi + Rpc handlers；亦可作独立 Bun 模板
 packages/domain Schema / branded types / domain errors
-packages/protocol HttpApi 契约（`/api`）+ Effect Rpc 契约（`AppRpcs` → `/rpc`）
+packages/protocol `http-api/`（`/api`）+ `rpc/`（`AppRpcs` → `/rpc`）
 packages/db     Drizzle schema / migrations / repositories（可选 `@ets/db/effect-sql`）
-packages/client HttpApiClient + AppRpcClient
+packages/client `@ets/client/http-api` + `@ets/client/rpc`
 packages/config 共享 tsconfig + ServerEnv
 ```
 
@@ -54,7 +54,7 @@ curl -X POST http://localhost:5173/api/todos \
 curl http://localhost:5173/api/todos
 ```
 
-Effect Rpc 走 `/rpc`（NDJSON），可用 `@ets/client` 的 `AppRpcClient` 或 `apps/web/src/lib/rpc.ts`。
+Effect Rpc 走 `/rpc`（NDJSON），用 `@ets/client/rpc`（`AppRpcClient`）或 `apps/web/src/lib/rpc.ts`；HttpApi 用 `@ets/client/http-api`。
 
 ## 许可
 

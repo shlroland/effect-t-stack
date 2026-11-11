@@ -1,5 +1,5 @@
 import type { DatabaseError, TodoDecodeError } from "@ets/db"
-import { AppRpcs } from "@ets/protocol"
+import { AppRpcs } from "@ets/protocol/rpc"
 import { Effect } from "effect"
 import { System } from "../services/System.ts"
 import { Todos } from "../services/Todos.ts"
