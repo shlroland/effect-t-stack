@@ -109,7 +109,7 @@ Do not disable the plugin or skip these diagnostics to “make CI green” unles
 | `packages/config`           | 共享 `tsconfig.base.json` + Effect Schema/Config env（`ServerEnv` / `loadServerEnv`）       | HTTP、DB、业务规则、prod Layer 组装           |
 | `packages/protocol`         | 契约分目录：`http-api/`（`/api`）+ `rpc/`（`AppRpcs` → `/rpc`）                             | 业务规则、SQL、具体 handler                   |
 | `packages/db`               | Drizzle migrations / Repository（默认；`schema` 包内私有）；`@ets/db/effect-sql` 为第二选项 | HTTP 映射、业务规则                           |
-| `packages/client`           | 分入口：`@ets/client/http-api`（`ApiClient`）+ `@ets/client/rpc`（`AppRpcClient`）           | 服务端 Layer                                  |
+| `packages/client`           | 分入口：`@ets/client/http-api`（`ApiClient`）+ `@ets/client/rpc`（`AppRpcClient`）          | 服务端 Layer                                  |
 | `apps/server`               | Services / handlers / Layers（`@ets/server`）；可作独立 Bun 模板                            | 前端 UI                                       |
 | `apps/server/src/services`  | 业务规则（Service）                                                                         | SQL 行解码、HTTP 状态码细节                   |
 | `apps/server/src/http`      | HttpApi handlers、`createHttpApiWebHandler`、HTTP 错误映射                                  | 业务规则、SQL、Rpc                            |
