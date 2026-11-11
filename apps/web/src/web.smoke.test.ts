@@ -1,12 +1,13 @@
 import { describe, expect, it } from "bun:test"
-import { api } from "./lib/api.ts"
+import { dehydrateTodosListPromise } from "./atoms/dehydrateTodos.ts"
+import { createTodoAtom, removeTodoAtom, todosListAtom, updateTodoAtom } from "./atoms/todos.ts"
 
 describe("web smoke", () => {
-  it("exposes api helpers used by the home loader", () => {
-    expect(typeof api.listTodos).toBe("function")
-    expect(typeof api.ready).toBe("function")
-    expect(typeof api.createTodo).toBe("function")
-    expect(typeof api.updateTodo).toBe("function")
-    expect(typeof api.removeTodo).toBe("function")
+  it("exposes Atom todos surface used by the home route", () => {
+    expect(todosListAtom).toBeDefined()
+    expect(createTodoAtom).toBeDefined()
+    expect(updateTodoAtom).toBeDefined()
+    expect(removeTodoAtom).toBeDefined()
+    expect(typeof dehydrateTodosListPromise).toBe("function")
   })
 })
