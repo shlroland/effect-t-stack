@@ -50,4 +50,29 @@ describe("Todos service", () => {
     )
     expect(error).toBeInstanceOf(TodoNotFound)
   })
+
+  it("returns the existing todo for an empty update patch", async () => {
+    const result = await run(
+      Effect.gen(function*() {
+        const service = yield* Todos
+        const created = yield* service.create(TodoTitle.make("unchanged"))
+        const updated = yield* service.update(created.id, {})
+        return { created, updated }
+      })
+    )
+
+    expect(result.updated.id).toBe(result.created.id)
+    expect(String(result.updated.title)).toBe("unchanged")
+    expect(result.updated.completed).toBe(false)
+  })
+
+  it("fails empty update when the todo is missing", async () => {
+    const error = await run(
+      Effect.gen(function*() {
+        const service = yield* Todos
+        return yield* service.update(TodoId.make(99), {}).pipe(Effect.flip)
+      })
+    )
+    expect(error).toBeInstanceOf(TodoNotFound)
+  })
 })

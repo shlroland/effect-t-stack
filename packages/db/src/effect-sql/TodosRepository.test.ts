@@ -1,4 +1,4 @@
-import { TodoTitle } from "@ets/domain"
+import { TodoId, TodoTitle } from "@ets/domain"
 import { describe, expect, it } from "bun:test"
 import { Effect, Layer } from "effect"
 import { TodosRepository } from "../TodosRepository.ts"
@@ -37,5 +37,40 @@ describe("TodosRepository (effect-sql)", () => {
     expect(result.updated?.completed).toBe(true)
     expect(result.removed).toBe(true)
     expect(result.after).toBeUndefined()
+  })
+
+  it("returns undefined / false for missing rows", async () => {
+    const result = await Effect.gen(function*() {
+      const repo = yield* TodosRepository
+      const missingId = TodoId.make(99)
+      const found = yield* repo.findById(missingId)
+      const updated = yield* repo.update(missingId, { completed: true })
+      const removed = yield* repo.remove(missingId)
+      return { found, updated, removed }
+    }).pipe(
+      Effect.provide(TestLive),
+      Effect.scoped,
+      Effect.runPromise
+    )
+
+    expect(result.found).toBeUndefined()
+    expect(result.updated).toBeUndefined()
+    expect(result.removed).toBe(false)
+  })
+
+  it("does not apply empty-patch business rule (Service owns that)", async () => {
+    const result = await Effect.gen(function*() {
+      const repo = yield* TodosRepository
+      const created = yield* repo.create(TodoTitle.make("empty patch"))
+      const updated = yield* repo.update(created.id, {})
+      return { created, updated }
+    }).pipe(
+      Effect.provide(TestLive),
+      Effect.scoped,
+      Effect.runPromise
+    )
+
+    expect(result.updated).toBeUndefined()
+    expect(result.created.id).toBeDefined()
   })
 })

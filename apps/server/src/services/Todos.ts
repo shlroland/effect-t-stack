@@ -41,6 +41,9 @@ export class Todos extends Context.Service<Todos, {
           readonly completed?: boolean | undefined
         }
       ) {
+        if (patch.title === undefined && patch.completed === undefined) {
+          return yield* findById(id)
+        }
         const todo = yield* repository.update(id, patch)
         if (!todo) return yield* new TodoNotFound({ id })
         return todo

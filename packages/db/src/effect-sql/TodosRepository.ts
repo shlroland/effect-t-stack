@@ -98,8 +98,9 @@ export const layerNoDeps = Layer.effect(
       if (patch.completed !== undefined) {
         clauses.push(sql`completed = ${patch.completed ? 1 : 0}`)
       }
+      // Empty patch is a Service rule (return existing / TodoNotFound).
       if (clauses.length === 0) {
-        return yield* findById(id)
+        return undefined
       }
 
       const rows = yield* mapDatabaseError(

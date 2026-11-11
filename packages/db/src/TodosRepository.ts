@@ -1,6 +1,6 @@
 import { Todo, type TodoId, type TodoTitle } from "@ets/domain"
 import { eq } from "drizzle-orm"
-import { Context, Effect, Layer, Schema } from "effect"
+import { Context, Effect, Layer, Record, Schema } from "effect"
 import { Database, mapDatabaseError } from "./Database.ts"
 import { type DatabaseError, TodoDecodeError, type TodosRepositoryError } from "./errors.ts"
 import { todos } from "./schema.ts"
@@ -65,11 +65,12 @@ export class TodosRepository extends Context.Service<TodosRepository, {
           readonly completed?: boolean | undefined
         }
       ) {
-        const values: { title?: string; completed?: boolean } = {}
+        const values: Record<string, string | boolean> = {}
         if (patch.title !== undefined) values.title = patch.title
         if (patch.completed !== undefined) values.completed = patch.completed
-        if (Object.keys(values).length === 0) {
-          return yield* findById(id)
+        // Empty patch is a Service rule (return existing / TodoNotFound).
+        if (Record.isEmptyRecord(values)) {
+          return undefined
         }
         const row = yield* mapDatabaseError(
           "todos.update",

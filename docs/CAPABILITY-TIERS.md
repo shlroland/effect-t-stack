@@ -37,9 +37,9 @@ From review vs `AGENTS.md` / `repos/effect` / `LLMS.md` (2026-11-10). Clear or A
 
 **P1 — rules & coverage**
 
-- [ ] Move empty-patch `update` behavior from `TodosRepository` into `Todos` Service
-- [ ] HttpApi tests: `/health` `/ready` (+ 503 on DB fail); Todo 404 paths; infra → 500/503 via `Errors.ts`
-- [ ] Repository tests: decode failure, missing row, empty update after rule move
+- [x] Move empty-patch `update` behavior from `TodosRepository` into `Todos` Service
+- [x] HttpApi tests: `/health` `/ready` (+ 503 on DB fail); Todo 404 paths; infra → 500/503 via `Errors.ts`
+- [x] Repository tests: decode failure, missing row, empty update after rule move
 - [x] `@ets/config`: shared Effect Schema/Config `ServerEnv` + `loadServerEnv` (tsconfig + env); server keeps `AppConfig` Context.Service
 
 **P2 — Effect idiom & web DX**
