@@ -11,6 +11,7 @@
     "test": "bun test"
   },
   "dependencies": {
+    "@effect/atom-react": "catalog:",
     "@ets/client": "workspace:*",
     "@ets/config": "workspace:*",
     "@ets/domain": "workspace:*",
@@ -20,7 +21,8 @@
     "@tanstack/react-start": "catalog:",
     "effect": "catalog:",
     "react": "catalog:",
-    "react-dom": "catalog:"
+    "react-dom": "catalog:",
+    "scheduler": "catalog:"
   },
   "devDependencies": {
     "@types/bun": "catalog:",

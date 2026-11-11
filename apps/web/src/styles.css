@@ -77,7 +77,96 @@ a {
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.todo-toolbar {
+  display: grid;
+  gap: 0.75rem;
   margin-bottom: 1.25rem;
+}
+
+.todo-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.todo-filter {
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  padding: 0.4rem 0.75rem;
+  cursor: pointer;
+}
+
+.todo-filter.active {
+  border-color: color-mix(in oklab, var(--accent) 55%, white);
+  color: var(--ink);
+  background: color-mix(in oklab, var(--accent) 18%, transparent);
+}
+
+.todo-search {
+  border: 1px solid var(--line);
+  background: color-mix(in oklab, black 25%, transparent);
+  color: var(--ink);
+  padding: 0.65rem 0.85rem;
+  outline: none;
+  width: 100%;
+}
+
+.todo-search:focus {
+  border-color: color-mix(in oklab, var(--accent) 55%, white);
+}
+
+.todo-toolbar-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.todo-counts {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.todo-toolbar-meta .ghost {
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  padding: 0.4rem 0.7rem;
+  cursor: pointer;
+}
+
+.todo-toolbar-meta .ghost:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.todo-title-button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  padding: 0;
+  cursor: pointer;
+}
+
+.todo-edit {
+  margin: 0;
+}
+
+.todo-edit input {
+  width: 100%;
+  border: 1px solid color-mix(in oklab, var(--accent) 55%, white);
+  background: color-mix(in oklab, black 25%, transparent);
+  color: var(--ink);
+  padding: 0.45rem 0.6rem;
+  outline: none;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.95rem;
 }
 
 .composer input {

@@ -1,3 +1,4 @@
+import { RegistryProvider } from "@effect/atom-react"
 import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-router"
 import type { ReactNode } from "react"
 import appCss from "../styles.css?url"
@@ -33,9 +34,11 @@ export const Route = createRootRoute({
 function RootComponent() {
   return (
     <RootDocument>
-      <div className="app-shell">
-        <Outlet />
-      </div>
+      <RegistryProvider>
+        <div className="app-shell">
+          <Outlet />
+        </div>
+      </RegistryProvider>
     </RootDocument>
   )
 }

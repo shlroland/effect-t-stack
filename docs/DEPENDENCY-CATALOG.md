@@ -19,5 +19,6 @@ See [ADR-0002](./adr/0002-dependency-currency.md).
 | `@effect/language-service`    | pinned minor (`0.87.5`) | Paired with TypeScript 5.x                                                        |
 | `drizzle-orm` / `drizzle-kit` | **`1.0.0-rc.5`** exact  | Required for `drizzle-orm/effect-sqlite-bun`; npm `latest` is still 0.45.x        |
 | `@effect/oxc`                 | unpublished → vendored  | Loaded from `repos/effect/packages/tools/oxc` via the `repos` addon               |
+| `@effect/atom-react`          | catalog (`^4.1.3`)      | React bindings for Effect Atom; peer `scheduler` also catalog-pinned              |
 
 Everything else defaults to current stable within the catalog ranges.

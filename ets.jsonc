@@ -46,6 +46,21 @@
   },
   "auth": "none",
   "frontend": "tanstack-start",
+  // Client state: Effect Atom (`effect/reactivity` + `@effect/atom-react`).
+  // Todos UI uses AtomHttpApi query/mutation + local UI atoms; React is subscribe/dispatch only.
+  "frontendOptions": {
+    "atom": {
+      "package": "@effect/atom-react",
+      "version": "catalog:",
+      "modules": ["Atom", "AtomHttpApi", "AsyncResult", "RegistryProvider"],
+      "reactivity": "effect/reactivity",
+      "note": "Server remains SoT; remote list/mutations via AtomHttpApi + reactivityKeys; UI filter/draft/edit in local atoms."
+    },
+    "peer": {
+      "scheduler": "catalog:"
+    },
+    "catalog": "docs/DEPENDENCY-CATALOG.md"
+  },
   // Primary: Start mounts HttpApi+Rpc. Secondary: apps/server BunHttpServer :3737.
   "backend": "self",
   "backendOptions": {
@@ -94,7 +109,8 @@
       "effectOxc": {
         "package": "@effect/oxc",
         "published": false,
-        "jsPlugin": "./repos/effect/packages/tools/oxc/src/oxlint/index.ts",
+        "install": "link:./repos/effect/packages/tools/oxc",
+        "jsPlugin": "@effect/oxc/oxlint",
         "requiresAddon": "repos",
         "note": "Vendored until @effect/oxc publishes."
       },
