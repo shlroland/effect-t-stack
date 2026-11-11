@@ -32,8 +32,8 @@ From review vs `AGENTS.md` / `repos/effect` / `LLMS.md` (2026-11-10). Clear or A
 
 **P0 — boundaries**
 
-- [ ] `apps/server/src/http/SystemHttp.ts` still yields `Migrations`; add `System` Service; HTTP stays thin
-- [ ] Narrow `layers.ts` so HTTP layers see Services only, not raw `Database`/`Migrations`
+- [x] `apps/server/src/http/SystemHttp.ts` still yields `Migrations`; add `System` Service; HTTP stays thin
+- [x] Narrow `layers.ts` so HTTP layers see Services only, not raw `Database`/`Migrations`
 
 **P1 — rules & coverage**
 

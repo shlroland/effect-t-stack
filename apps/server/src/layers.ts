@@ -1,8 +1,13 @@
 import { Database, Migrations, TodosRepository } from "@ets/db"
 import { Effect, Layer } from "effect"
 import { AppConfig } from "./config/AppConfig.ts"
+import { System } from "./services/System.ts"
 import { Todos } from "./services/Todos.ts"
 
+/**
+ * Prod app Layer for HTTP. Only Services (+ AppConfig) remain in the
+ * public context — Database / Migrations / Repository stay internal deps.
+ */
 export const makeAppLive = (config: {
   readonly databaseUrl: string
   readonly port?: number
@@ -14,13 +19,12 @@ export const makeAppLive = (config: {
     Layer.provide(DatabaseLive)
   )
   const TodosLive = Todos.layerNoDeps.pipe(Layer.provide(TodosRepositoryLive))
+  const SystemLive = System.layerNoDeps.pipe(Layer.provide(MigrationsLive))
 
   return Layer.mergeAll(
     AppConfigLive,
-    DatabaseLive,
-    MigrationsLive,
-    TodosRepositoryLive,
-    TodosLive
+    TodosLive,
+    SystemLive
   )
 }
 
