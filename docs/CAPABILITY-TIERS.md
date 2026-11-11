@@ -44,12 +44,12 @@ From review vs `AGENTS.md` / `repos/effect` / `LLMS.md` (2026-11-10). Clear or A
 
 **P2 — Effect idiom & web DX**
 
-- [ ] Drop pure pass-through `Effect.fn` wrappers in `Todos` (`all`/`create`); name Http handler spans (`Effect.fn("…")`)
+- [x] Drop pure pass-through `Effect.fn` wrappers in `Todos` (`all`/`create`); name Http handler spans (`Effect.fn("…")`)
 - [x] Clarify `Migrations.ready` API vs real DB ping (`ready` now runs `select 1` after boot migrations)
-- [ ] Web: TanStack Router `loader` instead of `useEffect` fetch; use `/ready` for connected status; mutation error handling; empty state
-- [ ] Web: type helpers with `TodoId`; drop unused `@ets/protocol` dep or use it intentionally; `apps/web/.env.example` for `VITE_API_URL`
-- [ ] CORS/origins from `Config`/env; root `engines`; richer `apps/server/.env.example`
-- [ ] Prefer keeping Drizzle `schema` internal; Effect SQL secondary lives under `@ets/db/effect-sql`
+- [x] Web: TanStack Router `loader` instead of `useEffect` fetch; use `/ready` for connected status; mutation error handling; empty state
+- [x] Web: type helpers with `TodoId`; drop unused `@ets/protocol` dep or use it intentionally; `apps/web/.env.example` for `VITE_API_URL`
+- [x] CORS/origins from `Config`/env; root `engines`; richer `apps/server/.env.example`
+- [x] Prefer keeping Drizzle `schema` internal; Effect SQL secondary lives under `@ets/db/effect-sql`
 
 **P3 — polish (may waive)**
 
@@ -76,7 +76,7 @@ From review vs `AGENTS.md` / `repos/effect` / `LLMS.md` (2026-11-10). Clear or A
 - [ ] Test pattern checklist: `test/layers.ts`, in-memory SQLite, Repository / Service / HttpApiTest layers (Todo as reference)
 - [ ] Post-install: `prepare` + `effect-language-service patch` owned by `language-service` addon
 - [ ] L0 web UI stance: custom CSS OK; **shadcn / `packages/ui` deferred to L4** (not required in Golden Sample)
-- [ ] `engines` / minimum runtime fields on golden root `package.json`
+- [x] `engines` / minimum runtime fields on golden root `package.json`
 
 ### Dependency currency (ongoing — 对标 BTS “latest dependencies”)
 

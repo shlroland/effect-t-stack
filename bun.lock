@@ -37,7 +37,6 @@
       "dependencies": {
         "@ets/client": "workspace:*",
         "@ets/domain": "workspace:*",
-        "@ets/protocol": "workspace:*",
         "@tanstack/react-router": "^1.120.5",
         "effect": "^4.1.2",
         "react": "^19.1.0",

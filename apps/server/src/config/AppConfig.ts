@@ -1,27 +1,30 @@
-import { layer as serverEnvLayer, serverEnvConfig } from "@ets/config"
+import { layer as serverEnvLayer, serverEnvConfig, ServerEnvDefaults } from "@ets/config"
 import { Context, Effect, Layer } from "effect"
 
 export class AppConfig extends Context.Service<AppConfig, {
   readonly databaseUrl: string
   readonly port: number
+  readonly corsOrigins: ReadonlyArray<string>
 }>()("@ets/server/AppConfig") {
   static readonly layerFrom = (config: {
     readonly databaseUrl: string
     readonly port?: number
+    readonly corsOrigins?: ReadonlyArray<string>
   }) =>
     Layer.succeed(
       AppConfig,
       AppConfig.of({
         databaseUrl: config.databaseUrl,
-        port: config.port ?? 3737
+        port: config.port ?? ServerEnvDefaults.PORT,
+        corsOrigins: config.corsOrigins ?? ServerEnvDefaults.CORS_ORIGINS
       })
     )
 
   static readonly layer = Layer.effect(
     AppConfig,
     Effect.gen(function*() {
-      const { databaseUrl, port } = yield* serverEnvConfig
-      return AppConfig.of({ databaseUrl, port })
+      const { databaseUrl, port, corsOrigins } = yield* serverEnvConfig
+      return AppConfig.of({ databaseUrl, port, corsOrigins })
     })
   ).pipe(Layer.provide(serverEnvLayer()))
 }

@@ -5,12 +5,6 @@ import { AppConfig } from "./config/AppConfig.ts"
 import { AllRoutes } from "./http/HttpApp.ts"
 import { AppLive } from "./layers.ts"
 
-const withCors = HttpMiddleware.cors({
-  allowedOrigins: ["http://localhost:5173", "http://127.0.0.1:5173"],
-  allowedMethods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type"]
-})
-
 const RoutesLive = AllRoutes.pipe(Layer.provide(AppLive))
 
 const ServerLive = Layer.unwrap(
@@ -20,8 +14,20 @@ const ServerLive = Layer.unwrap(
   })
 ).pipe(Layer.provide(AppConfig.layer))
 
-const HttpLive = HttpRouter.serve(RoutesLive, {
-  middleware: withCors
-}).pipe(Layer.provide(ServerLive))
+const HttpLive = Layer.unwrap(
+  Effect.gen(function*() {
+    const { corsOrigins } = yield* AppConfig
+    return HttpRouter.serve(RoutesLive, {
+      middleware: HttpMiddleware.cors({
+        allowedOrigins: [...corsOrigins],
+        allowedMethods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+        allowedHeaders: ["Content-Type"]
+      })
+    })
+  })
+).pipe(
+  Layer.provide(ServerLive),
+  Layer.provide(AppConfig.layer)
+)
 
 BunRuntime.runMain(Layer.launch(HttpLive))

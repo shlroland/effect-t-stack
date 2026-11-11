@@ -20,18 +20,10 @@ export class Todos extends Context.Service<Todos, {
     Effect.gen(function*() {
       const repository = yield* TodosRepository
 
-      const all = Effect.fn("Todos.all")(function*() {
-        return yield* repository.all()
-      })
-
       const findById = Effect.fn("Todos.findById")(function*(id: TodoId) {
         const todo = yield* repository.findById(id)
         if (!todo) return yield* new TodoNotFound({ id })
         return todo
-      })
-
-      const create = Effect.fn("Todos.create")(function*(title: TodoTitle) {
-        return yield* repository.create(title)
       })
 
       const update = Effect.fn("Todos.update")(function*(
@@ -54,7 +46,13 @@ export class Todos extends Context.Service<Todos, {
         if (!deleted) return yield* new TodoNotFound({ id })
       })
 
-      return Todos.of({ all, findById, create, update, remove })
+      return Todos.of({
+        all: () => repository.all(),
+        create: (title) => repository.create(title),
+        findById,
+        update,
+        remove
+      })
     })
   )
 

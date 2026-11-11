@@ -156,6 +156,13 @@ a {
   color: #3f0d18;
 }
 
+.empty-state {
+  margin: 0;
+  padding: 1.25rem 0.25rem;
+  color: var(--muted);
+  font-size: 0.98rem;
+}
+
 .status {
   margin-top: 1rem;
   color: var(--muted);

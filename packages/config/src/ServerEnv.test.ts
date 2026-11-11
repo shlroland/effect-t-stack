@@ -3,40 +3,49 @@ import { Effect } from "effect"
 import { mkdtempSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
-import { loadServerEnv, makeServerEnvProvider, serverEnvConfig } from "./ServerEnv.ts"
+import { loadServerEnv, makeServerEnvProvider, serverEnvConfig, ServerEnvDefaults } from "./ServerEnv.ts"
 
 describe("ServerEnv", () => {
   it("uses defaults when env and file are empty", () => {
     const env = loadServerEnv({ env: {}, envFile: false })
     expect(env).toEqual({
       DATABASE_URL: "./data.db",
-      PORT: 3737
+      PORT: 3737,
+      CORS_ORIGINS: [...ServerEnvDefaults.CORS_ORIGINS]
     })
   })
 
   it("prefers process env over .env file", () => {
     const dir = mkdtempSync(join(tmpdir(), "ets-config-"))
     const envFile = join(dir, ".env")
-    writeFileSync(envFile, "DATABASE_URL=./from-file.db\nPORT=1111\n")
+    writeFileSync(
+      envFile,
+      "DATABASE_URL=./from-file.db\nPORT=1111\nCORS_ORIGINS=http://file.example\n"
+    )
 
     const env = loadServerEnv({
       envFile,
       env: {
         DATABASE_URL: "./from-env.db",
-        PORT: "2222"
+        PORT: "2222",
+        CORS_ORIGINS: "http://env.example,http://env2.example"
       }
     })
 
     expect(env).toEqual({
       DATABASE_URL: "./from-env.db",
-      PORT: 2222
+      PORT: 2222,
+      CORS_ORIGINS: ["http://env.example", "http://env2.example"]
     })
   })
 
   it("fills gaps from .env when process env is missing keys", () => {
     const dir = mkdtempSync(join(tmpdir(), "ets-config-"))
     const envFile = join(dir, ".env")
-    writeFileSync(envFile, "DATABASE_URL=./from-file.db\nPORT=4444\n")
+    writeFileSync(
+      envFile,
+      "DATABASE_URL=./from-file.db\nPORT=4444\nCORS_ORIGINS=http://file.example\n"
+    )
 
     const env = loadServerEnv({
       envFile,
@@ -45,7 +54,8 @@ describe("ServerEnv", () => {
 
     expect(env).toEqual({
       DATABASE_URL: "./from-file.db",
-      PORT: 4444
+      PORT: 4444,
+      CORS_ORIGINS: ["http://file.example"]
     })
   })
 
@@ -57,7 +67,8 @@ describe("ServerEnv", () => {
 
     expect(env).toEqual({
       DATABASE_URL: "./data.db",
-      PORT: 5555
+      PORT: 5555,
+      CORS_ORIGINS: [...ServerEnvDefaults.CORS_ORIGINS]
     })
   })
 
@@ -65,11 +76,19 @@ describe("ServerEnv", () => {
     const values = Effect.runSync(
       serverEnvConfig.parse(
         makeServerEnvProvider({
-          env: { DATABASE_URL: "./x.db", PORT: "8080" },
+          env: {
+            DATABASE_URL: "./x.db",
+            PORT: "8080",
+            CORS_ORIGINS: "http://a.test"
+          },
           envFile: false
         })
       )
     )
-    expect(values).toEqual({ databaseUrl: "./x.db", port: 8080 })
+    expect(values).toEqual({
+      databaseUrl: "./x.db",
+      port: 8080,
+      corsOrigins: ["http://a.test"]
+    })
   })
 })

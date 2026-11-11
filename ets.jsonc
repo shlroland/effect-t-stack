@@ -46,7 +46,8 @@
     "provider": ["fromEnv", "fromDotEnvContents"],
     "defaults": {
       "DATABASE_URL": "./data.db",
-      "PORT": 3737
+      "PORT": 3737,
+      "CORS_ORIGINS": ["http://localhost:5173", "http://127.0.0.1:5173"]
     },
     "serverEnvFile": "apps/server/.env",
     "note": "AppConfig stays in apps/server; @ets/config owns Schema/Config/loadServerEnv only."

@@ -1,48 +1,66 @@
-import type { Todo } from "@ets/domain"
-import { createFileRoute } from "@tanstack/react-router"
-import { type FormEvent, useEffect, useState, useTransition } from "react"
+import type { Todo, TodoId } from "@ets/domain"
+import { createFileRoute, useRouter } from "@tanstack/react-router"
+import { type FormEvent, useState, useTransition } from "react"
 import { api } from "../lib/api.ts"
 
+type HomeLoaderData = {
+  readonly todos: ReadonlyArray<Todo>
+  readonly ready: boolean
+  readonly loadError: string | null
+}
+
 export const Route = createFileRoute("/")({
+  loader: async (): Promise<HomeLoaderData> => {
+    try {
+      await api.ready()
+      const todos = await api.listTodos()
+      return { todos, ready: true, loadError: null }
+    } catch (cause) {
+      return {
+        todos: [],
+        ready: false,
+        loadError: cause instanceof Error ? cause.message : String(cause)
+      }
+    }
+  },
   component: TodosPage
 })
 
 function TodosPage() {
-  const [todos, setTodos] = useState<ReadonlyArray<Todo>>([])
+  const { todos, ready, loadError } = Route.useLoaderData()
+  const router = useRouter()
   const [title, setTitle] = useState("")
-  const [error, setError] = useState<string | null>(null)
-  const [ready, setReady] = useState(false)
+  const [error, setError] = useState<string | null>(loadError)
   const [pending, startTransition] = useTransition()
 
-  const refresh = () =>
+  const runMutation = (action: () => Promise<unknown>) => {
     startTransition(async () => {
       try {
-        const [items, health] = await Promise.all([api.listTodos(), api.health()])
-        setTodos(items)
-        setReady(health.status === "ok")
+        await action()
+        await router.invalidate()
         setError(null)
       } catch (cause) {
         setError(cause instanceof Error ? cause.message : String(cause))
       }
     })
-
-  useEffect(() => {
-    refresh()
-  }, [])
+  }
 
   const onCreate = (event: FormEvent) => {
     event.preventDefault()
     const next = title.trim()
     if (!next) return
-    startTransition(async () => {
-      try {
-        await api.createTodo(next)
-        setTitle("")
-        await refresh()
-      } catch (cause) {
-        setError(cause instanceof Error ? cause.message : String(cause))
-      }
+    runMutation(async () => {
+      await api.createTodo(next)
+      setTitle("")
     })
+  }
+
+  const onToggle = (id: TodoId, completed: boolean) => {
+    runMutation(() => api.updateTodo(id, { completed: !completed }))
+  }
+
+  const onRemove = (id: TodoId) => {
+    runMutation(() => api.removeTodo(id))
   }
 
   return (
@@ -60,47 +78,48 @@ function TodosPage() {
             onChange={(e) => setTitle(e.target.value)}
             placeholder="添加一个 Todo…"
             aria-label="Todo title"
+            disabled={!ready || pending}
           />
-          <button type="submit" disabled={pending}>
+          <button type="submit" disabled={!ready || pending}>
             添加
           </button>
         </form>
 
-        <ul className="todo-list">
-          {todos.map((todo) => (
-            <li
-              key={todo.id}
-              className={`todo-item${todo.completed ? " done" : ""}`}
-            >
-              <input
-                type="checkbox"
-                checked={todo.completed}
-                onChange={() =>
-                  startTransition(async () => {
-                    await api.updateTodo(todo.id, {
-                      completed: !todo.completed
-                    })
-                    await refresh()
-                  })}
-                aria-label={`完成 ${todo.title}`}
-              />
-              <span className="todo-title">{todo.title}</span>
-              <div className="todo-actions">
-                <button
-                  type="button"
-                  className="ghost danger"
-                  onClick={() =>
-                    startTransition(async () => {
-                      await api.removeTodo(todo.id)
-                      await refresh()
-                    })}
+        {todos.length === 0
+          ? (
+            <p className="empty-state">
+              {ready ? "还没有 Todo，添加第一条吧。" : "无法加载 Todo 列表。"}
+            </p>
+          )
+          : (
+            <ul className="todo-list">
+              {todos.map((todo) => (
+                <li
+                  key={todo.id}
+                  className={`todo-item${todo.completed ? " done" : ""}`}
                 >
-                  删除
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
+                  <input
+                    type="checkbox"
+                    checked={todo.completed}
+                    onChange={() => onToggle(todo.id, todo.completed)}
+                    disabled={pending}
+                    aria-label={`完成 ${todo.title}`}
+                  />
+                  <span className="todo-title">{todo.title}</span>
+                  <div className="todo-actions">
+                    <button
+                      type="button"
+                      className="ghost danger"
+                      onClick={() => onRemove(todo.id)}
+                      disabled={pending}
+                    >
+                      删除
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
 
         <p className={`status${error ? " error" : ""}`}>
           {error
@@ -108,8 +127,8 @@ function TodosPage() {
             : ready
             ? pending
               ? "同步中…"
-              : `已连接 · ${todos.length} 条 Todo`
-            : "连接服务器中…"}
+              : `已就绪 · ${todos.length} 条 Todo`
+            : "服务未就绪…"}
         </p>
       </section>
     </>

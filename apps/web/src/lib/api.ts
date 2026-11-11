@@ -1,5 +1,5 @@
 import { ApiClient } from "@ets/client"
-import { TodoId, TodoTitle } from "@ets/domain"
+import { type TodoId, TodoTitle } from "@ets/domain"
 import { Effect, ManagedRuntime } from "effect"
 
 const baseUrl = import.meta.env.VITE_API_URL ?? "http://localhost:3737"
@@ -24,13 +24,13 @@ export const api = {
       })
     })),
   updateTodo: (
-    id: number,
+    id: TodoId,
     patch: { title?: string; completed?: boolean }
   ) =>
     runApi(Effect.gen(function*() {
       const client = yield* ApiClient
       return yield* client.todos.update({
-        params: { id: TodoId.make(id) },
+        params: { id },
         payload: {
           ...(patch.title !== undefined
             ? { title: TodoTitle.make(patch.title) }
@@ -41,16 +41,16 @@ export const api = {
         }
       })
     })),
-  removeTodo: (id: number) =>
+  removeTodo: (id: TodoId) =>
     runApi(Effect.gen(function*() {
       const client = yield* ApiClient
       return yield* client.todos.remove({
-        params: { id: TodoId.make(id) }
+        params: { id }
       })
     })),
-  health: () =>
+  ready: () =>
     runApi(Effect.gen(function*() {
       const client = yield* ApiClient
-      return yield* client.health()
+      return yield* client.ready({})
     }))
 }

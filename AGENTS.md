@@ -102,17 +102,17 @@ Do not disable the plugin or skip these diagnostics to “make CI green” unles
 
 ## 包边界
 
-| 包 / 目录                   | 职责                                                                                  | 禁止                                        |
-| --------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------- |
-| `packages/domain`           | Schema、branded types、domain tagged errors                                           | IO、HTTP、Drizzle、Layer 组装               |
-| `packages/config`           | 共享 `tsconfig.base.json` + Effect Schema/Config env（`ServerEnv` / `loadServerEnv`） | HTTP、DB、业务规则、prod Layer 组装         |
-| `packages/protocol`         | `HttpApi` / `HttpApiGroup` 契约与 OpenAPI 注解                                        | 业务规则、SQL、具体 handler                 |
-| `packages/db`               | Drizzle schema / migrations / Repository（默认）；`@ets/db/effect-sql` 为第二选项     | HTTP 映射、业务规则                         |
-| `packages/client`           | 从 protocol 派生的 `HttpApiClient`                                                    | 服务端 Layer                                |
-| `apps/server/src/services`  | 业务规则（Service）                                                                   | SQL 行解码、HTTP 状态码细节                 |
-| `apps/server/src/http`      | HttpApi handlers、HTTP 错误映射                                                       | 业务规则、SQL                               |
-| `apps/server/src/layers.ts` | prod / test Layer 组装                                                                | 新业务逻辑                                  |
-| `apps/web`                  | TanStack Router UI                                                                    | 直接碰 DB / domain 私有细节之外的服务端实现 |
+| 包 / 目录                   | 职责                                                                                        | 禁止                                        |
+| --------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| `packages/domain`           | Schema、branded types、domain tagged errors                                                 | IO、HTTP、Drizzle、Layer 组装               |
+| `packages/config`           | 共享 `tsconfig.base.json` + Effect Schema/Config env（`ServerEnv` / `loadServerEnv`）       | HTTP、DB、业务规则、prod Layer 组装         |
+| `packages/protocol`         | `HttpApi` / `HttpApiGroup` 契约与 OpenAPI 注解                                              | 业务规则、SQL、具体 handler                 |
+| `packages/db`               | Drizzle migrations / Repository（默认；`schema` 包内私有）；`@ets/db/effect-sql` 为第二选项 | HTTP 映射、业务规则                         |
+| `packages/client`           | 从 protocol 派生的 `HttpApiClient`                                                          | 服务端 Layer                                |
+| `apps/server/src/services`  | 业务规则（Service）                                                                         | SQL 行解码、HTTP 状态码细节                 |
+| `apps/server/src/http`      | HttpApi handlers、HTTP 错误映射                                                             | 业务规则、SQL                               |
+| `apps/server/src/layers.ts` | prod / test Layer 组装                                                                      | 新业务逻辑                                  |
+| `apps/web`                  | TanStack Router UI                                                                          | 直接碰 DB / domain 私有细节之外的服务端实现 |
 
 ## 架构不变量
 

@@ -4,12 +4,17 @@ import { fileURLToPath } from "node:url"
 
 export const ServerEnvDefaults = {
   DATABASE_URL: "./data.db",
-  PORT: 3737
+  PORT: 3737,
+  CORS_ORIGINS: [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173"
+  ]
 } as const
 
 export const ServerEnvFields = {
   DATABASE_URL: Schema.NonEmptyString,
-  PORT: Schema.Int.check(Schema.isBetween({ minimum: 1, maximum: 65535 }))
+  PORT: Schema.Int.check(Schema.isBetween({ minimum: 1, maximum: 65535 })),
+  CORS_ORIGINS: Schema.Array(Schema.NonEmptyString)
 } as const
 
 /**
@@ -18,7 +23,8 @@ export const ServerEnvFields = {
  */
 export const ServerEnv = Schema.Struct({
   DATABASE_URL: ServerEnvFields.DATABASE_URL,
-  PORT: ServerEnvFields.PORT
+  PORT: ServerEnvFields.PORT,
+  CORS_ORIGINS: ServerEnvFields.CORS_ORIGINS
 })
 export type ServerEnv = typeof ServerEnv.Type
 
@@ -32,6 +38,9 @@ export const serverEnvConfig = Config.all({
   ),
   port: Config.Port("PORT").pipe(
     Config.withDefault(ServerEnvDefaults.PORT)
+  ),
+  corsOrigins: Config.Array(Schema.NonEmptyString, "CORS_ORIGINS").pipe(
+    Config.withDefault(ServerEnvDefaults.CORS_ORIGINS)
   )
 })
 
@@ -83,16 +92,17 @@ export const layer = (options?: MakeServerEnvProviderOptions) => ConfigProvider.
 
 /**
  * Sync loader for tooling (`drizzle.config.ts`, scripts).
- * Returns Schema keys (`DATABASE_URL`, `PORT`).
+ * Returns Schema keys (`DATABASE_URL`, `PORT`, `CORS_ORIGINS`).
  */
 export const loadServerEnv = (
   options?: MakeServerEnvProviderOptions
 ): ServerEnv => {
-  const { databaseUrl, port } = Effect.runSync(
+  const { databaseUrl, port, corsOrigins } = Effect.runSync(
     serverEnvConfig.parse(makeServerEnvProvider(options))
   )
   return {
     DATABASE_URL: databaseUrl,
-    PORT: port
+    PORT: port,
+    CORS_ORIGINS: corsOrigins
   }
 }

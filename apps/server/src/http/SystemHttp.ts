@@ -7,11 +7,21 @@ import { mapReadinessError } from "./Errors.ts"
 export const SystemApiHandlers = HttpApiBuilder.group(
   Api,
   "system",
-  Effect.fn(function*(handlers) {
+  Effect.fn("SystemHttp")(function*(handlers) {
     const system = yield* System
 
     return handlers
-      .handle("health", () => system.health())
-      .handle("ready", () => mapReadinessError(system.ready()))
+      .handle(
+        "health",
+        Effect.fn("SystemHttp.health")(function*() {
+          return yield* system.health()
+        })
+      )
+      .handle(
+        "ready",
+        Effect.fn("SystemHttp.ready")(function*() {
+          return yield* mapReadinessError(system.ready())
+        })
+      )
   })
 )

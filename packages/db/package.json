@@ -5,8 +5,7 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./effect-sql": "./src/effect-sql/index.ts",
-    "./*": "./src/*.ts"
+    "./effect-sql": "./src/effect-sql/index.ts"
   },
   "scripts": {
     "check-types": "tsc --noEmit -p tsconfig.json",
