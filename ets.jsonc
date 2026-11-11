@@ -47,14 +47,20 @@
   "auth": "none",
   "frontend": "tanstack-start",
   // Client state: Effect Atom (`effect/reactivity` + `@effect/atom-react`).
-  // Todos UI uses AtomHttpApi query/mutation + local UI atoms; React is subscribe/dispatch only.
+  // Todos: AtomHttpApi + local UI atoms; Start loader dehydrates → HydrationBoundary.
   "frontendOptions": {
     "atom": {
       "package": "@effect/atom-react",
       "version": "catalog:",
-      "modules": ["Atom", "AtomHttpApi", "AsyncResult", "RegistryProvider"],
+      "modules": ["Atom", "AtomHttpApi", "AsyncResult", "RegistryProvider", "HydrationBoundary"],
       "reactivity": "effect/reactivity",
-      "note": "Server remains SoT; remote list/mutations via AtomHttpApi + reactivityKeys; UI filter/draft/edit in local atoms."
+      "ssr": {
+        "loader": "apps/web/src/routes/index.tsx",
+        "dehydrate": "apps/web/src/atoms/dehydrateTodos.ts",
+        "hydrate": "HydrationBoundary",
+        "serializationKey": "todos list query"
+      },
+      "note": "Server remains SoT; Start loader dehydrates AtomHttpApi query; client HydrationBoundary + optimistic mutations; UI filter/draft/edit in local atoms."
     },
     "peer": {
       "scheduler": "catalog:"

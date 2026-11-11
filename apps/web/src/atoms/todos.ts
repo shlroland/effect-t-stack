@@ -3,13 +3,14 @@ import { Effect } from "effect"
 import { AsyncResult, Atom } from "effect/reactivity"
 import { ApiAtoms, todosReactivityKeys } from "./api.ts"
 
-const todosQuery = ApiAtoms.query("todos", "list", {
+/** Serializable query atom — dehydrated on the server, hydrated into the client registry. */
+export const todosQueryAtom = ApiAtoms.query("todos", "list", {
   reactivityKeys: todosReactivityKeys,
   timeToLive: "30 seconds",
   serializationKey: "list"
 })
 
-export const todosListAtom = Atom.optimistic(todosQuery)
+export const todosListAtom = Atom.optimistic(todosQueryAtom)
 
 const mapSuccess = <E>(
   current: AsyncResult.AsyncResult<ReadonlyArray<Todo>, E>,
