@@ -22,7 +22,7 @@ Formal todos for对标 Better-T-Stack. Implement **strictly L1 → L6**; do not 
 - [x] Apps: server · web
 - [x] Todo vertical slice + Repository / Service / HttpApi tests
 - [x] Addons present: turborepo · skills · repos · language-service · mcp（`effect-mcp`；`effect-solutions` 可选且默认关）
-- [x] In-server OpenAPI + `/rpc/docs`
+- [x] In-server OpenAPI + `/api/docs`
 - [x] Operational endpoints: `health` / `ready` (ready = migrations + DB)
 - [x] Dev CORS middleware; HTTP boundary `Effect.logError` mapping
 
@@ -38,7 +38,7 @@ From review vs `AGENTS.md` / `repos/effect` / `LLMS.md` (2026-11-10). Clear or A
 **P1 — rules & coverage**
 
 - [x] Move empty-patch `update` behavior from `TodosRepository` into `Todos` Service
-- [x] HttpApi tests: `/health` `/ready` (+ 503 on DB fail); Todo 404 paths; infra → 500/503 via `Errors.ts`
+- [x] HttpApi tests: `/api/health` `/api/ready` (+ 503 on DB fail); Todo 404 paths; infra → 500/503 via `Errors.ts`
 - [x] Repository tests: decode failure, missing row, empty update after rule move
 - [x] `@ets/config`: shared Effect Schema/Config `ServerEnv` + `loadServerEnv` (tsconfig + env); server keeps `AppConfig` Context.Service
 

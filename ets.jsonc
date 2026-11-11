@@ -34,19 +34,19 @@
   "auth": "none",
   "frontend": "tanstack-start",
   // Primary: HttpApi embedded in TanStack Start (`apps/web/src/server.ts` → createApiWebHandler).
-  // All HttpApi traffic is under `/rpc` (see `ApiPrefix` in `@ets/protocol`).
+  // All HttpApi traffic is under `/api` (see `ApiPrefix` in `@ets/protocol`).
   // Secondary: standalone Bun server template (`apps/server` + BunHttpServer on :3737).
   "backend": "self",
   "backendOptions": {
     "mount": "apps/web/src/server.ts",
-    "apiPrefix": "/rpc",
+    "apiPrefix": "/api",
     "webHandler": "@ets/server/createApiWebHandler",
     "secondary": {
       "backend": "httpapi-server",
       "app": "apps/server",
       "runtime": "bun",
       "port": 3737,
-      "note": "Same Services/HttpApi Layers under /rpc; run `bun run dev:server` and set VITE_API_URL=http://localhost:3737."
+      "note": "Same Services/HttpApi Layers under /api; run `bun run dev:server` and set VITE_API_URL=http://localhost:3737."
     }
   },
   // Shared Effect Schema/Config env in `@ets/config` (also hosts tsconfig.base.json).
