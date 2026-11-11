@@ -1,27 +1,34 @@
 import { migrate } from "drizzle-orm/effect-sqlite-bun/migrator"
-import { Context, Effect, Layer } from "effect"
-import { fileURLToPath } from "node:url"
-import { Database, mapDatabaseError } from "./Database.ts"
+import { Context, Effect, Layer, Path } from "effect"
+import { Database, mapDatabaseError, ping } from "./Database.ts"
+import type { DatabaseError } from "./errors.ts"
 
-const defaultMigrationsFolder = fileURLToPath(new URL("../drizzle", import.meta.url))
+const resolveDefaultMigrationsFolder = Effect.gen(function*() {
+  const path = yield* Path.Path
+  const modulePath = yield* path.fromFileUrl(new URL(import.meta.url))
+  return path.join(path.dirname(modulePath), "..", "drizzle")
+}).pipe(Effect.orDie)
 
 export class Migrations extends Context.Service<Migrations, {
-  readonly ready: Effect.Effect<void>
+  readonly ready: Effect.Effect<void, DatabaseError>
 }>()("@ets/db/Migrations") {
-  static readonly layer = (migrationsFolder = defaultMigrationsFolder) =>
+  static readonly layerFrom = (migrationsFolder?: string) =>
     Layer.effect(
       Migrations,
       Effect.gen(function*() {
         const db = yield* Database
+        const folder = migrationsFolder ?? (yield* resolveDefaultMigrationsFolder)
 
         yield* mapDatabaseError(
           "migrations.run",
-          migrate(db, { migrationsFolder })
+          migrate(db, { migrationsFolder: folder })
         )
 
         return Migrations.of({
-          ready: Effect.void
+          ready: ping(db)
         })
       })
-    )
+    ).pipe(Layer.provide(Path.layer))
+
+  static readonly layer = () => this.layerFrom()
 }

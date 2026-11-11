@@ -44,7 +44,7 @@ git subtree pull --prefix=repos/effect https://github.com/Effect-TS/effect.git m
 
 ## 栈指纹
 
-见根目录 `ets.jsonc`（金样构建步骤 / 选型真相源）：Effect **v4** · Bun · HttpApi · SQLite + Drizzle **1.0 RC**（`@effect/sql-sqlite-bun` + `drizzle-orm/effect-sqlite-bun`）· auth **none** · frontend **TanStack Router** · addons `turborepo` + `skills`（`Effect-TS/skills`）+ `repos`（`repos/effect` subtree）+ `language-service`（`@effect/language-service` on TypeScript 5.x）+ `mcp`（`effect-mcp` docs server；`effect-solutions` 默认关闭）+ `effect-style`（`dprint` + `oxlint`/`@effect/oxc`，金样默认开）。
+见根目录 `ets.jsonc`（金样构建步骤 / 选型真相源）：Effect **v4** · Bun · HttpApi · SQLite + **Drizzle 1.0 RC**（默认：`drizzle-orm/effect-sqlite-bun` + `@effect/sql-sqlite-bun`；第二选项：Effect SQL via `@ets/db/effect-sql`）· auth **none** · frontend **TanStack Router** · addons `turborepo` + `skills`（`Effect-TS/skills`）+ `repos`（`repos/effect` subtree）+ `language-service`（`@effect/language-service` on TypeScript 5.x）+ `mcp`（`effect-mcp` docs server；`effect-solutions` 默认关闭）+ `effect-style`（`dprint` + `oxlint`/`@effect/oxc`，金样默认开）。
 
 新增金样能力时，先改可跑代码，再同步写入 `ets.jsonc` 的 `addons` / `addonOptions`。
 
@@ -56,6 +56,9 @@ Golden Sample enables **`effect-style`** by default (optional in the future Opti
 - Lint with **`oxlint`** + **`@effect/oxc`** rules (config: `.oxlintrc.json`)
 - `bun run check` includes `lint`; pre-commit via **Lefthook** (`lefthook.yml`: staged `dprint fmt` + `oxlint --fix`)
 - Naming / modules / API conventions follow `repos/effect` + `LLMS.md` (PascalCase modules, `Context.Service`, `Schema.TaggedError`, `Effect.fn`, `.ts` import extensions, …)
+- **Named exports only** — do not use `export default` / default imports in application code. Prefer `export const X` / `export { X }` and matching named imports. Exceptions only when a tool or framework contract requires a default export (enforced by oxlint `import/no-default-export`), currently:
+  - Effect SQL file migrations (`packages/db/effect-sql-migrations/**`) — `SqliteMigrator.fromFileSystem` loads the default export
+  - Tooling config files that mandate default export (`*.config.ts`, e.g. Vite `defineConfig`, Drizzle Kit `defineConfig`)
 - Do **not** add competing formatters/linters (`biome`, etc.) alongside this addon
 
 `@effect/oxc` is not on npm yet; the Golden Sample loads its oxlint JS plugin from
@@ -99,23 +102,23 @@ Do not disable the plugin or skip these diagnostics to “make CI green” unles
 
 ## 包边界
 
-| 包 / 目录                   | 职责                                                                           | 禁止                                        |
-| --------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------- |
-| `packages/domain`           | Schema、branded types、domain tagged errors                                    | IO、HTTP、Drizzle、Layer 组装               |
-| `packages/protocol`         | `HttpApi` / `HttpApiGroup` 契约与 OpenAPI 注解                                 | 业务规则、SQL、具体 handler                 |
-| `packages/db`               | Drizzle schema、migrations、Repository（`SqliteClient` + `effect-sqlite-bun`） | HTTP 映射、业务规则                         |
-| `packages/client`           | 从 protocol 派生的 `HttpApiClient`                                             | 服务端 Layer                                |
-| `apps/server/src/services`  | 业务规则（Service）                                                            | SQL 行解码、HTTP 状态码细节                 |
-| `apps/server/src/http`      | HttpApi handlers、HTTP 错误映射                                                | 业务规则、SQL                               |
-| `apps/server/src/layers.ts` | prod / test Layer 组装                                                         | 新业务逻辑                                  |
-| `apps/web`                  | TanStack Router UI                                                             | 直接碰 DB / domain 私有细节之外的服务端实现 |
+| 包 / 目录                   | 职责                                                                              | 禁止                                        |
+| --------------------------- | --------------------------------------------------------------------------------- | ------------------------------------------- |
+| `packages/domain`           | Schema、branded types、domain tagged errors                                       | IO、HTTP、Drizzle、Layer 组装               |
+| `packages/protocol`         | `HttpApi` / `HttpApiGroup` 契约与 OpenAPI 注解                                    | 业务规则、SQL、具体 handler                 |
+| `packages/db`               | Drizzle schema / migrations / Repository（默认）；`@ets/db/effect-sql` 为第二选项 | HTTP 映射、业务规则                         |
+| `packages/client`           | 从 protocol 派生的 `HttpApiClient`                                                | 服务端 Layer                                |
+| `apps/server/src/services`  | 业务规则（Service）                                                               | SQL 行解码、HTTP 状态码细节                 |
+| `apps/server/src/http`      | HttpApi handlers、HTTP 错误映射                                                   | 业务规则、SQL                               |
+| `apps/server/src/layers.ts` | prod / test Layer 组装                                                            | 新业务逻辑                                  |
+| `apps/web`                  | TanStack Router UI                                                                | 直接碰 DB / domain 私有细节之外的服务端实现 |
 
 ## 架构不变量
 
 1. **SQL 行解码不出 Repository** — `packages/db` 内把行解码成 domain `Todo`；上层只看见 domain 类型。
 2. **业务规则在 Service** — 例如「找不到 → `TodoNotFound`」属于 `apps/server/src/services`。
 3. **HTTP 契约在 `protocol`** — 前后端共享同一 `Api`；不要在 web 里手写平行 DTO。
-4. **HTTP 错误映射在 server 边界** — `DatabaseError` / `TodoDecodeError` → `InternalServerError` 等只在 `apps/server/src/http`。`DatabaseError` 由 Repository / ping 把 `EffectDrizzleQueryError` / `SqlError` 等 infra 错误映射而来；不要在 handler 里直接依赖 Drizzle/Sql 错误标签。
+4. **HTTP 错误映射在 server 边界** — `DatabaseError` / `TodoDecodeError` → `InternalServerError` 等只在 `apps/server/src/http`。`DatabaseError` 由 Repository / ping 把 Drizzle query 错误 / `SqlError` 等 infra 错误映射而来；不要在 handler 里直接依赖驱动错误标签。
 5. **运行时组装只在 Layers** — 入口与测试各自提供 prod / test Layer，勿在 handler 里 `new` 依赖。
 
 ## 新增资源清单（以 Todo 为模板）

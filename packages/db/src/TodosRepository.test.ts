@@ -14,7 +14,7 @@ const TestLive = (() => {
 })()
 
 describe("TodosRepository", () => {
-  it("persists todos in SQLite", async () => {
+  it("persists todos in SQLite via Drizzle", async () => {
     const result = await Effect.gen(function*() {
       const repo = yield* TodosRepository
       const created = yield* repo.create(TodoTitle.make("persist me"))

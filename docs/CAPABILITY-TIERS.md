@@ -2,7 +2,7 @@
 
 Formal todos for对标 Better-T-Stack. Implement **strictly L1 → L6**; do not skip tiers for L5/L6 product work. See [ADR-0001](./adr/0001-effect-core-and-capability-tiers.md) and root `GLOSSARY.md`.
 
-**Defaults (Golden Sample):** Bun · Effect HttpApi · SQLite + Drizzle · auth `none` · TanStack Router · turborepo · example `todo`.
+**Defaults (Golden Sample):** Bun · Effect HttpApi · SQLite + Drizzle（Effect SQL secondary via `@ets/db/effect-sql`）· auth `none` · TanStack Router · turborepo · example `todo`.
 
 **Non-goals:** `api` tRPC/oRPC as first-class (L6c); Convex; `backend=self`; scaffold-level i18n; first-class realtime (SSE/WS) examples (unless a later example slice is explicitly added); auto-`migrate`/codemod upgrades of old generated apps.
 
@@ -32,7 +32,7 @@ From review vs `AGENTS.md` / `repos/effect` / `LLMS.md` (2026-11-10). Clear or A
 
 **P0 — boundaries**
 
-- [ ] `apps/server/src/http/SystemHttp.ts` must not `yield*` `Database`/`Migrations`; add `System` Service; HTTP stays thin
+- [ ] `apps/server/src/http/SystemHttp.ts` still yields `Migrations`; add `System` Service; HTTP stays thin
 - [ ] Narrow `layers.ts` so HTTP layers see Services only, not raw `Database`/`Migrations`
 
 **P1 — rules & coverage**
@@ -45,11 +45,11 @@ From review vs `AGENTS.md` / `repos/effect` / `LLMS.md` (2026-11-10). Clear or A
 **P2 — Effect idiom & web DX**
 
 - [ ] Drop pure pass-through `Effect.fn` wrappers in `Todos` (`all`/`create`); name Http handler spans (`Effect.fn("…")`)
-- [ ] Clarify `Migrations.ready` API vs real DB ping (rename or dedicated check)
+- [x] Clarify `Migrations.ready` API vs real DB ping (`ready` now runs `select 1` after boot migrations)
 - [ ] Web: TanStack Router `loader` instead of `useEffect` fetch; use `/ready` for connected status; mutation error handling; empty state
 - [ ] Web: type helpers with `TodoId`; drop unused `@ets/protocol` dep or use it intentionally; `apps/web/.env.example` for `VITE_API_URL`
 - [ ] CORS/origins from `Config`/env; root `engines`; richer `apps/server/.env.example`
-- [ ] Stop re-exporting Drizzle `schema` from `@ets/db` public barrel (keep internal)
+- [ ] Prefer keeping Drizzle `schema` internal; Effect SQL secondary lives under `@ets/db/effect-sql`
 
 **P3 — polish (may waive)**
 

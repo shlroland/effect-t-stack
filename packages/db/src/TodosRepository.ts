@@ -1,17 +1,14 @@
 import { Todo, type TodoId, type TodoTitle } from "@ets/domain"
 import { eq } from "drizzle-orm"
 import { Context, Effect, Layer, Schema } from "effect"
-import { Database, type DatabaseError, mapDatabaseError } from "./Database.ts"
+import { Database, mapDatabaseError } from "./Database.ts"
+import { type DatabaseError, TodoDecodeError, type TodosRepositoryError } from "./errors.ts"
 import { todos } from "./schema.ts"
 
+export { TodoDecodeError }
+export type { TodosRepositoryError }
+
 const decodeTodo = Schema.decodeUnknownEffect(Todo)
-
-export class TodoDecodeError extends Schema.TaggedError<TodoDecodeError>()("TodoDecodeError", {
-  operation: Schema.String,
-  cause: Schema.Unknown
-}) {}
-
-export type TodosRepositoryError = DatabaseError | TodoDecodeError
 
 const decodePersistedTodo = (
   operation: string,

@@ -4,14 +4,14 @@ Effect **v4** 全栈脚手架的 Phase 1a 金样：可运行 monorepo，CLI 尚�
 
 ## 默认栈
 
-| 维度     | 选择             |
-| -------- | ---------------- |
-| Runtime  | Bun              |
-| API      | Effect HttpApi   |
-| DB / ORM | SQLite + Drizzle |
-| Auth     | none             |
-| Frontend | TanStack Router  |
-| Monorepo | turborepo        |
+| 维度     | 选择                                                            |
+| -------- | --------------------------------------------------------------- |
+| Runtime  | Bun                                                             |
+| API      | Effect HttpApi                                                  |
+| DB / ORM | SQLite + Drizzle（Effect SQL 为 `@ets/db/effect-sql` 第二选项） |
+| Auth     | none                                                            |
+| Frontend | TanStack Router                                                 |
+| Monorepo | turborepo                                                       |
 
 ## 快速开始
 
@@ -30,7 +30,7 @@ apps/server     HttpApi handlers + Services + Layers
 apps/web        TanStack Router 前端
 packages/domain Schema / branded types / domain errors
 packages/protocol 共享 HttpApi 契约
-packages/db     Drizzle schema / migrations / repositories
+packages/db     Drizzle schema / migrations / repositories（可选 `@ets/db/effect-sql`）
 packages/client 从 protocol 派生的 typed client
 packages/config 共享 tsconfig
 ```

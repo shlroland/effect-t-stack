@@ -8,17 +8,28 @@
   "runtime": "bun",
   "api": "httpapi",
   "database": "sqlite",
-  // Drizzle 1.0 RC is required for official Effect drivers (`drizzle-orm/effect-sqlite-bun`).
+  // Default ORM: Drizzle 1.0 RC (`drizzle-orm/effect-sqlite-bun` + `@effect/sql-sqlite-bun`).
+  // Secondary option: Effect SQL (`@ets/db/effect-sql`, SqlClient + SqliteMigrator + SqlSchema).
   // Reproduce (@ets/db):
   //   bun add drizzle-orm@1.0.0-rc.5 @effect/sql-sqlite-bun@^4.1.3 effect@^4.1.3
   //   bun add -D drizzle-kit@1.0.0-rc.5
+  //   # secondary also needs: @effect/platform-bun (FileSystem/Path for fromFileSystem migrator)
   "orm": "drizzle",
   "ormOptions": {
     "package": "drizzle-orm",
     "version": "1.0.0-rc.5",
     "kit": "drizzle-kit@1.0.0-rc.5",
     "effectDriver": "drizzle-orm/effect-sqlite-bun",
-    "sqlClient": "@effect/sql-sqlite-bun"
+    "sqlClient": "@effect/sql-sqlite-bun",
+    "secondary": {
+      "orm": "effect-sql",
+      "package": "@effect/sql-sqlite-bun",
+      "version": "^4.1.3",
+      "modules": ["SqlClient", "SqlSchema", "SqliteMigrator"],
+      "import": "@ets/db/effect-sql",
+      "migrations": "packages/db/effect-sql-migrations",
+      "note": "Swap Database/Migrations/TodosRepository layers; shared TodosRepository service tag."
+    }
   },
   "auth": "none",
   "frontend": "tanstack-router",

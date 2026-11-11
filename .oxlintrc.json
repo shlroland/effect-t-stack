@@ -35,6 +35,7 @@
     "import/no-duplicates": "error",
     "import/no-self-import": "error",
     "import/no-empty-named-blocks": "error",
+    "import/no-default-export": "error",
     "typescript/no-unnecessary-type-assertion": "error",
     "typescript/no-unnecessary-type-constraint": "error",
     "typescript/no-useless-empty-export": "error",
@@ -95,6 +96,18 @@
       "rules": {
         "eslint/no-console": "off",
         "import/no-unassigned-import": "off"
+      }
+    },
+    {
+      "files": [
+        "packages/db/effect-sql-migrations/**",
+        "**/*.config.ts",
+        "**/*.config.js",
+        "**/*.config.mjs",
+        "**/*.config.cjs"
+      ],
+      "rules": {
+        "import/no-default-export": "off"
       }
     }
   ]
