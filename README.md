@@ -10,7 +10,7 @@ Effect **v4** 全栈脚手架的 Phase 1a 金样：可运行 monorepo，CLI 尚�
 | API      | Effect HttpApi                                                  |
 | DB / ORM | SQLite + Drizzle（Effect SQL 为 `@ets/db/effect-sql` 第二选项） |
 | Auth     | none                                                            |
-| Frontend | TanStack Router                                                 |
+| Frontend | TanStack Start                                                  |
 | Monorepo | turborepo                                                       |
 
 ## 快速开始
@@ -27,7 +27,7 @@ bun run dev:web      # http://localhost:5173
 
 ```
 apps/server     HttpApi handlers + Services + Layers
-apps/web        TanStack Router 前端
+apps/web        TanStack Start 前端
 packages/domain Schema / branded types / domain errors
 packages/protocol 共享 HttpApi 契约
 packages/db     Drizzle schema / migrations / repositories（可选 `@ets/db/effect-sql`）

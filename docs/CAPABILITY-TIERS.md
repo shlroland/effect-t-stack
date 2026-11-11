@@ -2,7 +2,7 @@
 
 Formal todos for对标 Better-T-Stack. Implement **strictly L1 → L6**; do not skip tiers for L5/L6 product work. See [ADR-0001](./adr/0001-effect-core-and-capability-tiers.md) and root `GLOSSARY.md`.
 
-**Defaults (Golden Sample):** Bun · Effect HttpApi · SQLite + Drizzle（Effect SQL secondary via `@ets/db/effect-sql`）· auth `none` · TanStack Router · turborepo · example `todo`.
+**Defaults (Golden Sample):** Bun · Effect HttpApi · SQLite + Drizzle（Effect SQL secondary via `@ets/db/effect-sql`）· auth `none` · TanStack Start · turborepo · example `todo`.
 
 **Non-goals:** `api` tRPC/oRPC as first-class (L6c); Convex; `backend=self`; scaffold-level i18n; first-class realtime (SSE/WS) examples (unless a later example slice is explicitly added); auto-`migrate`/codemod upgrades of old generated apps.
 
@@ -16,7 +16,7 @@ Formal todos for对标 Better-T-Stack. Implement **strictly L1 → L6**; do not 
 
 ### Baseline present (necessary but not sufficient)
 
-- [x] Runnable monorepo: Bun · HttpApi · SQLite+Drizzle · auth none · TanStack Router · turborepo
+- [x] Runnable monorepo: Bun · HttpApi · SQLite+Drizzle · auth none · TanStack Start · turborepo
 - [x] Fingerprint `ets.jsonc` (v1 — expect schema churn; see Fingerprint hygiene)
 - [x] Packages: domain · protocol · db · client · config
 - [x] Apps: server · web
@@ -46,7 +46,7 @@ From review vs `AGENTS.md` / `repos/effect` / `LLMS.md` (2026-11-10). Clear or A
 
 - [x] Drop pure pass-through `Effect.fn` wrappers in `Todos` (`all`/`create`); name Http handler spans (`Effect.fn("…")`)
 - [x] Clarify `Migrations.ready` API vs real DB ping (`ready` now runs `select 1` after boot migrations)
-- [x] Web: TanStack Router `loader` instead of `useEffect` fetch; use `/ready` for connected status; mutation error handling; empty state
+- [x] Web: TanStack Start `loader` instead of `useEffect` fetch; use `/ready` for connected status; mutation error handling; empty state
 - [x] Web: type helpers with `TodoId`; drop unused `@ets/protocol` dep or use it intentionally; `apps/web/.env.example` for `VITE_API_URL`
 - [x] CORS/origins from `Config`/env; root `engines`; richer `apps/server/.env.example`
 - [x] Prefer keeping Drizzle `schema` internal; Effect SQL secondary lives under `@ets/db/effect-sql`
@@ -249,9 +249,9 @@ Introduce `packages/template-generator` + `.hbs` when combinations explode (expe
 
 ### Frontend — web (`--frontend`)
 
-- [ ] `tanstack-router` (default)
+- [ ] `tanstack-start` (default)
+- [ ] `tanstack-router`
 - [ ] `react-router`
-- [ ] `tanstack-start`
 - [ ] `next`
 - [ ] `nuxt` _(low priority)_
 - [ ] `svelte` _(low priority)_

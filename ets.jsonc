@@ -32,7 +32,7 @@
     }
   },
   "auth": "none",
-  "frontend": "tanstack-router",
+  "frontend": "tanstack-start",
   // Shared Effect Schema/Config env in `@ets/config` (also hosts tsconfig.base.json).
   // Runtime: AppConfig Layer via serverEnvConfig + makeServerEnvProvider
   //   (process env > optional .env via fromDotEnvContents > Config.withDefault).

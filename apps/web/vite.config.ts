@@ -1,13 +1,26 @@
-import { TanStackRouterVite } from "@tanstack/router-plugin/vite"
-import react from "@vitejs/plugin-react"
+import { tanstackStart } from "@tanstack/react-start/plugin/vite"
+import viteReact from "@vitejs/plugin-react"
 import { defineConfig } from "vite"
 
 export default defineConfig({
-  plugins: [
-    TanStackRouterVite({ target: "react", autoCodeSplitting: true }),
-    react()
-  ],
   server: {
-    port: 5173
-  }
+    port: 5173,
+    watch: {
+      ignored: [
+        "**/node_modules/**",
+        "**/repos/**",
+        "**/.git/**",
+        "**/dist/**",
+        "**/.output/**"
+      ]
+    }
+  },
+  resolve: {
+    tsconfigPaths: true
+  },
+  plugins: [
+    tanstackStart(),
+    // react's vite plugin must come after Start's vite plugin
+    viteReact()
+  ]
 })

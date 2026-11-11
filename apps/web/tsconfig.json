@@ -3,7 +3,8 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "types": ["vite/client"]
+    "types": ["vite/client", "node"],
+    "verbatimModuleSyntax": false
   },
-  "include": ["src"]
+  "include": ["src", "vite.config.ts"]
 }
