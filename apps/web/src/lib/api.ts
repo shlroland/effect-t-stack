@@ -2,7 +2,9 @@ import { ApiClient } from "@ets/client"
 import { type TodoId, TodoTitle } from "@ets/domain"
 import { Effect, ManagedRuntime } from "effect"
 
-const baseUrl = import.meta.env.VITE_API_URL ?? "http://localhost:3737"
+/** Same-origin by default (Start embeds HttpApi). Override for standalone `apps/server`. */
+const baseUrl = import.meta.env.VITE_API_URL ??
+  (typeof window !== "undefined" ? window.location.origin : "http://localhost:5173")
 
 const runtime = ManagedRuntime.make(ApiClient.layer(baseUrl))
 

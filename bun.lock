@@ -38,6 +38,7 @@
         "@ets/client": "workspace:*",
         "@ets/domain": "workspace:*",
         "@ets/protocol": "workspace:*",
+        "@ets/server": "workspace:*",
         "@tanstack/react-router": "^1.170.46",
         "@tanstack/react-start": "^1.169.5",
         "effect": "^4.1.2",

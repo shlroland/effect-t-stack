@@ -67,7 +67,7 @@ function TodosPage() {
     <>
       <h1 className="brand">effect-t-stack</h1>
       <p className="lede">
-        Effect v4 HttpApi 金样基础模板。共享 protocol 契约，服务端 Layers 组装，前端 TanStack Start 调用同源类型客户端。
+        Effect v4 HttpApi 金样基础模板。共享 protocol 契约，HttpApi 由 TanStack Start 同源托管，前端调用类型客户端。
       </p>
 
       <section className="panel">

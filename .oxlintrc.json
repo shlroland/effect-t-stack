@@ -101,6 +101,7 @@
     {
       "files": [
         "packages/db/effect-sql-migrations/**",
+        "apps/web/src/server.ts",
         "**/*.config.ts",
         "**/*.config.js",
         "**/*.config.mjs",

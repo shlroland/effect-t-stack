@@ -12,9 +12,9 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "turbo run dev",
-    "dev:server": "turbo run dev --filter=@ets/server",
+    "dev": "turbo run dev --filter=@ets/web",
     "dev:web": "turbo run dev --filter=@ets/web",
+    "dev:server": "turbo run dev --filter=@ets/server",
     "check-types": "turbo run check-types",
     "test": "turbo run test",
     "lint": "oxlint -c .oxlintrc.json -f unix apps packages && dprint check",

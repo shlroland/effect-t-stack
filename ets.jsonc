@@ -33,10 +33,27 @@
   },
   "auth": "none",
   "frontend": "tanstack-start",
+  // Primary: HttpApi embedded in TanStack Start (`apps/web/src/server.ts` → createApiWebHandler).
+  // All HttpApi traffic is under `/rpc` (see `ApiPrefix` in `@ets/protocol`).
+  // Secondary: standalone Bun server template (`apps/server` + BunHttpServer on :3737).
+  "backend": "self",
+  "backendOptions": {
+    "mount": "apps/web/src/server.ts",
+    "apiPrefix": "/rpc",
+    "webHandler": "@ets/server/createApiWebHandler",
+    "secondary": {
+      "backend": "httpapi-server",
+      "app": "apps/server",
+      "runtime": "bun",
+      "port": 3737,
+      "note": "Same Services/HttpApi Layers under /rpc; run `bun run dev:server` and set VITE_API_URL=http://localhost:3737."
+    }
+  },
   // Shared Effect Schema/Config env in `@ets/config` (also hosts tsconfig.base.json).
   // Runtime: AppConfig Layer via serverEnvConfig + makeServerEnvProvider
   //   (process env > optional .env via fromDotEnvContents > Config.withDefault).
   // Tooling: loadServerEnv() (e.g. packages/db/drizzle.config.ts → apps/server/.env).
+  // Primary Start loads `apps/web/.env`; secondary Bun server loads `apps/server/.env`.
   // Reproduce:
   //   bun add effect@^4.1.3
   //   # packages/config/src/ServerEnv.ts — Schema + Config + sync loader
@@ -49,8 +66,9 @@
       "PORT": 3737,
       "CORS_ORIGINS": ["http://localhost:5173", "http://127.0.0.1:5173"]
     },
+    "webEnvFile": "apps/web/.env",
     "serverEnvFile": "apps/server/.env",
-    "note": "AppConfig stays in apps/server; @ets/config owns Schema/Config/loadServerEnv only."
+    "note": "HttpApi Layers live in @ets/server; @ets/config owns Schema/Config/loadServerEnv only."
   },
   "addons": ["turborepo", "skills", "repos", "language-service", "mcp", "effect-style"],
   "addonOptions": {

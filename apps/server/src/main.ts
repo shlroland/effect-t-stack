@@ -1,3 +1,7 @@
+/**
+ * Secondary standalone Bun HttpApi server template.
+ * Primary golden path embeds the same Layers via TanStack Start (`apps/web/src/server.ts`).
+ */
 import { BunHttpServer, BunRuntime } from "@effect/platform-bun"
 import { Effect, Layer } from "effect"
 import { HttpMiddleware, HttpRouter } from "effect/http"

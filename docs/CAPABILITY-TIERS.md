@@ -2,9 +2,9 @@
 
 Formal todos for对标 Better-T-Stack. Implement **strictly L1 → L6**; do not skip tiers for L5/L6 product work. See [ADR-0001](./adr/0001-effect-core-and-capability-tiers.md) and root `GLOSSARY.md`.
 
-**Defaults (Golden Sample):** Bun · Effect HttpApi · SQLite + Drizzle（Effect SQL secondary via `@ets/db/effect-sql`）· auth `none` · TanStack Start · turborepo · example `todo`.
+**Defaults (Golden Sample):** Bun · Effect HttpApi（Start self-host；`apps/server` secondary）· SQLite + Drizzle（Effect SQL secondary via `@ets/db/effect-sql`）· auth `none` · TanStack Start · turborepo · example `todo`.
 
-**Non-goals:** `api` tRPC/oRPC as first-class (L6c); Convex; `backend=self`; scaffold-level i18n; first-class realtime (SSE/WS) examples (unless a later example slice is explicitly added); auto-`migrate`/codemod upgrades of old generated apps.
+**Non-goals:** `api` tRPC/oRPC as first-class (L6c); Convex; scaffold-level i18n; first-class realtime (SSE/WS) examples (unless a later example slice is explicitly added); auto-`migrate`/codemod upgrades of old generated apps. Golden Sample **does** use Start self-host for HttpApi (`backend=self`); standalone `apps/server` remains a secondary template.
 
 **Branding (default):** repo / product `effect-t-stack`; npm / binary `create-effect-t-stack`; workspace scope in Golden Sample `@ets/*`, on `create` renamed to `@<project>/*`.
 
@@ -16,13 +16,13 @@ Formal todos for对标 Better-T-Stack. Implement **strictly L1 → L6**; do not 
 
 ### Baseline present (necessary but not sufficient)
 
-- [x] Runnable monorepo: Bun · HttpApi · SQLite+Drizzle · auth none · TanStack Start · turborepo
+- [x] Runnable monorepo: Bun · HttpApi（Start self）· SQLite+Drizzle · auth none · TanStack Start · turborepo
 - [x] Fingerprint `ets.jsonc` (v1 — expect schema churn; see Fingerprint hygiene)
 - [x] Packages: domain · protocol · db · client · config
 - [x] Apps: server · web
 - [x] Todo vertical slice + Repository / Service / HttpApi tests
 - [x] Addons present: turborepo · skills · repos · language-service · mcp（`effect-mcp`；`effect-solutions` 可选且默认关）
-- [x] In-server OpenAPI + `/docs`
+- [x] In-server OpenAPI + `/rpc/docs`
 - [x] Operational endpoints: `health` / `ready` (ready = migrations + DB)
 - [x] Dev CORS middleware; HTTP boundary `Effect.logError` mapping
 
@@ -352,7 +352,8 @@ Introduce `packages/template-generator` + `.hbs` when combinations explode (expe
 - [ ] **L6a** Same HttpApi on multiple runtime hosts — merge with L3 `--runtime`; do not duplicate
 - [ ] **L6b** Thin HTTP shells (Hono / Elysia / …) that mount Effect Core handlers/Layers
 - [ ] ~~L6c Parallel tRPC/oRPC~~ **non-goal**
-- [ ] ~~L6d Convex / `backend=self`~~ **non-goal**
+- [ ] ~~L6d Convex~~ **non-goal**
+- [x] Start self-host HttpApi (`backend=self`) — Golden Sample default; standalone Bun server secondary
 
 ---
 
@@ -361,10 +362,11 @@ Introduce `packages/template-generator` + `.hbs` when combinations explode (expe
 | BTS concept                   | ETS stance                                               |
 | ----------------------------- | -------------------------------------------------------- |
 | `backend` hono/express/…      | Separate Server + Effect; L6b shell only                 |
+| `backend` self                | Golden Sample default with TanStack Start + HttpApi      |
 | `api` trpc/orpc               | HttpApi only                                             |
 | `auth` better-auth/clerk/none | Full L3 surface; Golden Sample stays `none`              |
 | `bts.jsonc`                   | `ets.jsonc`                                              |
-| Convex / self                 | Non-goals                                                |
+| Convex                        | Non-goal                                                 |
 | Biome / oxlint addons         | Prefer **`effect-style`** (default on); mutual exclusion |
 | Analytics default-on          | ETS telemetry **opt-in**                                 |
 | Template string snapshots     | Forbidden; use generated-build probes                    |
