@@ -20,7 +20,7 @@ export const SystemApiHandlers = HttpApiBuilder.group(
       .handle(
         "ready",
         Effect.fn("SystemHttp.ready")(function*() {
-          return yield* mapReadinessError(system.ready())
+          return yield* system.ready().pipe(mapReadinessError)
         })
       )
   })

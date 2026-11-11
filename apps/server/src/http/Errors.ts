@@ -12,17 +12,19 @@ const failUnavailable = (message: string, error: unknown) =>
     Effect.andThen(Effect.fail(new HttpApiError.ServiceUnavailable()))
   )
 
+/** Pipeable: infra / decode defects → 500. Domain errors (e.g. `TodoNotFound`) pass through. */
 export const mapUnexpectedErrors = <A, E, R>(
-  effect: Effect.Effect<A, E | DatabaseError | TodoDecodeError, R>
+  self: Effect.Effect<A, E | DatabaseError | TodoDecodeError, R>
 ) =>
-  effect.pipe(
+  self.pipe(
     Effect.catchTag("DatabaseError", (error) => failInternal("database operation failed", error)),
     Effect.catchTag("TodoDecodeError", (error) => failInternal("persisted todo failed to decode", error))
   )
 
+/** Pipeable: readiness DB failure → 503. */
 export const mapReadinessError = <A, E, R>(
-  effect: Effect.Effect<A, E | DatabaseError, R>
+  self: Effect.Effect<A, E | DatabaseError, R>
 ) =>
-  effect.pipe(
+  self.pipe(
     Effect.catchTag("DatabaseError", (error) => failUnavailable("readiness check failed", error))
   )

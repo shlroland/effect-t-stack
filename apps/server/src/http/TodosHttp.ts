@@ -14,31 +14,31 @@ export const TodosApiHandlers = HttpApiBuilder.group(
       .handle(
         "list",
         Effect.fn("TodosHttp.list")(function*() {
-          return yield* mapUnexpectedErrors(todos.all())
+          return yield* todos.all().pipe(mapUnexpectedErrors)
         })
       )
       .handle(
         "create",
         Effect.fn("TodosHttp.create")(function*({ payload }) {
-          return yield* mapUnexpectedErrors(todos.create(payload.title))
+          return yield* todos.create(payload.title).pipe(mapUnexpectedErrors)
         })
       )
       .handle(
         "getById",
         Effect.fn("TodosHttp.getById")(function*({ params }) {
-          return yield* mapUnexpectedErrors(todos.findById(params.id))
+          return yield* todos.findById(params.id).pipe(mapUnexpectedErrors)
         })
       )
       .handle(
         "update",
         Effect.fn("TodosHttp.update")(function*({ params, payload }) {
-          return yield* mapUnexpectedErrors(todos.update(params.id, payload))
+          return yield* todos.update(params.id, payload).pipe(mapUnexpectedErrors)
         })
       )
       .handle(
         "remove",
         Effect.fn("TodosHttp.remove")(function*({ params }) {
-          return yield* mapUnexpectedErrors(todos.remove(params.id))
+          return yield* todos.remove(params.id).pipe(mapUnexpectedErrors)
         })
       )
   })
