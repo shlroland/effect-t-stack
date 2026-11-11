@@ -4,6 +4,20 @@
   "private": true,
   "type": "module",
   "exports": {
+    ".": "./src/index.ts",
+    "./ServerEnv": "./src/ServerEnv.ts",
     "./tsconfig.base.json": "./tsconfig.base.json"
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit -p tsconfig.json",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "effect": "^4.1.3"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "^26.6.6",
+    "typescript": "^5.9.2"
   }
 }

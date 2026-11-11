@@ -40,7 +40,7 @@ From review vs `AGENTS.md` / `repos/effect` / `LLMS.md` (2026-11-10). Clear or A
 - [ ] Move empty-patch `update` behavior from `TodosRepository` into `Todos` Service
 - [ ] HttpApi tests: `/health` `/ready` (+ 503 on DB fail); Todo 404 paths; infra → 500/503 via `Errors.ts`
 - [ ] Repository tests: decode failure, missing row, empty update after rule move
-- [ ] Decide `@ets/config`: move Effect `AppConfig` into `packages/config` (today only tsconfig) **or** ADR that `config` = tsconfig-only and rename fingerprint story
+- [x] `@ets/config`: shared Effect Schema/Config `ServerEnv` + `loadServerEnv` (tsconfig + env); server keeps `AppConfig` Context.Service
 
 **P2 — Effect idiom & web DX**
 
@@ -303,7 +303,7 @@ Introduce `packages/template-generator` + `.hbs` when combinations explode (expe
 ### Env
 
 - [ ] Per-app `.env.example`
-- [ ] **L0/default:** Effect `Config` (as today’s server `AppConfig`) — keep as golden path
+- [x] **L0/default:** Effect `Config` via `@ets/config` `ServerEnv` → server `AppConfig` Layer; tooling uses `loadServerEnv`
 - [ ] **L4 optional:** typed env codegen (Varlock **or** Effect Schema generate) + `env:generate` when chosen
 - [ ] Web `VITE_*` vs server env split documented
 - [ ] CORS: dev allowlist; prod from env; document placeholder rate-limit / security-headers (off by default)

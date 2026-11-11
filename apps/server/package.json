@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@effect/platform-bun": "^4.1.2",
+    "@ets/config": "workspace:*",
     "@ets/db": "workspace:*",
     "@ets/domain": "workspace:*",
     "@ets/protocol": "workspace:*",

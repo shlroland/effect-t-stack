@@ -33,6 +33,24 @@
   },
   "auth": "none",
   "frontend": "tanstack-router",
+  // Shared Effect Schema/Config env in `@ets/config` (also hosts tsconfig.base.json).
+  // Runtime: AppConfig Layer via serverEnvConfig + makeServerEnvProvider
+  //   (process env > optional .env via fromDotEnvContents > Config.withDefault).
+  // Tooling: loadServerEnv() (e.g. packages/db/drizzle.config.ts → apps/server/.env).
+  // Reproduce:
+  //   bun add effect@^4.1.3
+  //   # packages/config/src/ServerEnv.ts — Schema + Config + sync loader
+  "env": {
+    "package": "@ets/config",
+    "module": "ServerEnv",
+    "provider": ["fromEnv", "fromDotEnvContents"],
+    "defaults": {
+      "DATABASE_URL": "./data.db",
+      "PORT": 3737
+    },
+    "serverEnvFile": "apps/server/.env",
+    "note": "AppConfig stays in apps/server; @ets/config owns Schema/Config/loadServerEnv only."
+  },
   "addons": ["turborepo", "skills", "repos", "language-service", "mcp", "effect-style"],
   "addonOptions": {
     // Effect-aligned format + lint gate (optional in Option Matrix; on by default here).

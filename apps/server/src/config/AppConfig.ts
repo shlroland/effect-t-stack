@@ -1,4 +1,5 @@
-import { Config, Context, Effect, Layer } from "effect"
+import { layer as serverEnvLayer, serverEnvConfig } from "@ets/config"
+import { Context, Effect, Layer } from "effect"
 
 export class AppConfig extends Context.Service<AppConfig, {
   readonly databaseUrl: string
@@ -19,13 +20,8 @@ export class AppConfig extends Context.Service<AppConfig, {
   static readonly layer = Layer.effect(
     AppConfig,
     Effect.gen(function*() {
-      const databaseUrl = yield* Config.String("DATABASE_URL").pipe(
-        Config.withDefault("./data.db")
-      )
-      const port = yield* Config.Port("PORT").pipe(
-        Config.withDefault(3737)
-      )
+      const { databaseUrl, port } = yield* serverEnvConfig
       return AppConfig.of({ databaseUrl, port })
     })
-  )
+  ).pipe(Layer.provide(serverEnvLayer()))
 }

@@ -44,7 +44,7 @@ git subtree pull --prefix=repos/effect https://github.com/Effect-TS/effect.git m
 
 ## 栈指纹
 
-见根目录 `ets.jsonc`（金样构建步骤 / 选型真相源）：Effect **v4** · Bun · HttpApi · SQLite + **Drizzle 1.0 RC**（默认：`drizzle-orm/effect-sqlite-bun` + `@effect/sql-sqlite-bun`；第二选项：Effect SQL via `@ets/db/effect-sql`）· auth **none** · frontend **TanStack Router** · addons `turborepo` + `skills`（`Effect-TS/skills`）+ `repos`（`repos/effect` subtree）+ `language-service`（`@effect/language-service` on TypeScript 5.x）+ `mcp`（`effect-mcp` docs server；`effect-solutions` 默认关闭）+ `effect-style`（`dprint` + `oxlint`/`@effect/oxc`，金样默认开）。
+见根目录 `ets.jsonc`（金样构建步骤 / 选型真相源）：Effect **v4** · Bun · HttpApi · SQLite + **Drizzle 1.0 RC**（默认：`drizzle-orm/effect-sqlite-bun` + `@effect/sql-sqlite-bun`；第二选项：Effect SQL via `@ets/db/effect-sql`）· auth **none** · frontend **TanStack Router** · env `@ets/config`（`ServerEnv` / `loadServerEnv`）· addons `turborepo` + `skills`（`Effect-TS/skills`）+ `repos`（`repos/effect` subtree）+ `language-service`（`@effect/language-service` on TypeScript 5.x）+ `mcp`（`effect-mcp` docs server；`effect-solutions` 默认关闭）+ `effect-style`（`dprint` + `oxlint`/`@effect/oxc`，金样默认开）。
 
 新增金样能力时，先改可跑代码，再同步写入 `ets.jsonc` 的 `addons` / `addonOptions`。
 
@@ -102,16 +102,17 @@ Do not disable the plugin or skip these diagnostics to “make CI green” unles
 
 ## 包边界
 
-| 包 / 目录                   | 职责                                                                              | 禁止                                        |
-| --------------------------- | --------------------------------------------------------------------------------- | ------------------------------------------- |
-| `packages/domain`           | Schema、branded types、domain tagged errors                                       | IO、HTTP、Drizzle、Layer 组装               |
-| `packages/protocol`         | `HttpApi` / `HttpApiGroup` 契约与 OpenAPI 注解                                    | 业务规则、SQL、具体 handler                 |
-| `packages/db`               | Drizzle schema / migrations / Repository（默认）；`@ets/db/effect-sql` 为第二选项 | HTTP 映射、业务规则                         |
-| `packages/client`           | 从 protocol 派生的 `HttpApiClient`                                                | 服务端 Layer                                |
-| `apps/server/src/services`  | 业务规则（Service）                                                               | SQL 行解码、HTTP 状态码细节                 |
-| `apps/server/src/http`      | HttpApi handlers、HTTP 错误映射                                                   | 业务规则、SQL                               |
-| `apps/server/src/layers.ts` | prod / test Layer 组装                                                            | 新业务逻辑                                  |
-| `apps/web`                  | TanStack Router UI                                                                | 直接碰 DB / domain 私有细节之外的服务端实现 |
+| 包 / 目录                   | 职责                                                                                  | 禁止                                        |
+| --------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------- |
+| `packages/domain`           | Schema、branded types、domain tagged errors                                           | IO、HTTP、Drizzle、Layer 组装               |
+| `packages/config`           | 共享 `tsconfig.base.json` + Effect Schema/Config env（`ServerEnv` / `loadServerEnv`） | HTTP、DB、业务规则、prod Layer 组装         |
+| `packages/protocol`         | `HttpApi` / `HttpApiGroup` 契约与 OpenAPI 注解                                        | 业务规则、SQL、具体 handler                 |
+| `packages/db`               | Drizzle schema / migrations / Repository（默认）；`@ets/db/effect-sql` 为第二选项     | HTTP 映射、业务规则                         |
+| `packages/client`           | 从 protocol 派生的 `HttpApiClient`                                                    | 服务端 Layer                                |
+| `apps/server/src/services`  | 业务规则（Service）                                                                   | SQL 行解码、HTTP 状态码细节                 |
+| `apps/server/src/http`      | HttpApi handlers、HTTP 错误映射                                                       | 业务规则、SQL                               |
+| `apps/server/src/layers.ts` | prod / test Layer 组装                                                                | 新业务逻辑                                  |
+| `apps/web`                  | TanStack Router UI                                                                    | 直接碰 DB / domain 私有细节之外的服务端实现 |
 
 ## 架构不变量
 

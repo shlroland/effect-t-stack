@@ -1,10 +1,15 @@
+import { loadServerEnv } from "@ets/config"
 import { defineConfig } from "drizzle-kit"
+
+const env = loadServerEnv({
+  envFile: new URL("../../apps/server/.env", import.meta.url)
+})
 
 export default defineConfig({
   schema: "./src/schema.ts",
   out: "./drizzle",
   dialect: "sqlite",
   dbCredentials: {
-    url: process.env.DATABASE_URL ?? "./data.db"
+    url: env.DATABASE_URL
   }
 })
