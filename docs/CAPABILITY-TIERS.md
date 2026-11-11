@@ -23,6 +23,7 @@ Formal todos for对标 Better-T-Stack. Implement **strictly L1 → L6**; do not 
 - [x] Todo vertical slice + Repository / Service / HttpApi tests
 - [x] Addons present: turborepo · skills · repos · language-service · mcp（`effect-mcp`；`effect-solutions` 可选且默认关）
 - [x] In-server OpenAPI + `/api/docs`
+- [x] Secondary Effect Rpc under `/rpc` (`AppRpcs` + NDJSON; same Services)
 - [x] Operational endpoints: `health` / `ready` (ready = migrations + DB)
 - [x] Dev CORS middleware; HTTP boundary `Effect.logError` mapping
 

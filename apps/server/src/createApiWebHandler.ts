@@ -1,5 +1,5 @@
 import { loadServerEnv, type MakeServerEnvProviderOptions } from "@ets/config"
-import { ApiPrefix } from "@ets/protocol"
+import { ApiPrefix, RpcPrefix } from "@ets/protocol"
 import { Layer } from "effect"
 import { HttpMiddleware, HttpRouter, HttpServer } from "effect/http"
 import { AllRoutes } from "./http/HttpApp.ts"
@@ -17,8 +17,8 @@ export type CreateApiWebHandlerOptions = MakeServerEnvProviderOptions & {
 }
 
 /**
- * Build a WinterCG `fetch` handler from the shared HttpApi Layers.
- * Used by TanStack Start (primary) and can be reused by other adapters.
+ * Build a WinterCG `fetch` handler from the shared route Layers
+ * (HttpApi under `/api` + Effect Rpc under `/rpc`).
  */
 export const createApiWebHandler = (options?: CreateApiWebHandlerOptions) => {
   const env = loadServerEnv(options)
@@ -36,6 +36,15 @@ export const createApiWebHandler = (options?: CreateApiWebHandlerOptions) => {
   )
 }
 
-/** All Effect HttpApi traffic lives under {@link ApiPrefix}. */
-export const isApiRequestPath = (pathname: string): boolean =>
+export const isHttpApiRequestPath = (pathname: string): boolean =>
   pathname === ApiPrefix || pathname.startsWith(`${ApiPrefix}/`)
+
+export const isRpcRequestPath = (pathname: string): boolean =>
+  pathname === RpcPrefix || pathname.startsWith(`${RpcPrefix}/`)
+
+/** HttpApi (`/api`) or Effect Rpc (`/rpc`) — both served by {@link createApiWebHandler}. */
+export const isBackendRequestPath = (pathname: string): boolean =>
+  isHttpApiRequestPath(pathname) || isRpcRequestPath(pathname)
+
+/** @deprecated Prefer {@link isBackendRequestPath}. */
+export const isApiRequestPath = isBackendRequestPath

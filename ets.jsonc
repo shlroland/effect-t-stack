@@ -7,6 +7,23 @@
   "effect": "v4",
   "runtime": "bun",
   "api": "httpapi",
+  // Primary: Effect HttpApi under `/api` (OpenAPI + Scalar docs).
+  // Secondary: Effect Rpc under `/rpc` (HTTP + NDJSON; see `AppRpcs` in `@ets/protocol`).
+  "apiOptions": {
+    "prefix": "/api",
+    "modules": ["HttpApi", "HttpApiBuilder", "HttpApiClient"],
+    "secondary": {
+      "api": "rpc",
+      "prefix": "/rpc",
+      "modules": ["Rpc", "RpcGroup", "RpcServer", "RpcClient", "RpcSerialization"],
+      "serialization": "ndjson",
+      "protocol": "http",
+      "group": "AppRpcs",
+      "import": "@ets/protocol",
+      "client": "@ets/client/AppRpcClient",
+      "note": "Same Todos/System services; mount via RpcServer.layerHttp beside HttpApi."
+    }
+  },
   "database": "sqlite",
   // Default ORM: Drizzle 1.0 RC (`drizzle-orm/effect-sqlite-bun` + `@effect/sql-sqlite-bun`).
   // Secondary option: Effect SQL (`@ets/db/effect-sql`, SqlClient + SqliteMigrator + SqlSchema).

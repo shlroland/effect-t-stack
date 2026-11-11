@@ -1,4 +1,4 @@
-import { createApiWebHandler, isApiRequestPath } from "@ets/server"
+import { createApiWebHandler, isBackendRequestPath } from "@ets/server"
 import handler, { createServerEntry } from "@tanstack/react-start/server-entry"
 import { fileURLToPath } from "node:url"
 
@@ -11,7 +11,7 @@ const api = createApiWebHandler({
 export default createServerEntry({
   fetch(request, opts) {
     const { pathname } = new URL(request.url)
-    if (isApiRequestPath(pathname)) {
+    if (isBackendRequestPath(pathname)) {
       return api.handler(request)
     }
     return handler.fetch(request, opts)
