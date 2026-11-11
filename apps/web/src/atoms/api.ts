@@ -6,6 +6,7 @@ import { AtomHttpApi } from "effect/reactivity"
 const baseUrl = import.meta.env.VITE_API_URL ??
   (typeof window !== "undefined" ? window.location.origin : "http://localhost:5173")
 
+/** HttpApi atom client (secondary; todos UI currently uses {@link ./rpc.ts}). */
 export const ApiAtoms = AtomHttpApi.Service()("ApiAtoms", {
   api: Api,
   baseUrl,

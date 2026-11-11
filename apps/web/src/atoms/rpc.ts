@@ -1,0 +1,25 @@
+import { AppRpcs, RpcPrefix } from "@ets/protocol/rpc"
+import { Layer } from "effect"
+import { FetchHttpClient } from "effect/http"
+import { AtomRpc } from "effect/reactivity"
+import { RpcClient, RpcSerialization } from "effect/rpc"
+
+/** Same-origin by default (Start embeds `/rpc`). Override for standalone `apps/server`. */
+const baseUrl = import.meta.env.VITE_API_URL ??
+  (typeof window !== "undefined" ? window.location.origin : "http://localhost:5173")
+
+/**
+ * Atom-backed Effect Rpc client used by the todos UI.
+ * NDJSON over `${origin}/rpc` (HttpApi twin: {@link ./api.ts}).
+ */
+export const RpcAtoms = AtomRpc.Service()("RpcAtoms", {
+  group: AppRpcs,
+  protocol: RpcClient.layerProtocolHttp({
+    url: `${baseUrl.replace(/\/$/, "")}${RpcPrefix}`
+  }).pipe(
+    Layer.provide(FetchHttpClient.layer),
+    Layer.provide(RpcSerialization.layerNdjson)
+  )
+})
+
+export const todosReactivityKeys = ["todos"] as const

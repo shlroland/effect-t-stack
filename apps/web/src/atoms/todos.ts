@@ -1,10 +1,10 @@
 import { Todo, TodoId, TodoTitle } from "@ets/domain"
 import { Effect } from "effect"
 import { AsyncResult, Atom } from "effect/reactivity"
-import { ApiAtoms, todosReactivityKeys } from "./api.ts"
+import { RpcAtoms, todosReactivityKeys } from "./rpc.ts"
 
 /** Serializable query atom — dehydrated on the server, hydrated into the client registry. */
-export const todosQueryAtom = ApiAtoms.query("todos", "list", {
+export const todosQueryAtom = RpcAtoms.query("ListTodos", void 0, {
   reactivityKeys: todosReactivityKeys,
   timeToLive: "30 seconds",
   serializationKey: "list"
@@ -34,12 +34,10 @@ export const createTodoAtom = todosListAtom.pipe(
           createdAt: new Date()
         })
       ]),
-    fn: ApiAtoms.runtime.fn(
+    fn: RpcAtoms.runtime.fn(
       Effect.fnUntraced(function*(title: CreateTodoInput) {
-        const client = yield* ApiAtoms
-        return yield* client.todos.create({
-          payload: { title: TodoTitle.make(title) }
-        })
+        const client = yield* RpcAtoms
+        return yield* client("CreateTodo", { title: TodoTitle.make(title) })
       }),
       { reactivityKeys: todosReactivityKeys }
     )
@@ -66,15 +64,13 @@ export const updateTodoAtom = todosListAtom.pipe(
             })
             : todo
         )),
-    fn: ApiAtoms.runtime.fn(
+    fn: RpcAtoms.runtime.fn(
       Effect.fnUntraced(function*(patch: UpdateTodoInput) {
-        const client = yield* ApiAtoms
-        return yield* client.todos.update({
-          params: { id: patch.id },
-          payload: {
-            ...(patch.title !== undefined ? { title: TodoTitle.make(patch.title) } : {}),
-            ...(patch.completed !== undefined ? { completed: patch.completed } : {})
-          }
+        const client = yield* RpcAtoms
+        return yield* client("UpdateTodo", {
+          id: patch.id,
+          ...(patch.title !== undefined ? { title: TodoTitle.make(patch.title) } : {}),
+          ...(patch.completed !== undefined ? { completed: patch.completed } : {})
         })
       }),
       { reactivityKeys: todosReactivityKeys }
@@ -87,12 +83,10 @@ export type RemoveTodoInput = TodoId
 export const removeTodoAtom = todosListAtom.pipe(
   Atom.optimisticFn({
     reducer: (current, id: RemoveTodoInput) => mapSuccess(current, (todos) => todos.filter((todo) => todo.id !== id)),
-    fn: ApiAtoms.runtime.fn(
+    fn: RpcAtoms.runtime.fn(
       Effect.fnUntraced(function*(id: RemoveTodoInput) {
-        const client = yield* ApiAtoms
-        return yield* client.todos.remove({
-          params: { id }
-        })
+        const client = yield* RpcAtoms
+        return yield* client("RemoveTodo", { id })
       }),
       { reactivityKeys: todosReactivityKeys }
     )
@@ -102,13 +96,13 @@ export const removeTodoAtom = todosListAtom.pipe(
 export const clearCompletedAtom = todosListAtom.pipe(
   Atom.optimisticFn({
     reducer: (current) => mapSuccess(current, (todos) => todos.filter((todo) => !todo.completed)),
-    fn: ApiAtoms.runtime.fn(
+    fn: RpcAtoms.runtime.fn(
       Effect.fnUntraced(function*() {
-        const client = yield* ApiAtoms
-        const todos = yield* client.todos.list({})
+        const client = yield* RpcAtoms
+        const todos = yield* client("ListTodos", void 0)
         yield* Effect.forEach(
           todos.filter((todo) => todo.completed),
-          (todo) => client.todos.remove({ params: { id: todo.id } }),
+          (todo) => client("RemoveTodo", { id: todo.id }),
           { concurrency: "unbounded" }
         )
       }),
