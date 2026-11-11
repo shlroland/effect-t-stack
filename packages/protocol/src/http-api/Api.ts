@@ -11,6 +11,6 @@ export class Api extends HttpApi.make("effect-t-stack")
   .prefix(ApiPrefix)
   .annotateMerge(OpenApi.annotations({
     title: "effect-t-stack API",
-    description: "Effect v4 HttpApi golden base — Todo CRUD + health"
+    description: "Effect v4 HttpApi secondary surface — Todo CRUD + health (primary API is Rpc)"
   }))
 {}

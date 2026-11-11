@@ -29,16 +29,20 @@ A staged delivery band (L0–L6) for Scaffold Product and generated-project feat
 _Avoid_: phase (unless tied to a named release), priority (alone)
 
 **Effect Core**:
-The fixed architectural spine of generated apps: Effect v4, HttpApi as the default API, and domain → protocol → db → service → http layering.
-_Avoid_: backend (ambiguous), stack
+The fixed architectural spine of generated apps: Effect v4, `api ∈ {httpapi, rpc}` (Golden/`--yes` default `rpc`), and domain → protocol → db → service → http/rpc layering.
+_Avoid_: backend (ambiguous), stack, HttpApi-only default (see ADR-0006)
+
+**API Primary**:
+The fingerprint root `api` value that binds the main protocol, default client, and default UI atoms; the other Effect API may remain mounted as secondary.
+_Avoid_: exclusive API mode (when secondary is still generated), transport (alone)
 
 **Backend Adapter**:
 A thin HTTP host (e.g. Hono shell) that still runs Effect Core handlers/Layers — not a parallel API stack.
 _Avoid_: backend (when meaning a full alternate stack), migration
 
 **Separate Server**:
-The default generated shape with a dedicated `apps/server` process hosting Effect HttpApi — distinct from BaaS or routes-in-web layouts.
-_Avoid_: Convex backend, self backend, fullstack web (when meaning API-in-`apps/web`)
+An optional generated shape with a dedicated `apps/server` process hosting Effect Rpc/HttpApi — distinct from BaaS; Golden default `backend=self` mounts APIs inside TanStack Start instead.
+_Avoid_: Convex backend, fullstack web (when meaning API-in-`apps/web` without a clear mount)
 
 **Dependency Catalog**:
 The single table of version pins that Golden Sample and templates must use so generated projects stay on current stable releases by default.

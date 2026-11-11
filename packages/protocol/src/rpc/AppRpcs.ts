@@ -10,8 +10,8 @@ import { HealthResponse, ReadyResponse } from "../Health.ts"
 export const RpcPrefix = "/rpc" as const
 
 /**
- * Secondary API surface built with Effect `Rpc` / `RpcGroup`.
- * Primary golden path remains HttpApi under `/api`.
+ * Primary golden API surface (`api=rpc`) built with Effect `Rpc` / `RpcGroup`.
+ * HttpApi under `/api` remains secondary (OpenAPI/docs). See ADR-0006.
  */
 export const AppRpcs = RpcGroup.make(
   Rpc.make("Health", {

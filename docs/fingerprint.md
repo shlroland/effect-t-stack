@@ -4,12 +4,12 @@ Golden Sample / generated-app **fingerprint**. Agents and future `create-effect-
 
 ## Field classes
 
-| Class              | Examples                                                      | Rules                                                                         |
-| ------------------ | ------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| **Stack dims**     | `runtime`, `api`, `orm`, `auth`, `frontend`, `backend`, `env` | Root Option Matrix; prefer nested `*Options` over new root keys               |
-| **`addons[]`**     | `turborepo`, `effect-style`, `mcp`                            | Ordered list of enabled addons                                                |
-| **`addonOptions`** | `addonOptions.effect-style`                                   | Per-addon details; nest here instead of inventing root keys                   |
-| **Meta**           | `version`, `createdAt`, `reproducibleCommand`, `cliVersion`   | Golden may omit create-time meta; generated apps include them once CLI exists |
+| Class              | Examples                                                      | Rules                                                                                                                                                    |
+| ------------------ | ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Stack dims**     | `runtime`, `api`, `orm`, `auth`, `frontend`, `backend`, `env` | Root Option Matrix; prefer nested `*Options` over new root keys. `api` primary binding: [ADR-0006](./adr/0006-api-primary-rpc-with-httpapi-secondary.md) |
+| **`addons[]`**     | `turborepo`, `effect-style`, `mcp`                            | Ordered list of enabled addons                                                                                                                           |
+| **`addonOptions`** | `addonOptions.effect-style`                                   | Per-addon details; nest here instead of inventing root keys                                                                                              |
+| **Meta**           | `version`, `createdAt`, `reproducibleCommand`, `cliVersion`   | Golden may omit create-time meta; generated apps include them once CLI exists                                                                            |
 
 ## Write path
 

@@ -9,8 +9,8 @@ const baseUrl = import.meta.env.VITE_API_URL ??
   (typeof window !== "undefined" ? window.location.origin : "http://localhost:5173")
 
 /**
- * Atom-backed Effect Rpc client used by the todos UI.
- * NDJSON over `${origin}/rpc` (HttpApi twin: {@link ./api.ts}).
+ * Atom-backed Effect Rpc client used by the todos UI (`api=rpc` primary).
+ * NDJSON over `${origin}/rpc`. HttpApi remains mounted at `/api` as secondary.
  */
 export const RpcAtoms = AtomRpc.Service()("RpcAtoms", {
   group: AppRpcs,

@@ -26,8 +26,8 @@ function TodosPage() {
     <>
       <h1 className="brand">effect-t-stack</h1>
       <p className="lede">
-        Effect v4 HttpApi 金样基础模板。共享 protocol 契约，HttpApi 由 TanStack Start 同源托管；Start loader 预热 Atom
-        再注水，React 只订阅与分发。
+        Effect v4 金样：默认 API primary 为 Rpc（`/rpc`），HttpApi（`/api`，OpenAPI）为 secondary。Todo UI 用
+        AtomRpc；Start loader 预热 Atom 再注水，React 只订阅与分发。
       </p>
 
       <section className="panel">

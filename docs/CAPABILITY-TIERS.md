@@ -2,9 +2,9 @@
 
 Formal todos for对标 Better-T-Stack. Implement **strictly L1 → L6**; do not skip tiers for L5/L6 product work. See [ADR-0001](./adr/0001-effect-core-and-capability-tiers.md) and root `GLOSSARY.md`.
 
-**Defaults (Golden Sample):** Bun · Effect HttpApi（Start self-host；`apps/server` secondary）· SQLite + Drizzle（Effect SQL secondary via `@ets/db/effect-sql`）· auth `none` · TanStack Start · turborepo · example `todo`.
+**Defaults (Golden Sample):** Bun · Effect **Rpc** primary + HttpApi secondary（Start self-host；`apps/server` secondary）· SQLite + Drizzle（Effect SQL secondary via `@ets/db/effect-sql`）· auth `none` · TanStack Start（Todo UI = `AtomRpc`）· turborepo · example `todo`. See [ADR-0006](./adr/0006-api-primary-rpc-with-httpapi-secondary.md).
 
-**Non-goals:** `api` tRPC/oRPC as first-class (L6c); Convex; scaffold-level i18n; first-class realtime (SSE/WS) examples (unless a later example slice is explicitly added); auto-`migrate`/codemod upgrades of old generated apps. Golden Sample **does** use Start self-host for HttpApi (`backend=self`); standalone `apps/server` remains a secondary template.
+**Non-goals:** `api` tRPC/oRPC as first-class (L6c); Convex; scaffold-level i18n; first-class realtime (SSE/WS) examples (unless a later example slice is explicitly added); auto-`migrate`/codemod upgrades of old generated apps. Golden Sample **does** use Start self-host for Rpc+HttpApi (`backend=self`); standalone `apps/server` remains a secondary template.
 
 **Branding (default):** repo / product `effect-t-stack`; npm / binary `create-effect-t-stack`; workspace scope in Golden Sample `@ets/*`, on `create` renamed to `@<project>/*`.
 
@@ -12,24 +12,24 @@ Formal todos for对标 Better-T-Stack. Implement **strictly L1 → L6**; do not 
 
 ## L0 — Golden Sample
 
-> **L0 exit gates are implemented; maintainer sign-off is still open.** Do **not** start L1 Scaffold Product until the sign-off checkbox below is ticked (or explicitly waived in an ADR). Known issues: [`docs/L0-KNOWN-ISSUES.md`](./L0-KNOWN-ISSUES.md).
+> **L0 closed (2026-11-11).** Maintainer sign-off recorded: Golden Sample may be copied by CLI. L1 Scaffold Product is unblocked. Known issues freeze: [`docs/L0-KNOWN-ISSUES.md`](./L0-KNOWN-ISSUES.md).
 
 ### Baseline present (necessary but not sufficient)
 
-- [x] Runnable monorepo: Bun · HttpApi（Start self）· SQLite+Drizzle · auth none · TanStack Start · turborepo
-- [x] Fingerprint `ets.jsonc` (v1 — expect schema churn; see Fingerprint hygiene)
+- [x] Runnable monorepo: Bun · Rpc primary + HttpApi secondary（Start self）· SQLite+Drizzle · auth none · TanStack Start · turborepo
+- [x] Fingerprint `ets.jsonc` (v1 — expect schema churn; see Fingerprint hygiene); root `api=rpc` (ADR-0006)
 - [x] Packages: domain · protocol · db · client · config
 - [x] Apps: server · web
-- [x] Todo vertical slice + Repository / Service / HttpApi tests
+- [x] Todo vertical slice + Repository / Service / HttpApi tests（UI via AtomRpc）
 - [x] Addons present: turborepo · skills · repos · language-service · mcp（`effect-mcp`；`effect-solutions` 可选且默认关）
-- [x] In-server OpenAPI + `/api/docs`
-- [x] Secondary Effect Rpc under `/rpc` (`@ets/protocol/rpc` + NDJSON; separate handlers/clients from HttpApi)
+- [x] In-server OpenAPI + `/api/docs`（HttpApi secondary）
+- [x] Primary Effect Rpc under `/rpc` (`@ets/protocol/rpc` + NDJSON; separate handlers/clients from HttpApi)
 - [x] Operational endpoints: `health` / `ready` (ready = migrations + DB)
 - [x] Dev CORS middleware; HTTP boundary `Effect.logError` mapping
 
-### Golden Sample quality debt (active L0 work)
+### Golden Sample quality debt (cleared at L0 exit)
 
-From review vs `AGENTS.md` / `repos/effect` / `LLMS.md` (2026-11-10). Clear or ADR-waive before L1.
+From review vs `AGENTS.md` / `repos/effect` / `LLMS.md` (2026-11-10). Cleared or ADR-waived before L1.
 
 **P0 — boundaries**
 
@@ -67,7 +67,7 @@ From review vs `AGENTS.md` / `repos/effect` / `LLMS.md` (2026-11-10). Clear or A
 - [x] Dependency Catalog in place; intentional lags documented — [`docs/DEPENDENCY-CATALOG.md`](./DEPENDENCY-CATALOG.md)
 - [x] `ets.jsonc` reviewed for v1 → tidy shape (no stale comments/options)
 - [x] AGENTS.md invariants match actual code
-- [ ] Explicit maintainer sign-off: “Golden Sample may be copied by CLI”
+- [x] Explicit maintainer sign-off: “Golden Sample may be copied by CLI” (2026-11-11)
 
 ### Effect Core invariants (document + keep true in Golden Sample / templates)
 
@@ -199,7 +199,11 @@ Introduce `packages/template-generator` + `.hbs` when combinations explode (expe
 
 ### API
 
-- [ ] `api=httpapi` only (default; locked until a future ADR reopens L6c)
+- [ ] `api=rpc` (Golden / `--yes` default; Todo UI = AtomRpc) — [ADR-0006](./adr/0006-api-primary-rpc-with-httpapi-secondary.md)
+- [ ] `api=httpapi` (primary flip; Todo UI = AtomHttpApi; Rpc may remain secondary)
+- [ ] Primary binding: root `api` + default client + default UI; unselected Effect API may stay secondary (not mutual exclusion)
+- [ ] CLI `create` / `--api` prompt (L1 wiring; matrix completeness here)
+- Non-goal remains: tRPC/oRPC as first-class (L6c)
 
 ### Runtime (`--runtime`)
 
@@ -354,7 +358,7 @@ Introduce `packages/template-generator` + `.hbs` when combinations explode (expe
 - [ ] **L6b** Thin HTTP shells (Hono / Elysia / …) that mount Effect Core handlers/Layers
 - [ ] ~~L6c Parallel tRPC/oRPC~~ **non-goal**
 - [ ] ~~L6d Convex~~ **non-goal**
-- [x] Start self-host HttpApi (`backend=self`) — Golden Sample default; standalone Bun server secondary
+- [x] Start self-host Rpc+HttpApi (`backend=self`) — Golden Sample default; standalone Bun server secondary
 
 ---
 
@@ -363,8 +367,9 @@ Introduce `packages/template-generator` + `.hbs` when combinations explode (expe
 | BTS concept                   | ETS stance                                               |
 | ----------------------------- | -------------------------------------------------------- |
 | `backend` hono/express/…      | Separate Server + Effect; L6b shell only                 |
-| `backend` self                | Golden Sample default with TanStack Start + HttpApi      |
-| `api` trpc/orpc               | HttpApi only                                             |
+| `backend` self                | Golden Sample default with TanStack Start + Rpc/HttpApi  |
+| `api` default                 | `rpc` primary; `httpapi` secondary (ADR-0006)            |
+| `api` trpc/orpc               | Non-goal (L6c); Effect HttpApi/Rpc only                  |
 | `auth` better-auth/clerk/none | Full L3 surface; Golden Sample stays `none`              |
 | `bts.jsonc`                   | `ets.jsonc`                                              |
 | Convex                        | Non-goal                                                 |

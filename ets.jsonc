@@ -6,23 +6,23 @@
   "name": "effect-t-stack",
   "effect": "v4",
   "runtime": "bun",
-  "api": "httpapi",
-  // Primary HttpApi `/api`; secondary Effect Rpc `/rpc` (NDJSON).
+  "api": "rpc",
+  // Primary Effect Rpc `/rpc` (NDJSON); secondary HttpApi `/api` (OpenAPI/docs). ADR-0006.
   "apiOptions": {
-    "prefix": "/api",
-    "import": "@ets/protocol/http-api",
-    "client": "@ets/client/http-api",
-    "modules": ["HttpApi", "HttpApiBuilder", "HttpApiClient"],
+    "prefix": "/rpc",
+    "import": "@ets/protocol/rpc",
+    "client": "@ets/client/rpc",
+    "group": "AppRpcs",
+    "modules": ["Rpc", "RpcGroup", "RpcServer", "RpcClient", "RpcSerialization"],
+    "serialization": "ndjson",
+    "protocol": "http",
     "secondary": {
-      "api": "rpc",
-      "prefix": "/rpc",
-      "modules": ["Rpc", "RpcGroup", "RpcServer", "RpcClient", "RpcSerialization"],
-      "serialization": "ndjson",
-      "protocol": "http",
-      "group": "AppRpcs",
-      "import": "@ets/protocol/rpc",
-      "client": "@ets/client/rpc",
-      "note": "Same Services; separate protocol/client/server folders from HttpApi."
+      "api": "httpapi",
+      "prefix": "/api",
+      "import": "@ets/protocol/http-api",
+      "client": "@ets/client/http-api",
+      "modules": ["HttpApi", "HttpApiBuilder", "HttpApiClient"],
+      "note": "Same Services; OpenAPI/docs; separate protocol/client/server folders from Rpc."
     }
   },
   "database": "sqlite",
@@ -47,12 +47,13 @@
   "auth": "none",
   "frontend": "tanstack-start",
   // Client state: Effect Atom (`effect/reactivity` + `@effect/atom-react`).
-  // Todos: AtomHttpApi + local UI atoms; Start loader dehydrates → HydrationBoundary.
+  // Todos: AtomRpc (primary api=rpc) + local UI atoms; Start loader dehydrates → HydrationBoundary.
   "frontendOptions": {
     "atom": {
       "package": "@effect/atom-react",
       "version": "catalog:",
-      "modules": ["Atom", "AtomHttpApi", "AsyncResult", "RegistryProvider", "HydrationBoundary"],
+      "client": "rpc",
+      "modules": ["Atom", "AtomRpc", "AsyncResult", "RegistryProvider", "HydrationBoundary"],
       "reactivity": "effect/reactivity",
       "ssr": {
         "loader": "apps/web/src/routes/index.tsx",
@@ -60,21 +61,21 @@
         "hydrate": "HydrationBoundary",
         "serializationKey": "todos list query"
       },
-      "note": "Server remains SoT; Start loader dehydrates AtomHttpApi query; client HydrationBoundary + optimistic mutations; UI filter/draft/edit in local atoms."
+      "note": "Server remains SoT; Start loader dehydrates AtomRpc ListTodos query; client HydrationBoundary + optimistic mutations; UI filter/draft/edit in local atoms. Future CLI may set atom.client to httpapi when api primary flips."
     },
     "peer": {
       "scheduler": "catalog:"
     },
     "catalog": "docs/DEPENDENCY-CATALOG.md"
   },
-  // Primary: Start mounts HttpApi+Rpc. Secondary: apps/server BunHttpServer :3737.
+  // Primary: Start mounts Rpc+HttpApi (Rpc primary). Secondary: apps/server BunHttpServer :3737.
   "backend": "self",
   "backendOptions": {
     "mount": "apps/web/src/server.ts",
+    "rpcPrefix": "/rpc",
+    "rpcWebHandler": "@ets/server/createRpcWebHandler",
     "apiPrefix": "/api",
     "httpApiWebHandler": "@ets/server/createHttpApiWebHandler",
-    "rpcWebHandler": "@ets/server/createRpcWebHandler",
-    "rpcPrefix": "/rpc",
     "secondary": {
       "backend": "httpapi-server",
       "app": "apps/server",
@@ -95,7 +96,7 @@
     },
     "webEnvFile": "apps/web/.env",
     "serverEnvFile": "apps/server/.env",
-    "note": "HttpApi Layers in @ets/server; @ets/config owns Schema/Config only."
+    "note": "Rpc + HttpApi Layers in @ets/server; @ets/config owns Schema/Config only."
   },
   "addons": ["turborepo", "skills", "repos", "language-service", "mcp", "effect-style"],
   "addonOptions": {

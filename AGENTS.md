@@ -1,6 +1,6 @@
 # AGENTS.md — effect-t-stack 金样边界
 
-本仓库是 **effect-t-stack Phase 1a 金样基础模板**（非 CLI）。Agent 与人类协作者扩展功能时，必须遵守下列边界。
+本仓库是 **effect-t-stack L0 Golden Sample**（已签离，可被 CLI 复制；Scaffold CLI 本身属 L1，本仓尚未包含）。Agent 与人类协作者扩展功能时，必须遵守下列边界。
 
 # Learning more about Effect
 
@@ -44,7 +44,7 @@ git subtree pull --prefix=repos/effect https://github.com/Effect-TS/effect.git m
 
 ## 栈指纹
 
-见根目录 `ets.jsonc`（金样构建步骤 / 选型真相源）：Effect **v4** · Bun · HttpApi · SQLite + **Drizzle 1.0 RC**（默认：`drizzle-orm/effect-sqlite-bun` + `@effect/sql-sqlite-bun`；第二选项：Effect SQL via `@ets/db/effect-sql`）· auth **none** · frontend **TanStack Start** · backend **self**（HttpApi 由 Start 同源托管；独立 `apps/server` BunHttpServer 为第二选项）· env `@ets/config`（`ServerEnv` / `loadServerEnv`）· addons `turborepo` + `skills`（`Effect-TS/skills`）+ `repos`（`repos/effect` subtree）+ `language-service`（`@effect/language-service` on TypeScript 5.x）+ `mcp`（`effect-mcp` docs server；`effect-solutions` 默认关闭）+ `effect-style`（`dprint` + `oxlint`/`@effect/oxc`，金样默认开）。
+见根目录 `ets.jsonc`（金样构建步骤 / 选型真相源）：Effect **v4** · Bun · **Rpc 主 / HttpApi 次**（ADR-0006）· SQLite + **Drizzle 1.0 RC**（默认：`drizzle-orm/effect-sqlite-bun` + `@effect/sql-sqlite-bun`；第二选项：Effect SQL via `@ets/db/effect-sql`）· auth **none** · frontend **TanStack Start**（Todo UI = `AtomRpc`）· backend **self**（`/rpc`+`/api` 由 Start 同源托管；独立 `apps/server` BunHttpServer 为第二选项）· env `@ets/config`（`ServerEnv` / `loadServerEnv`）· addons `turborepo` + `skills`（`Effect-TS/skills`）+ `repos`（`repos/effect` subtree）+ `language-service`（`@effect/language-service` on TypeScript 5.x）+ `mcp`（`effect-mcp` docs server；`effect-solutions` 默认关闭）+ `effect-style`（`dprint` + `oxlint`/`@effect/oxc`，金样默认开）。
 
 新增金样能力时，先改可跑代码，再同步写入 `ets.jsonc` 的 `addons` / `addonOptions`。指纹字段分类见 `docs/fingerprint.md`；共享版本钉在根 `package.json` `workspaces.catalog`（`docs/DEPENDENCY-CATALOG.md`）。
 
@@ -95,7 +95,7 @@ bunx effect-solutions@latest show <topic>
 ```
 
 Treat results as opinionated scenario patterns only. Stack choices in this
-repo (HttpApi, Drizzle, domain → protocol → db → service → http) win on conflict.
+repo (Rpc primary / HttpApi secondary, Drizzle, domain → protocol → db → service → http/rpc) win on conflict.
 
 ## Effect language service
 
@@ -133,8 +133,8 @@ Do not disable the plugin or skip these diagnostics to “make CI green” unles
 3. **HTTP 契约在 `protocol`** — 前后端共享同一 `Api`；不要在 web 里手写平行 DTO。
 4. **HTTP 错误映射在 server 边界** — `DatabaseError` / `TodoDecodeError` → `InternalServerError` 等只在 `apps/server/src/http`。`DatabaseError` 由 Repository / ping 把 Drizzle query 错误 / `SqlError` 等 infra 错误映射而来；不要在 handler 里直接依赖驱动错误标签。
 5. **运行时组装只在 Layers** — 入口与测试各自提供 prod / test Layer，勿在 handler 里 `new` 依赖。
-6. **默认 backend = self** — 金样用 TanStack Start `src/server.ts` 分别挂载 `createHttpApiWebHandler`（`/api`）与 `createRpcWebHandler`（`/rpc`）；独立 `apps/server`（BunHttpServer :3737）是第二选项，需设 `VITE_API_URL`。
-7. **API 双轨** — 主路径 **HttpApi**（`/api`，OpenAPI/docs）；第二选项 **Effect Rpc**（`/rpc`，`AppRpcs` + NDJSON）。契约 / handler / client 分目录；Start 上共享同一 `appLive` + `memoMap`，勿把两套 mount 混进一个 factory。
+6. **默认 backend = self** — 金样用 TanStack Start `src/server.ts` 分别挂载 `createRpcWebHandler`（`/rpc`）与 `createHttpApiWebHandler`（`/api`）；独立 `apps/server`（BunHttpServer :3737）是第二选项，需设 `VITE_API_URL`。
+7. **API Primary 绑定** — 根指纹 `api` 默认 **`rpc`**（`/rpc`，`AppRpcs` + NDJSON；Todo UI = `AtomRpc`）；**HttpApi**（`/api`，OpenAPI/docs）为 secondary。契约 / handler / client 分目录；Start 上共享同一 `appLive` + `memoMap`，勿把两套 mount 混进一个 factory。未来 CLI 可选 primary（ADR-0006）；L0 不实现切换。
 
 ## 新增资源清单（以 Todo 为模板）
 
@@ -145,7 +145,7 @@ Do not disable the plugin or skip these diagnostics to “make CI green” unles
 5. `apps/server/src/http`：`HttpApiBuilder.group` handlers + 错误映射（Rpc 则写 `src/rpc`）
 6. `apps/server/src/layers.ts`：接入 Layer
 7. 测试：Repository / Service / HttpApiTest（可选：`makeAppLive` 集成）
-8. 可选：`apps/web` 用 `@ets/client/http-api` 或 `@ets/client/rpc`
+8. 金样 web：`AtomRpc` + `@ets/client/rpc`（`api=httpapi` 时改用 `AtomHttpApi` + `@ets/client/http-api`）
 
 ## 命令
 
@@ -156,9 +156,9 @@ bun run lint                      # oxlint + dprint check
 bun run lint-fix                 # oxlint --fix + dprint fmt
 bun run effect:diagnostics:server # Effect LSP diagnostics as JSON
 bun run effect:diagnostics:web
-bun run dev                       # TanStack Start :5173（UI + HttpApi 同源）
+bun run dev                       # TanStack Start :5173（UI + Rpc/HttpApi 同源）
 bun run dev:web                   # 同上
-bun run dev:server                # 备选：独立 Bun HttpApi :3737
+bun run dev:server                # 备选：独立 Bun server :3737
 ```
 
 ## 运行时
