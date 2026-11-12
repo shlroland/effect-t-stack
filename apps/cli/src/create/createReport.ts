@@ -1,9 +1,9 @@
 import * as Console from "effect/Console"
 import * as Effect from "effect/Effect"
+import { buildRenameMap } from "../template/rename.ts"
 import type { CreateOptions } from "./CreateOptions.ts"
 import type { CreateResult } from "./CreateResult.ts"
 import { formatVerbose, makeCreateResult } from "./CreateResult.ts"
-import { buildRenameMap } from "./rename.ts"
 
 const TITLE = `
 ┌─────────────────────────────────────┐

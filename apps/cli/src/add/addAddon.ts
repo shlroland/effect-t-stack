@@ -1,10 +1,16 @@
 import * as Console from "effect/Console"
 import * as Effect from "effect/Effect"
 import * as Path from "effect/Path"
-import { CLI_VERSION } from "./cliVersion.ts"
-import { CreateError } from "./CreateError.ts"
-import { GOLDEN_ADDONS, isGoldenAddon, loadFingerprint, recordAddon, writeFingerprint } from "./fingerprint.ts"
-import { appendHistory } from "./history.ts"
+import { CLI_VERSION } from "../fingerprint/cliVersion.ts"
+import {
+  GOLDEN_ADDONS,
+  isGoldenAddon,
+  loadFingerprint,
+  recordAddon,
+  writeFingerprint
+} from "../fingerprint/fingerprint.ts"
+import { appendHistory } from "../fingerprint/history.ts"
+import { CreateError } from "../shared/CreateError.ts"
 
 export type AddAddonOptions = {
   readonly addon: string

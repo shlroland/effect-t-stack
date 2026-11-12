@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test"
-import { ETS_SCHEMA_URL } from "./cliVersion.ts"
-import { parseFingerprint, stampCreateFingerprint, stripJsoncComments } from "./fingerprint.ts"
+import { ETS_SCHEMA_URL } from "../src/fingerprint/cliVersion.ts"
+import { parseFingerprint, stampCreateFingerprint, stripJsoncComments } from "../src/fingerprint/fingerprint.ts"
 
 describe("fingerprint", () => {
   test("stripJsoncComments keeps URLs and strips line comments", () => {

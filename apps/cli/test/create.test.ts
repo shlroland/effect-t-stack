@@ -5,11 +5,11 @@ import * as Exit from "effect/Exit"
 import { mkdir, mkdtemp, readFile, rm, stat } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
-import { resolveTargetDirectory } from "./copyGolden.ts"
-import { createProject } from "./create.ts"
-import { CreateError } from "./CreateError.ts"
-import type { CreateOptions } from "./CreateOptions.ts"
-import { resolveGoldenRoot } from "./paths.ts"
+import { resolveTargetDirectory } from "../src/create/copyGolden.ts"
+import { createProject } from "../src/create/create.ts"
+import type { CreateOptions } from "../src/create/CreateOptions.ts"
+import { CreateError } from "../src/shared/CreateError.ts"
+import { resolveGoldenRoot } from "../src/template/paths.ts"
 
 const provideBun = <A, E, R>(effect: Effect.Effect<A, E, R>) =>
   effect.pipe(Effect.provide(BunServices.layer)) as Effect.Effect<A, E>

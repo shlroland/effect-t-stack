@@ -17,12 +17,12 @@ export const resolveGoldenRoot = (fromModuleUrl: string = import.meta.url): stri
   }
 
   const here = dirname(fileURLToPath(fromModuleUrl))
-  const monorepo = join(here, "../../../examples/golden")
+  const monorepo = join(here, "../../../../examples/golden")
   if (existsSync(join(monorepo, "package.json"))) {
     return monorepo
   }
 
-  const packed = join(here, "../templates/golden")
+  const packed = join(here, "../../templates/golden")
   if (existsSync(join(packed, "package.json"))) {
     return packed
   }
@@ -32,5 +32,5 @@ export const resolveGoldenRoot = (fromModuleUrl: string = import.meta.url): stri
 
 export const resolveRepoRoot = (fromModuleUrl: string = import.meta.url): string => {
   const here = dirname(fileURLToPath(fromModuleUrl))
-  return join(here, "../../..")
+  return join(here, "../../../..")
 }

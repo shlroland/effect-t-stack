@@ -34,7 +34,6 @@
     "README.md",
     "schemas",
     "src",
-    "!src/**/*.test.ts",
     "templates"
   ],
   "scripts": {
@@ -42,8 +41,8 @@
     "pack:golden": "bun run scripts/pack-golden.ts",
     "prepack": "bun run pack:golden",
     "check-types": "tsc --noEmit -p tsconfig.json",
-    "test": "bun test src",
-    "lint": "oxlint -c .oxlintrc.json -f unix src scripts",
+    "test": "bun test test",
+    "lint": "oxlint -c .oxlintrc.json -f unix src scripts test",
     "check": "bun run lint && bun run check-types && bun run test"
   },
   "dependencies": {

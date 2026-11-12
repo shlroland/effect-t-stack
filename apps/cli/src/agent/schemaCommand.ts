@@ -3,9 +3,9 @@ import * as Effect from "effect/Effect"
 import * as FileSystem from "effect/FileSystem"
 import * as Path from "effect/Path"
 import { fileURLToPath } from "node:url"
-import { CreateError } from "./CreateError.ts"
-import type { CreateOptions } from "./CreateOptions.ts"
-import { GOLDEN_ADDONS } from "./fingerprint.ts"
+import type { CreateOptions } from "../create/CreateOptions.ts"
+import { GOLDEN_ADDONS } from "../fingerprint/fingerprint.ts"
+import { CreateError } from "../shared/CreateError.ts"
 
 export type SchemaName = "all" | "createInput" | "addonOptions" | "fingerprint"
 
@@ -56,7 +56,7 @@ export const emitSchema = Effect.fn("emitSchema")(function*(name: SchemaName) {
   const fs = yield* FileSystem.FileSystem
   const path = yield* Path.Path
   const here = path.dirname(fileURLToPath(import.meta.url))
-  const schemaPath = path.join(here, "../schemas/ets.schema.json")
+  const schemaPath = path.join(here, "../../schemas/ets.schema.json")
   const exists = yield* fs.exists(schemaPath)
   if (!exists) {
     return yield* new CreateError({

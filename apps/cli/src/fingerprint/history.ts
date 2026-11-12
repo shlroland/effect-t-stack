@@ -2,7 +2,7 @@ import * as Effect from "effect/Effect"
 import * as FileSystem from "effect/FileSystem"
 import * as Path from "effect/Path"
 import { homedir } from "node:os"
-import { CreateError } from "./CreateError.ts"
+import { CreateError } from "../shared/CreateError.ts"
 
 export type HistoryEntry = {
   readonly at: string

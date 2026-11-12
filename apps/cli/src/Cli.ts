@@ -1,7 +1,7 @@
 import * as Command from "effect/cli/Command"
-import { addCommand } from "./addCommand.ts"
-import { addJsonCommand, createJsonCommand, historyCommand, schemaCommand } from "./agentCommands.ts"
-import { createCommand } from "./createCommand.ts"
+import { addCommand } from "./add/addCommand.ts"
+import { addJsonCommand, createJsonCommand, historyCommand, schemaCommand } from "./agent/agentCommands.ts"
+import { createCommand } from "./create/createCommand.ts"
 
 /**
  * Root CLI. Prefer subcommands (`create`, `add`, …).

@@ -5,7 +5,7 @@ import { spawn } from "node:child_process"
 import { mkdtemp, readFile, rm } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
-import { createProject } from "./create.ts"
+import { createProject } from "../src/create/create.ts"
 
 /**
  * Generated-build smoke: materialize a project and typecheck.

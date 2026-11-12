@@ -1,8 +1,8 @@
 import * as Effect from "effect/Effect"
 import * as FileSystem from "effect/FileSystem"
 import * as Path from "effect/Path"
+import { CreateError } from "../shared/CreateError.ts"
 import { CLI_VERSION, ETS_SCHEMA_URL } from "./cliVersion.ts"
-import { CreateError } from "./CreateError.ts"
 
 export type Fingerprint = {
   readonly version: number

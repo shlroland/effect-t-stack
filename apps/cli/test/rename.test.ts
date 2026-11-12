@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test"
-import { isDeniedName } from "./denylist.ts"
-import { toPackageScope } from "./projectName.ts"
-import { applyRename, buildRenameMap } from "./rename.ts"
+import { isDeniedName } from "../src/template/denylist.ts"
+import { toPackageScope } from "../src/template/projectName.ts"
+import { applyRename, buildRenameMap } from "../src/template/rename.ts"
 
 describe("rename", () => {
   test("maps @ets packages to project scope", () => {

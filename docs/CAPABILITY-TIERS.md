@@ -177,7 +177,7 @@ See [ADR-0005](./adr/0005-l0-exit-and-fingerprint-hygiene.md).
 ### Fingerprint
 
 - [x] `ets.jsonc` fields: `$schema` · `version` · `createdAt` · `reproducibleCommand` · `addonOptions` · `dbSetupOptions` (deploy fields reserved in schema; filled when L4 deploy lands)
-- [x] **Version semantics:** `ets.jsonc.version` = fingerprint **schema** version; CLI release stamped via `reproducibleCommand` / `cliVersion` — not the same number (`apps/cli/src/cliVersion.ts`)
+- [x] **Version semantics:** `ets.jsonc.version` = fingerprint **schema** version; CLI release stamped via `reproducibleCommand` / `cliVersion` — not the same number (`apps/cli/src/fingerprint/cliVersion.ts`)
 - [x] In-repo JSON Schema first (`apps/cli/schemas/ets.schema.json`); optional hosted CDN schema later for editor/`$schema` UX
 - [x] Docs: keep file for `add`; safe-to-delete caveat if user abandons CLI; `add` rewrites fingerprint (`docs/fingerprint.md`)
 - [x] CLI ↔ generated versioning: publish `create-effect-t-stack@x.y.z`; generated apps do **not** auto-track CLI releases (stamp only)

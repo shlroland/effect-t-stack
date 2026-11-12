@@ -2,10 +2,10 @@ import * as Console from "effect/Console"
 import * as Effect from "effect/Effect"
 import * as FileSystem from "effect/FileSystem"
 import * as Path from "effect/Path"
-import { CreateError } from "./CreateError.ts"
-import { loadFingerprint, writeFingerprint } from "./fingerprint.ts"
-import { appendHistory } from "./history.ts"
-import { toPackageScope } from "./projectName.ts"
+import { loadFingerprint, writeFingerprint } from "../fingerprint/fingerprint.ts"
+import { appendHistory } from "../fingerprint/history.ts"
+import { CreateError } from "../shared/CreateError.ts"
+import { toPackageScope } from "../template/projectName.ts"
 
 export type AddPackageOptions = {
   readonly packageName: string

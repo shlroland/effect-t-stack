@@ -1,6 +1,6 @@
 import * as Prompt from "effect/cli/Prompt"
 import * as Effect from "effect/Effect"
-import { CreateError } from "./CreateError.ts"
+import { CreateError } from "../shared/CreateError.ts"
 import { type CreateOptions, skipsConfirmation } from "./CreateOptions.ts"
 
 export const confirmCreate = Effect.fn("confirmCreate")(function*(

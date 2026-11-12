@@ -6,7 +6,7 @@
 import { cp, mkdir, readdir, rm, stat } from "node:fs/promises"
 import { dirname, join, relative } from "node:path"
 import { fileURLToPath } from "node:url"
-import { isDeniedName } from "../src/denylist.ts"
+import { isDeniedName } from "../src/template/denylist.ts"
 
 const here = dirname(fileURLToPath(import.meta.url))
 const cliRoot = join(here, "..")

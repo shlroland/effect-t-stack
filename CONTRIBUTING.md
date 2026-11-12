@@ -27,7 +27,7 @@ bun run check
 ## Test tiers (Scaffold)
 
 1. **Contract** — `bun run --filter=create-effect-t-stack test` (parse/rename/denylist; no golden file-text snapshots)
-2. **Generated-build** — `ETS_GENERATED_BUILD=1 bun test apps/cli/src/generated-build.smoke.test.ts`
+2. **Generated-build** — `ETS_GENERATED_BUILD=1 bun test apps/cli/test/generated-build.smoke.test.ts`
 3. **Live** — manual `bun run create -- <name> --yes` then `bun run check-types` in the target; CI: Actions workflow **live-smoke** (`workflow_dispatch` / weekly)
 
 ## Publishing the CLI

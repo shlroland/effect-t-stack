@@ -33,7 +33,7 @@ Smoke tiers:
 
 ```sh
 # Generated-build (gated, slow)
-ETS_GENERATED_BUILD=1 bun test apps/cli/src/generated-build.smoke.test.ts
+ETS_GENERATED_BUILD=1 bun test apps/cli/test/generated-build.smoke.test.ts
 # Live CI: Actions → live-smoke (workflow_dispatch / weekly)
 ```
 

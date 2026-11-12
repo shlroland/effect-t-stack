@@ -4,7 +4,7 @@ const require = createRequire(import.meta.url)
 
 /** CLI package version from apps/cli/package.json. */
 export const CLI_VERSION: string = (
-  require("../package.json") as { readonly version: string }
+  require("../../package.json") as { readonly version: string }
 ).version
 
 export const ETS_SCHEMA_URL =

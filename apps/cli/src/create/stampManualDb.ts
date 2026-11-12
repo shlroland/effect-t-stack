@@ -1,5 +1,5 @@
 import * as Effect from "effect/Effect"
-import { loadFingerprint, writeFingerprint } from "./fingerprint.ts"
+import { loadFingerprint, writeFingerprint } from "../fingerprint/fingerprint.ts"
 
 /** Stamp dbSetupOptions.mode=manual; real db-setup behavior is L4. */
 export const stampManualDb = Effect.fn("stampManualDb")(function*(targetDir: string) {

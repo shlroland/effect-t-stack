@@ -4,10 +4,10 @@ import * as Effect from "effect/Effect"
 import { mkdtemp, readFile, rm } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
-import { addPackage } from "./addPackage.ts"
-import { createProject } from "./create.ts"
-import type { CreateOptions } from "./CreateOptions.ts"
-import { parseFingerprint } from "./fingerprint.ts"
+import { addPackage } from "../src/add/addPackage.ts"
+import { createProject } from "../src/create/create.ts"
+import type { CreateOptions } from "../src/create/CreateOptions.ts"
+import { parseFingerprint } from "../src/fingerprint/fingerprint.ts"
 
 const provideBun = <A, E, R>(effect: Effect.Effect<A, E, R>) =>
   effect.pipe(Effect.provide(BunServices.layer)) as Effect.Effect<A, E>

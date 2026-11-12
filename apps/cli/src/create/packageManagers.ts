@@ -5,7 +5,7 @@ import * as Path from "effect/Path"
 import { ChildProcess } from "effect/process"
 import { ChildProcessSpawner } from "effect/process/ChildProcessSpawner"
 import * as Stream from "effect/Stream"
-import { CreateError } from "./CreateError.ts"
+import { CreateError } from "../shared/CreateError.ts"
 
 export type PackageManager = "bun" | "npm" | "pnpm"
 

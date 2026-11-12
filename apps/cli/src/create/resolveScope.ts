@@ -1,9 +1,9 @@
 import * as Effect from "effect/Effect"
 import * as FileSystem from "effect/FileSystem"
-import { CreateError } from "./CreateError.ts"
+import { CreateError } from "../shared/CreateError.ts"
+import { resolveGoldenRoot } from "../template/paths.ts"
+import { toPackageScope } from "../template/projectName.ts"
 import type { CreateOptions } from "./CreateOptions.ts"
-import { resolveGoldenRoot } from "./paths.ts"
-import { toPackageScope } from "./projectName.ts"
 
 export type ResolvedCreateContext = {
   readonly cwd: string

@@ -2,11 +2,11 @@ import * as Effect from "effect/Effect"
 import * as FileSystem from "effect/FileSystem"
 import * as Path from "effect/Path"
 import type * as PlatformError from "effect/PlatformError"
-import { CreateError } from "./CreateError.ts"
+import { stampCreateFingerprint } from "../fingerprint/fingerprint.ts"
+import { CreateError } from "../shared/CreateError.ts"
+import { isDeniedName } from "../template/denylist.ts"
+import { applyRename, shouldRewriteFile } from "../template/rename.ts"
 import type { DirectoryConflict } from "./CreateOptions.ts"
-import { isDeniedName } from "./denylist.ts"
-import { stampCreateFingerprint } from "./fingerprint.ts"
-import { applyRename, shouldRewriteFile } from "./rename.ts"
 
 export type CopyPlan = {
   readonly files: ReadonlyArray<string>

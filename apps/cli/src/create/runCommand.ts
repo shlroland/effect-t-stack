@@ -2,7 +2,7 @@ import * as Console from "effect/Console"
 import * as Effect from "effect/Effect"
 import { ChildProcess } from "effect/process"
 import { ChildProcessSpawner } from "effect/process/ChildProcessSpawner"
-import { CreateError } from "./CreateError.ts"
+import { CreateError } from "../shared/CreateError.ts"
 
 export const runCommand = Effect.fn("runCommand")(function*(
   command: string,

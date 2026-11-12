@@ -1,5 +1,5 @@
 import * as Effect from "effect/Effect"
-import { CreateError } from "./CreateError.ts"
+import { CreateError } from "../shared/CreateError.ts"
 import type { CreateOptions } from "./CreateOptions.ts"
 
 /** L1 capability guards — non-default matrix cells fail clearly until L3. */

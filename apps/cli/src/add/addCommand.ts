@@ -3,9 +3,9 @@ import * as Command from "effect/cli/Command"
 import * as Flag from "effect/cli/Flag"
 import * as Effect from "effect/Effect"
 import * as Option from "effect/Option"
+import { CreateError } from "../shared/CreateError.ts"
 import { addAddon } from "./addAddon.ts"
 import { addPackage } from "./addPackage.ts"
-import { CreateError } from "./CreateError.ts"
 
 const addonArg = Argument.String("addon").pipe(
   Argument.withDescription("Addon id to enable in ets.jsonc (Golden addons in L2)"),

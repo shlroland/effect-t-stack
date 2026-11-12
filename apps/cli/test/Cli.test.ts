@@ -3,9 +3,9 @@ import { describe, expect, test } from "bun:test"
 import * as Command from "effect/cli/Command"
 import * as Effect from "effect/Effect"
 import * as Exit from "effect/Exit"
-import { createEffectTStack } from "./Cli.ts"
-import { CreateError } from "./CreateError.ts"
-import { normalizeArgv } from "./normalizeArgv.ts"
+import { createEffectTStack } from "../src/Cli.ts"
+import { normalizeArgv } from "../src/normalizeArgv.ts"
+import { CreateError } from "../src/shared/CreateError.ts"
 
 const runCli = (args: ReadonlyArray<string>) =>
   Effect.runPromise(
