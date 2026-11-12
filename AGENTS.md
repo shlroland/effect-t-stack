@@ -143,3 +143,17 @@ bun run --cwd examples/golden effect:diagnostics:server
 - 默认用 **Bun**（`bun test` / `bun --hot`），不要默认改成 Node/npm。
 - 金样 env：`examples/golden/apps/web/.env`（见 `.env.example`）。备选独立 server：`examples/golden/apps/server/.env`。
 - Scaffold / CLI `check` 需要完整 workspace 解析；在 Cursor agent 里跑时对 `bun run check` / `bun run --filter=create-effect-t-stack check` 使用非沙箱权限（否则会出现假红的 missing `@effect/platform-bun` / bun types）。
+
+## Agent skills
+
+### Issue tracker
+
+GitHub Issues on `shlroland/effect-t-stack` via `gh`. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default five roles (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: root `GLOSSARY.md` + `docs/adr/`. See `docs/agents/domain.md`.
