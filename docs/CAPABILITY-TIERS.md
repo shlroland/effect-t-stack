@@ -172,28 +172,30 @@ See [ADR-0005](./adr/0005-l0-exit-and-fingerprint-hygiene.md).
 
 ## L2 — Fingerprint, `add`, agent contract
 
+> **L2 in progress (thin slice landed):** fingerprint schema + read/write, `add` / `add --package`, agent JSON commands, local history. Compatibility engine + full illegal-combo catalog still open (deepens with L3 matrix).
+
 ### Fingerprint
 
-- [ ] `ets.jsonc` fields: `$schema` · `version` · `createdAt` · `reproducibleCommand` · `addonOptions` · `dbSetupOptions` · deploy fields
-- [ ] **Version semantics:** `ets.jsonc.version` = fingerprint **schema** version; CLI release stamped via `reproducibleCommand` / optional `cliVersion` field — not the same number
-- [ ] In-repo JSON Schema first; optional hosted CDN schema later for editor/`$schema` UX
-- [ ] Docs: keep file for `add`; safe-to-delete caveat if user abandons CLI; `add` rewrites fingerprint
-- [ ] CLI ↔ generated versioning: publish `create-effect-t-stack@x.y.z`; generated apps do **not** auto-track CLI releases
+- [x] `ets.jsonc` fields: `$schema` · `version` · `createdAt` · `reproducibleCommand` · `addonOptions` · `dbSetupOptions` (deploy fields reserved in schema; filled when L4 deploy lands)
+- [x] **Version semantics:** `ets.jsonc.version` = fingerprint **schema** version; CLI release stamped via `reproducibleCommand` / `cliVersion` — not the same number (`apps/cli/src/cliVersion.ts`)
+- [x] In-repo JSON Schema first (`apps/cli/schemas/ets.schema.json`); optional hosted CDN schema later for editor/`$schema` UX
+- [x] Docs: keep file for `add`; safe-to-delete caveat if user abandons CLI; `add` rewrites fingerprint (`docs/fingerprint.md`)
+- [x] CLI ↔ generated versioning: publish `create-effect-t-stack@x.y.z`; generated apps do **not** auto-track CLI releases (stamp only)
 
 ### Commands
 
-- [ ] `add` (addons into existing project)
-- [ ] `add --package <name>` scaffold empty workspace package (manifest + `src/index.ts` + tsconfig)
-- [ ] `add-json` · `create-json`
-- [ ] `schema --name …` (`all` · `createInput` · `addonOptions` · …)
-- [ ] `history` (`--limit` · `--json` · `--clear`) — **local only**, documented paths, no upload; privacy note in help
+- [x] `add` (Golden Sample addons → fingerprint ensure; non-golden errors until L3 overlays)
+- [x] `add --package <name>` scaffold empty workspace package (manifest + `src/index.ts` + tsconfig)
+- [x] `add-json` · `create-json`
+- [x] `schema --name …` (`all` · `createInput` · `addonOptions` · `fingerprint`)
+- [x] `history` (`--limit` · `--json` · `--clear`) — **local only** (`~/.config/create-effect-t-stack/history.jsonl`), documented paths, no upload; privacy note in help
 
 ### Validation & upgrade
 
 - [ ] Compatibility engine: reject illegal combinations at create/add
 - [ ] Documented Effect-specific rules + illegal combo catalog (e.g. `database=none`+drizzle; payments without better-auth; `frontend=none` API-only shape)
 - [ ] Validation order (enums → combinations → auth/addons → examples) documented for agents
-- [ ] **Upgrade policy:** `add` only; no scaffold `migrate`/codemods; dep bumps are user/Dependabot/catalog-driven; fingerprint records additive changes only
+- [x] **Upgrade policy (documented):** `add` only; no scaffold `migrate`/codemods; dep bumps are user/Dependabot/catalog-driven; fingerprint records additive changes only
 
 ---
 

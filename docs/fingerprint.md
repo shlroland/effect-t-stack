@@ -4,12 +4,12 @@ Golden Sample / generated-app **fingerprint** (canonical file: [`examples/golden
 
 ## Field classes
 
-| Class              | Examples                                                      | Rules                                                                                                                                                    |
-| ------------------ | ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Stack dims**     | `runtime`, `api`, `orm`, `auth`, `frontend`, `backend`, `env` | Root Option Matrix; prefer nested `*Options` over new root keys. `api` primary binding: [ADR-0006](./adr/0006-api-primary-rpc-with-httpapi-secondary.md) |
-| **`addons[]`**     | `turborepo`, `effect-style`, `mcp`                            | Ordered list of enabled addons                                                                                                                           |
-| **`addonOptions`** | `addonOptions.effect-style`                                   | Per-addon details; nest here instead of inventing root keys                                                                                              |
-| **Meta**           | `version`, `createdAt`, `reproducibleCommand`, `cliVersion`   | Golden may omit create-time meta; L1 CLI stamps them on generated apps                                                                                   |
+| Class              | Examples                                                               | Rules                                                                                                                                                                       |
+| ------------------ | ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Stack dims**     | `runtime`, `api`, `orm`, `auth`, `frontend`, `backend`, `env`          | Root Option Matrix; prefer nested `*Options` over new root keys. `api` primary binding: [ADR-0006](./adr/0006-api-primary-rpc-with-httpapi-secondary.md)                    |
+| **`addons[]`**     | `turborepo`, `effect-style`, `mcp`                                     | Ordered list of enabled addons                                                                                                                                              |
+| **`addonOptions`** | `addonOptions.effect-style`                                            | Per-addon details; nest here instead of inventing root keys                                                                                                                 |
+| **Meta**           | `$schema`, `version`, `createdAt`, `reproducibleCommand`, `cliVersion` | Golden may omit create-time meta; CLI stamps them on generate/`add`. `version` = **schema** version; `cliVersion` = CLI release. Schema: `apps/cli/schemas/ets.schema.json` |
 
 ## Golden-owned vs template-only (L3 preview)
 
@@ -25,3 +25,16 @@ L1 thin MVP only whole-tree-copies golden (no `.hbs` yet).
 - Only CLI/`add` (and documented manual golden edits) mutate the fingerprint
 - Agents must not invent ad-hoc top-level keys
 - Shared dependency pins live in `examples/golden/package.json` `workspaces.catalog` — see [DEPENDENCY-CATALOG.md](./DEPENDENCY-CATALOG.md)
+- Keep `ets.jsonc` so `add` can evolve the app; safe to delete only if you abandon the CLI
+- **Upgrade policy:** no scaffold `migrate`/codemods — use `add` for additive changes; dependency bumps are user/Dependabot/catalog-driven
+
+## CLI commands (L2)
+
+| Command                    | Role                                                                                               |
+| -------------------------- | -------------------------------------------------------------------------------------------------- |
+| `create` / bare `my-app`   | Whole-tree golden copy + stamp meta                                                                |
+| `add <addon>`              | Ensure Golden addon in fingerprint (file overlays for new addons → L3)                             |
+| `add --package <name>`     | Scaffold `packages/<name>` + record under `addonOptions.packages`                                  |
+| `create-json` / `add-json` | Agent stdin/stdout JSON contracts                                                                  |
+| `schema --name …`          | Emit JSON Schema documents                                                                         |
+| `history`                  | Local-only JSONL at `~/.config/create-effect-t-stack/history.jsonl` (override: `ETS_HISTORY_PATH`) |

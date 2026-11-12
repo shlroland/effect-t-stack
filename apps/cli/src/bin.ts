@@ -4,8 +4,12 @@ import * as BunServices from "@effect/platform-bun/BunServices"
 import * as Command from "effect/cli/Command"
 import * as Effect from "effect/Effect"
 import { createEffectTStack } from "./Cli.ts"
+import { CLI_VERSION } from "./cliVersion.ts"
+import { normalizeArgv } from "./normalizeArgv.ts"
 
-const program = Command.run(createEffectTStack, { version: "0.1.0" }).pipe(
+const argv = normalizeArgv(process.argv.slice(2))
+
+const program = Command.runWith(createEffectTStack, { version: CLI_VERSION })(argv).pipe(
   Effect.provide(BunServices.layer)
 )
 

@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/shlroland/effect-t-stack/main/apps/cli/schemas/ets.schema.json",
+  "title": "effect-t-stack fingerprint (ets.jsonc)",
+  "description": "Stack fingerprint for create-effect-t-stack. version = schema version (not CLI release). See docs/fingerprint.md.",
+  "type": "object",
+  "required": ["version", "runtime", "api", "database", "orm", "auth", "frontend", "backend", "addons"],
+  "additionalProperties": true,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Optional JSON Schema URL for editor UX"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Fingerprint schema version (not CLI semver)"
+    },
+    "name": { "type": "string" },
+    "effect": { "type": "string" },
+    "runtime": { "type": "string" },
+    "api": { "type": "string" },
+    "apiOptions": { "type": "object" },
+    "database": { "type": "string" },
+    "orm": { "type": "string" },
+    "ormOptions": { "type": "object" },
+    "auth": { "type": "string" },
+    "frontend": { "type": "string" },
+    "frontendOptions": { "type": "object" },
+    "backend": { "type": "string" },
+    "backendOptions": { "type": "object" },
+    "env": { "type": "object" },
+    "addons": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "addonOptions": { "type": "object" },
+    "examples": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "packageManager": { "type": "string" },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Create-time stamp (generated apps; golden may omit)"
+    },
+    "cliVersion": {
+      "type": "string",
+      "description": "create-effect-t-stack release that wrote/updated this file"
+    },
+    "reproducibleCommand": {
+      "type": "string",
+      "description": "Command that produced or last updated this fingerprint"
+    },
+    "dbSetupOptions": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": ["alchemy", "auto", "manual"]
+        }
+      },
+      "additionalProperties": true
+    },
+    "webDeploy": { "type": "string" },
+    "serverDeploy": { "type": "string" }
+  }
+}

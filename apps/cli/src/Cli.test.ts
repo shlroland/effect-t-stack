@@ -5,13 +5,13 @@ import * as Effect from "effect/Effect"
 import * as Exit from "effect/Exit"
 import { createEffectTStack } from "./Cli.ts"
 import { CreateError } from "./CreateError.ts"
+import { normalizeArgv } from "./normalizeArgv.ts"
 
 const runCli = (args: ReadonlyArray<string>) =>
   Effect.runPromise(
-    Command.runWith(createEffectTStack, { version: "0.1.0", renderErrors: false })([...args]).pipe(
-      Effect.provide(BunServices.layer),
-      Effect.exit
-    )
+    Command.runWith(createEffectTStack, { version: "0.1.0", renderErrors: false })([
+      ...normalizeArgv(args)
+    ]).pipe(Effect.provide(BunServices.layer), Effect.exit)
   )
 
 describe("create-effect-t-stack (effect/cli)", () => {
@@ -25,6 +25,11 @@ describe("create-effect-t-stack (effect/cli)", () => {
     expect(Exit.isSuccess(exit)).toBe(true)
   })
 
+  test("explicit create subcommand works", async () => {
+    const exit = await runCli(["create", "demo-explicit", "--dry-run", "--no-render-title"])
+    expect(Exit.isSuccess(exit)).toBe(true)
+  })
+
   test("unknown flag fails at parse time", async () => {
     const exit = await runCli(["demo", "--yes", "--not-a-real-flag"])
     expect(Exit.isFailure(exit)).toBe(true)
@@ -34,6 +39,21 @@ describe("create-effect-t-stack (effect/cli)", () => {
     const exit = await runCli(["demo", "--yes", "--api", "httpapi", "--no-render-title"])
     expect(Exit.isFailure(exit)).toBe(true)
     expect(String(exit)).toContain("CreateError")
+  })
+})
+
+describe("normalizeArgv", () => {
+  test("injects create for bare project name", () => {
+    expect(normalizeArgv(["my-app", "--yes"])).toEqual(["create", "my-app", "--yes"])
+  })
+
+  test("leaves subcommands alone", () => {
+    expect(normalizeArgv(["add", "--package", "billing"])).toEqual(["add", "--package", "billing"])
+    expect(normalizeArgv(["schema", "--name", "all"])).toEqual(["schema", "--name", "all"])
+  })
+
+  test("leaves root help alone", () => {
+    expect(normalizeArgv(["--help"])).toEqual(["--help"])
   })
 })
 

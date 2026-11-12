@@ -37,7 +37,7 @@ ETS_GENERATED_BUILD=1 bun test apps/cli/src/generated-build.smoke.test.ts
 # Live CI: Actions → live-smoke (workflow_dispatch / weekly)
 ```
 
-**Next:** L2 (`add`, fingerprint `$schema`, agent JSON) — see [`docs/CAPABILITY-TIERS.md`](./docs/CAPABILITY-TIERS.md).
+**L2 (in progress):** `add` / `add --package`, `create-json` / `add-json`, `schema`, `history`, fingerprint `$schema` — see [`docs/fingerprint.md`](./docs/fingerprint.md) and [`docs/CAPABILITY-TIERS.md`](./docs/CAPABILITY-TIERS.md).
 
 ## Golden Sample
 

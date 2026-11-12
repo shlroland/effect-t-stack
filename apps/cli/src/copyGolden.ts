@@ -5,6 +5,7 @@ import type * as PlatformError from "effect/PlatformError"
 import { CreateError } from "./CreateError.ts"
 import type { DirectoryConflict } from "./CreateOptions.ts"
 import { isDeniedName } from "./denylist.ts"
+import { stampCreateFingerprint } from "./fingerprint.ts"
 import { applyRename, shouldRewriteFile } from "./rename.ts"
 
 export type CopyPlan = {
@@ -12,12 +13,20 @@ export type CopyPlan = {
   readonly scope: string
   readonly targetDir: string
   readonly goldenRoot: string
+  readonly packageManager: string
+  readonly reproducibleCommand: string
+  readonly manualDb: boolean
 }
 
 export const planCopy = Effect.fn("planCopy")(function*(
   goldenRoot: string,
   targetDir: string,
-  scope: string
+  scope: string,
+  meta: {
+    readonly packageManager: string
+    readonly reproducibleCommand: string
+    readonly manualDb: boolean
+  }
 ) {
   const fs = yield* FileSystem.FileSystem
   const path = yield* Path.Path
@@ -47,7 +56,15 @@ export const planCopy = Effect.fn("planCopy")(function*(
 
   yield* walk(goldenRoot)
   files.sort()
-  return { files, scope, targetDir, goldenRoot } satisfies CopyPlan
+  return {
+    files,
+    scope,
+    targetDir,
+    goldenRoot,
+    packageManager: meta.packageManager,
+    reproducibleCommand: meta.reproducibleCommand,
+    manualDb: meta.manualDb
+  } satisfies CopyPlan
 })
 
 export const executeCopy = Effect.fn("executeCopy")(function*(plan: CopyPlan) {
@@ -66,7 +83,12 @@ export const executeCopy = Effect.fn("executeCopy")(function*(plan: CopyPlan) {
         next = rewriteRootPackageName(next, plan.scope)
       }
       if (rel === "ets.jsonc") {
-        next = stampFingerprint(next, plan.scope)
+        next = stampCreateFingerprint(next, {
+          scope: plan.scope,
+          packageManager: plan.packageManager,
+          reproducibleCommand: plan.reproducibleCommand,
+          manualDb: plan.manualDb
+        })
       }
       yield* fs.writeFileString(dest, next)
     } else {
@@ -83,18 +105,6 @@ const rewriteRootPackageName = (content: string, scope: string): string => {
   } catch {
     return content
   }
-}
-
-const stampFingerprint = (content: string, scope: string): string => {
-  let next = content.replace(/("name"\s*:\s*)"[^"]*"/, `$1${JSON.stringify(scope)}`)
-  if (next.includes("\"createdAt\"")) {
-    return next
-  }
-  const createdAt = new Date().toISOString()
-  const stamp = `\n  "createdAt": ${JSON.stringify(createdAt)},\n  "cliVersion": "0.1.0",\n  "reproducibleCommand": ${
-    JSON.stringify(`create-effect-t-stack ${scope} --yes`)
-  },`
-  return next.replace(/("version"\s*:\s*\d+\s*,)/, `$1${stamp}`)
 }
 
 export const resolveTargetDirectory = Effect.fn("resolveTargetDirectory")(function*(

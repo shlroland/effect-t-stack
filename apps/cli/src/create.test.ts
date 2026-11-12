@@ -89,6 +89,8 @@ describe("createProject (Effect)", () => {
     const ets = await readFile(join(result.targetDir, "ets.jsonc"), "utf8")
     expect(ets).toContain("\"name\": \"acme\"")
     expect(ets).toContain("\"cliVersion\"")
+    expect(ets).toContain("\"$schema\"")
+    expect(ets).toContain("reproducibleCommand")
     expect(ets).not.toContain("@ets/")
     await expect(stat(join(result.targetDir, "repos"))).rejects.toThrow()
   })

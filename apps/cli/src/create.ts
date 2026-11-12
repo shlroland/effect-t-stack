@@ -4,6 +4,7 @@ import { type CopyPlan, planCopy, resolveTargetDirectory } from "./copyGolden.ts
 import type { CreateOptions } from "./CreateOptions.ts"
 import { effectiveDirectoryConflict } from "./CreateOptions.ts"
 import { buildResult, emitResult, printPlanSummary, printTitle } from "./createReport.ts"
+import { appendHistory } from "./history.ts"
 import { materializeProject } from "./materialize.ts"
 import { resolveCreateContext } from "./resolveScope.ts"
 import { validateCreateOptions } from "./validateCreate.ts"
@@ -49,15 +50,30 @@ const planProject = (prepared: CreatePrepared) =>
       phases: [...prepared.phases, "resolve-target"],
       targetDir
     })),
-    Effect.flatMap((state) =>
-      planCopy(state.goldenRoot, state.targetDir, state.scope).pipe(
+    Effect.flatMap((state) => {
+      const reproducibleCommand = [
+        "create-effect-t-stack",
+        "create",
+        state.scope,
+        state.options.yes || state.options.yolo ? "--yes" : undefined,
+        state.options.packageManager !== "bun" ? `--package-manager ${state.options.packageManager}` : undefined,
+        state.options.manualDb ? "--manual-db" : undefined,
+        state.options.api !== "rpc" ? `--api ${state.options.api}` : undefined,
+        !state.options.effectStyle ? "--no-effect-style" : undefined
+      ].filter((part): part is string => part !== undefined).join(" ")
+
+      return planCopy(state.goldenRoot, state.targetDir, state.scope, {
+        packageManager: state.options.packageManager,
+        reproducibleCommand,
+        manualDb: state.options.manualDb
+      }).pipe(
         Effect.map((plan): CreatePlanned => ({
           ...state,
           phases: [...state.phases, "plan-copy"],
           plan
         }))
       )
-    ),
+    }),
     Effect.tap((state) =>
       printPlanSummary({
         options: state.options,
@@ -90,6 +106,14 @@ const finishDryRun = (state: CreatePlanned) => report(state, [...state.phases, "
 
 const finishWrite = (state: CreatePlanned) =>
   materializeProject(state).pipe(
+    Effect.tap((written) =>
+      appendHistory({
+        at: new Date().toISOString(),
+        command: written.plan.reproducibleCommand,
+        projectDir: written.targetDir,
+        scope: written.scope
+      })
+    ),
     Effect.flatMap((written) =>
       report(
         written,
