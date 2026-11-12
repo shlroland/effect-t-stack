@@ -38,3 +38,5 @@ L1 thin MVP only whole-tree-copies golden (no `.hbs` yet).
 | `create-json` / `add-json` | Agent stdin/stdout JSON contracts                                                                  |
 | `schema --name …`          | Emit JSON Schema documents                                                                         |
 | `history`                  | Local-only JSONL at `~/.config/create-effect-t-stack/history.jsonl` (override: `ETS_HISTORY_PATH`) |
+
+Illegal create/add combinations and agent validation order: [compatibility.md](./compatibility.md).

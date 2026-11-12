@@ -4,6 +4,7 @@ import * as Console from "effect/Console"
 import * as Effect from "effect/Effect"
 import { addAddon } from "../add/addAddon.ts"
 import { addPackage } from "../add/addPackage.ts"
+import { resolveAddInput } from "../compatibility/index.ts"
 import { createProject } from "../create/create.ts"
 import type { CreateOptions } from "../create/CreateOptions.ts"
 import { clearHistory, readHistory, resolveHistoryPath } from "../fingerprint/history.ts"
@@ -74,19 +75,25 @@ export const addJsonCommand = Command.make("add-json").pipe(
       const input = yield* readStdinJson()
       const projectDir = typeof input["projectDir"] === "string" ? input["projectDir"] : "."
       const dryRun = Boolean(input["dryRun"])
-      const packageName = input["packageName"]
-      const addon = input["addon"]
+      const resolved = yield* resolveAddInput({
+        packageName: typeof input["packageName"] === "string" ? input["packageName"] : undefined,
+        addon: typeof input["addon"] === "string" ? input["addon"] : undefined
+      })
 
-      if (typeof packageName === "string") {
-        yield* addPackage({ packageName, projectDir, dryRun, verbose: true })
+      if (resolved.kind === "package") {
+        yield* addPackage({
+          packageName: resolved.packageName,
+          projectDir,
+          dryRun,
+          verbose: true
+        })
         return
       }
-      if (typeof addon === "string") {
-        yield* addAddon({ addon, projectDir, dryRun, verbose: true })
-        return
-      }
-      return yield* new CreateError({
-        message: "add-json requires { \"addon\": string } or { \"packageName\": string }"
+      yield* addAddon({
+        addon: resolved.addon,
+        projectDir,
+        dryRun,
+        verbose: true
       })
     })
   )

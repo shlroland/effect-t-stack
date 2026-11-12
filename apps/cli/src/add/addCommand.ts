@@ -3,7 +3,7 @@ import * as Command from "effect/cli/Command"
 import * as Flag from "effect/cli/Flag"
 import * as Effect from "effect/Effect"
 import * as Option from "effect/Option"
-import { CreateError } from "../shared/CreateError.ts"
+import { resolveAddInput } from "../compatibility/index.ts"
 import { addAddon } from "./addAddon.ts"
 import { addPackage } from "./addPackage.ts"
 
@@ -37,31 +37,22 @@ export const addCommand = Command.make("add", {
   ),
   Command.withHandler((config) =>
     Effect.gen(function*() {
-      const pkg = Option.getOrUndefined(config.packageName)
-      const addon = Option.getOrUndefined(config.addonArg)
+      const resolved = yield* resolveAddInput({
+        packageName: Option.getOrUndefined(config.packageName),
+        addon: Option.getOrUndefined(config.addonArg)
+      })
 
-      if (pkg !== undefined && pkg.length > 0) {
-        if (addon !== undefined) {
-          return yield* new CreateError({
-            message: "Pass either --package <name> or <addon>, not both"
-          })
-        }
+      if (resolved.kind === "package") {
         return yield* addPackage({
-          packageName: pkg,
+          packageName: resolved.packageName,
           projectDir: config.projectDir,
           dryRun: config.dryRun,
           verbose: config.verbose
         }).pipe(Effect.asVoid)
       }
 
-      if (addon === undefined || addon.length === 0) {
-        return yield* new CreateError({
-          message: "Usage: create-effect-t-stack add <addon> | add --package <name>"
-        })
-      }
-
       return yield* addAddon({
-        addon,
+        addon: resolved.addon,
         projectDir: config.projectDir,
         dryRun: config.dryRun,
         verbose: config.verbose

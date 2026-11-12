@@ -1,11 +1,24 @@
 export { createEffectTStack } from "./Cli.ts"
+export {
+  activeRules,
+  COMPATIBILITY_RULES,
+  resolveAddInput,
+  validateAddonSet,
+  validateCreateOptions,
+  validateGoldenAddon
+} from "./compatibility/index.ts"
+export type { CompatibilityRule, ResolvedAddInput, ValidationStage } from "./compatibility/index.ts"
 export { executeCopy, planCopy, resolveTargetDirectory } from "./create/copyGolden.ts"
 export type { CopyPlan } from "./create/copyGolden.ts"
 export { createProject } from "./create/create.ts"
 export type { ApiPrimary, CreateOptions, DirectoryConflict } from "./create/CreateOptions.ts"
 export type { CreateResult } from "./create/CreateResult.ts"
 export { formatVerbose, makeCreateResult } from "./create/CreateResult.ts"
-export { emitPackageManagerArtifacts, installCommand, resolvePackageManagerPin } from "./create/packageManagers.ts"
+export {
+  emitPackageManagerArtifacts,
+  installCommand,
+  resolvePackageManagerPin
+} from "./create/packageManagers.ts"
 export type { PackageManager } from "./create/packageManagers.ts"
 export { CLI_VERSION, ETS_SCHEMA_URL, FINGERPRINT_SCHEMA_VERSION } from "./fingerprint/cliVersion.ts"
 export {

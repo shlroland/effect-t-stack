@@ -1,9 +1,11 @@
 import * as BunServices from "@effect/platform-bun/BunServices"
 import { afterAll, describe, expect, test } from "bun:test"
 import * as Effect from "effect/Effect"
+import * as Exit from "effect/Exit"
 import { mkdtemp, readFile, rm } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
+import { addAddon } from "../src/add/addAddon.ts"
 import { addPackage } from "../src/add/addPackage.ts"
 import { createProject } from "../src/create/create.ts"
 import type { CreateOptions } from "../src/create/CreateOptions.ts"
@@ -60,5 +62,52 @@ describe("add --package", () => {
     expect((ets.addonOptions as { packages?: Array<string> } | undefined)?.packages).toContain(
       "billing"
     )
+  })
+})
+
+describe("add <addon>", () => {
+  const temps: Array<string> = []
+
+  afterAll(async () => {
+    await Promise.all(temps.map((dir) => rm(dir, { recursive: true, force: true })))
+  })
+
+  test("idempotent golden addon", async () => {
+    const cwd = await mkdtemp(join(tmpdir(), "ets-add-addon-"))
+    temps.push(cwd)
+    const created = await Effect.runPromise(
+      provideBun(createProject(base({ projectName: "addon-shop", cwd })))
+    )
+    const result = await Effect.runPromise(
+      provideBun(
+        addAddon({
+          addon: "mcp",
+          projectDir: created.targetDir,
+          dryRun: false,
+          verbose: false
+        })
+      )
+    )
+    expect(result.alreadyPresent).toBe(true)
+  })
+
+  test("rejects non-golden addon", async () => {
+    const cwd = await mkdtemp(join(tmpdir(), "ets-add-bad-"))
+    temps.push(cwd)
+    const created = await Effect.runPromise(
+      provideBun(createProject(base({ projectName: "addon-bad", cwd })))
+    )
+    const exit = await Effect.runPromise(
+      provideBun(
+        addAddon({
+          addon: "biome",
+          projectDir: created.targetDir,
+          dryRun: false,
+          verbose: false
+        })
+      ).pipe(Effect.exit)
+    )
+    expect(Exit.isFailure(exit)).toBe(true)
+    expect(String(exit)).toContain("biome")
   })
 })

@@ -1,4 +1,5 @@
 import * as Effect from "effect/Effect"
+import { validateCreateOptions } from "../compatibility/index.ts"
 import { appendHistory } from "../fingerprint/history.ts"
 import { confirmCreate } from "./confirmCreate.ts"
 import { type CopyPlan, planCopy, resolveTargetDirectory } from "./copyGolden.ts"
@@ -7,7 +8,6 @@ import { effectiveDirectoryConflict } from "./CreateOptions.ts"
 import { buildResult, emitResult, printPlanSummary, printTitle } from "./createReport.ts"
 import { materializeProject } from "./materialize.ts"
 import { resolveCreateContext } from "./resolveScope.ts"
-import { validateCreateOptions } from "./validateCreate.ts"
 
 export type { CreateOptions, DirectoryConflict } from "./CreateOptions.ts"
 export type { CreateResult } from "./CreateResult.ts"
@@ -56,7 +56,9 @@ const planProject = (prepared: CreatePrepared) =>
         "create",
         state.scope,
         state.options.yes || state.options.yolo ? "--yes" : undefined,
-        state.options.packageManager !== "bun" ? `--package-manager ${state.options.packageManager}` : undefined,
+        state.options.packageManager !== "bun"
+          ? `--package-manager ${state.options.packageManager}`
+          : undefined,
         state.options.manualDb ? "--manual-db" : undefined,
         state.options.api !== "rpc" ? `--api ${state.options.api}` : undefined,
         !state.options.effectStyle ? "--no-effect-style" : undefined
@@ -102,7 +104,8 @@ const report = (
   return emitResult(state.options, result, humanMessage).pipe(Effect.as(result))
 }
 
-const finishDryRun = (state: CreatePlanned) => report(state, [...state.phases, "dry-run"], true, "Dry run — no writes.")
+const finishDryRun = (state: CreatePlanned) =>
+  report(state, [...state.phases, "dry-run"], true, "Dry run — no writes.")
 
 const finishWrite = (state: CreatePlanned) =>
   materializeProject(state).pipe(
@@ -124,7 +127,8 @@ const finishWrite = (state: CreatePlanned) =>
     )
   )
 
-const finish = (state: CreatePlanned) => state.options.dryRun ? finishDryRun(state) : finishWrite(state)
+const finish = (state: CreatePlanned) =>
+  state.options.dryRun ? finishDryRun(state) : finishWrite(state)
 
 /**
  * Create a project by whole-tree copying the Golden Sample.

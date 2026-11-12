@@ -1,6 +1,6 @@
 # effect-t-stack
 
-Effect **v4** Scaffold Product for **`create-effect-t-stack`**. L0 Golden Sample is signed off under [`examples/golden`](./examples/golden); **L1 Scaffold MVP is closed** (local create + publish packaging + gated Live smoke).
+Effect **v4** Scaffold Product for **`create-effect-t-stack`**. L0 Golden Sample is signed off under [`examples/golden`](./examples/golden); **L1 Scaffold MVP** and **L2** (fingerprint / `add` / agent JSON / compatibility engine) are closed. **L3** Option Matrix (`.hbs` + non-default cells) is next.
 
 ## Layout
 
@@ -37,7 +37,7 @@ ETS_GENERATED_BUILD=1 bun test apps/cli/test/generated-build.smoke.test.ts
 # Live CI: Actions → live-smoke (workflow_dispatch / weekly)
 ```
 
-**L2 (in progress):** `add` / `add --package`, `create-json` / `add-json`, `schema`, `history`, fingerprint `$schema` — see [`docs/fingerprint.md`](./docs/fingerprint.md) and [`docs/CAPABILITY-TIERS.md`](./docs/CAPABILITY-TIERS.md).
+**L2 (closed):** `add` / `add --package`, `create-json` / `add-json`, `schema`, `history`, fingerprint `$schema`, compatibility engine — see [`docs/fingerprint.md`](./docs/fingerprint.md), [`docs/compatibility.md`](./docs/compatibility.md), [`docs/CAPABILITY-TIERS.md`](./docs/CAPABILITY-TIERS.md).
 
 ## Golden Sample
 
@@ -71,6 +71,7 @@ bun run dev:golden    # http://localhost:5173
 - Boundaries: [`AGENTS.md`](./AGENTS.md)
 - Tiers: [`docs/CAPABILITY-TIERS.md`](./docs/CAPABILITY-TIERS.md)
 - Fingerprint: [`docs/fingerprint.md`](./docs/fingerprint.md)
+- Compatibility: [`docs/compatibility.md`](./docs/compatibility.md)
 - API primary: [`docs/adr/0006-api-primary-rpc-with-httpapi-secondary.md`](./docs/adr/0006-api-primary-rpc-with-httpapi-secondary.md)
 
 ## 许可

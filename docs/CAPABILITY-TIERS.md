@@ -172,7 +172,7 @@ See [ADR-0005](./adr/0005-l0-exit-and-fingerprint-hygiene.md).
 
 ## L2 — Fingerprint, `add`, agent contract
 
-> **L2 in progress (thin slice landed):** fingerprint schema + read/write, `add` / `add --package`, agent JSON commands, local history. Compatibility engine + full illegal-combo catalog still open (deepens with L3 matrix).
+> **L2 closed.** Fingerprint schema + read/write, `add` / `add --package`, agent JSON commands, local history, and a shared **compatibility engine** (active L2 gates + deferred L3 catalog). Full Option Matrix enums / illegal cells deepen in **L3** when `--database` / `--frontend` / … land — extend `apps/cli/src/compatibility/catalog.ts`, do not invent a second validator.
 
 ### Fingerprint
 
@@ -192,9 +192,9 @@ See [ADR-0005](./adr/0005-l0-exit-and-fingerprint-hygiene.md).
 
 ### Validation & upgrade
 
-- [ ] Compatibility engine: reject illegal combinations at create/add
-- [ ] Documented Effect-specific rules + illegal combo catalog (e.g. `database=none`+drizzle; payments without better-auth; `frontend=none` API-only shape)
-- [ ] Validation order (enums → combinations → auth/addons → examples) documented for agents
+- [x] Compatibility engine: reject illegal combinations at create/add (`apps/cli/src/compatibility/`)
+- [x] Documented Effect-specific rules + illegal combo catalog (active L2 + deferred L3 rows e.g. `database=none`+drizzle; payments without better-auth; `frontend=none`) — [`docs/compatibility.md`](./compatibility.md) + `catalog.ts`
+- [x] Validation order (enums → combinations → auth/addons → examples) documented for agents
 - [x] **Upgrade policy (documented):** `add` only; no scaffold `migrate`/codemods; dep bumps are user/Dependabot/catalog-driven; fingerprint records additive changes only
 
 ---

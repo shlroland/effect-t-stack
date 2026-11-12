@@ -78,7 +78,7 @@ const packageManager = Flag.Literals("package-manager", ["bun", "npm", "pnpm"] a
 )
 
 const api = Flag.Literals("api", ["rpc", "httpapi"] as const).pipe(
-  Flag.withDescription("API primary (L1 plumbing; only rpc is implemented until L3)"),
+  Flag.withDescription("API primary (only rpc until L3 Option Matrix)"),
   Flag.withDefault("rpc" as const)
 )
 

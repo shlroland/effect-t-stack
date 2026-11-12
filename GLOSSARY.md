@@ -24,6 +24,10 @@ _Avoid_: template (alone), framework
 The set of dimensions and allowed values users may pick at create/add time (runtime, database, auth, frontend, addons, …).
 _Avoid_: feature list, roadmap
 
+**Compatibility engine**:
+The CLI module that rejects illegal create/add combinations in a fixed stage order (enums → combinations → auth/addons → examples), with active L2 gates and deferred L3 catalog rows.
+_Avoid_: JSON Schema alone (insufficient for cross-field rules), Option Matrix (the surface; engine is the enforcer)
+
 **Capability Tier**:
 A staged delivery band (L0–L6) for Scaffold Product and generated-project features; higher tiers depend on lower ones.
 _Avoid_: phase (unless tied to a named release), priority (alone)

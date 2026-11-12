@@ -23,6 +23,8 @@ bunx create-effect-t-stack history --json
 
 Notable create flags: `--dry-run`, `--verbose`, `--package-manager bun|npm|pnpm`, `--directory-conflict`, `--open <bin>`, `--manual-db`.
 
+Illegal combinations are rejected by the compatibility engine (`docs/compatibility.md`); `--api httpapi` / `--no-effect-style` stay gated until L3.
+
 ## Publish (maintainers)
 
 From the repo root:

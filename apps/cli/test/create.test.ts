@@ -137,7 +137,7 @@ describe("createProject (Effect)", () => {
     expect(Array.isArray(pkg.workspaces)).toBe(true)
   })
 
-  test("api=httpapi fails clearly in L1", async () => {
+  test("api=httpapi fails clearly until L3", async () => {
     const exit = await Effect.runPromise(
       provideBun(createProject(base({ projectName: "x", cwd: tmpdir(), api: "httpapi" }))).pipe(
         Effect.exit
@@ -145,6 +145,16 @@ describe("createProject (Effect)", () => {
     )
     expect(Exit.isFailure(exit)).toBe(true)
     expect(String(exit)).toContain("httpapi")
+  })
+
+  test("effectStyle=false fails clearly until L3", async () => {
+    const exit = await Effect.runPromise(
+      provideBun(createProject(base({ projectName: "x", cwd: tmpdir(), effectStyle: false }))).pipe(
+        Effect.exit
+      )
+    )
+    expect(Exit.isFailure(exit)).toBe(true)
+    expect(String(exit)).toContain("effect-style")
   })
 
   test("resolveGoldenRoot points at examples/golden", async () => {
