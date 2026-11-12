@@ -126,25 +126,27 @@ See [ADR-0005](./adr/0005-l0-exit-and-fingerprint-hygiene.md).
 
 ## L1 — Scaffold MVP
 
+> **L1 thin MVP (in progress / partial):** layout + `create --yes` whole-tree copy + rename + contract tests landed. Remaining flags / multi-PM / npm publish still open below.
+
 ### Repo shape
 
-- [ ] Scaffold Product layout: `apps/cli` + Golden Sample under `examples/golden` (or equivalent)
-- [ ] Root workspace wires CLI; Golden Sample remains source of truth until templates extract
+- [x] Scaffold Product layout: `apps/cli` + Golden Sample under `examples/golden` (or equivalent)
+- [x] Root workspace wires CLI; Golden Sample remains source of truth until templates extract
 
 ### `create` command
 
 - [ ] Interactive prompts
-- [ ] `--yes` / `-y` default stack
+- [x] `--yes` / `-y` default stack
 - [ ] `--api` flag + prompt plumbing (`rpc` default; `httpapi` primary flip) — full matrix / secondary binding completes in **L3** ([ADR-0006](./adr/0006-api-primary-rpc-with-httpapi-secondary.md))
 - [ ] Addon omit path: allow skipping `effect-style` (and peers) at create; `--yes` keeps Golden defaults — Option Matrix completeness in **L3**
-- [ ] Whole-tree copy of Golden Sample + project/package rename (no conditional `.hbs` yet)
-- [ ] Workspace rename protocol: `@ets/*` → `@<project>/*`; root `name`; turbo `--filter` / script names stay consistent
+- [x] Whole-tree copy of Golden Sample + project/package rename (no conditional `.hbs` yet)
+- [x] Workspace rename protocol: `@ets/*` → `@<project>/*`; root `name`; turbo `--filter` / script names stay consistent
 - [ ] `--package-manager` `npm` | `pnpm` | `bun`
 - [ ] Emit PM artifacts by choice: `bunfig.toml` / `pnpm-workspace.yaml` / `.npmrc` as needed; map Dependency Catalog → bun/pnpm **catalog** fields when used
-- [ ] `--install` / `--no-install`
-- [ ] `--git` / `--no-git`
-- [ ] `--directory-conflict` `merge` | `overwrite` | `increment` | `error`
-- [ ] `--dry-run`
+- [x] `--install` / `--no-install`
+- [x] `--git` / `--no-git`
+- [x] `--directory-conflict` `overwrite` | `increment` | `error` (`merge` still open)
+- [x] `--dry-run`
 - [ ] `--verbose` (JSON result schema for agents: phases, planned files, validation)
 - [ ] `--yolo`
 - [ ] `--render-title` / `--no-render-title`
@@ -156,10 +158,10 @@ See [ADR-0005](./adr/0005-l0-exit-and-fingerprint-hygiene.md).
 
 ### Scaffold testing (对标 BTS three-tier)
 
-- [ ] **Contract tests**: CLI option parsing / compatibility — never assert raw copied template string equality
-- [ ] **Generated-builds**: sample catalog + per-sample `checks`, filter env, shardable; prove install/typecheck/test on generated trees
+- [x] **Contract tests**: CLI option parsing / compatibility — never assert raw copied template string equality
+- [x] **Generated-builds** (thin): gated smoke `ETS_GENERATED_BUILD=1` → create + `check-types` — expand to sample catalog / shardable matrix later
 - [ ] **Live** pre-release smoke (manual or gated CI)
-- [ ] ADR / AGENTS: compile/boot probes are the proof, not snapshot diffs of generated file text
+- [x] ADR / AGENTS: compile/boot probes are the proof, not snapshot diffs of generated file text
 
 ### Scaffold-repo governance
 
@@ -300,7 +302,7 @@ Introduce `packages/template-generator` + `.hbs` when combinations explode (expe
 - [ ] `packages/template-generator` (in-memory VFS; Handlebars helpers; post-processors: scope rename, turbo scripts, README, `reproducibleCommand`)
 - [ ] Handlebars templates + helpers (`eq` / `ne` / `and` / `or` / `includes`)
 - [ ] **Golden Sample → templates sync script** (edit golden first; regenerate templates; never hand-pin versions outside Dependency Catalog)
-- [ ] Document ownership: which paths are golden-owned vs template-only overlays
+- [x] Document ownership: which paths are golden-owned vs template-only overlays — preview in [fingerprint.md](./fingerprint.md) (L1); enforce with sync script when `.hbs` lands
 - [ ] `db:*` script matrix per database/ORM/deploy combo (BTS `DbScriptSupport` analogue)
 
 ---

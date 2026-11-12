@@ -5,7 +5,7 @@ Vocabulary for the Effect full-stack scaffolder and the projects it generates.
 ## Language
 
 **Golden Sample**:
-The runnable default-stack monorepo that is the source of truth for what a generated project should look like.
+The runnable default-stack monorepo under `examples/golden` that is the source of truth for what a `--yes` generated project should look like.
 _Avoid_: demo app, starter only, example repo (when meaning the canonical base)
 
 **Fingerprint**:

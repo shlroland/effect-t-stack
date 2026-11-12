@@ -1,5 +1,7 @@
 node_modules
+**/node_modules
 .turbo
+**/.turbo
 dist
 .DS_Store
 *.db
@@ -10,3 +12,5 @@ dist
 .vite
 coverage
 *.tsbuildinfo
+# Local create targets
+/tmp-ets-*

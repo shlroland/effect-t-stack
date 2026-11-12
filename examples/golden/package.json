@@ -1,0 +1,68 @@
+{
+  "name": "effect-t-stack-golden",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Effect v4 Golden Sample (default stack). Copied by create-effect-t-stack.",
+  "type": "module",
+  "engines": {
+    "bun": ">=1.4.0"
+  },
+  "workspaces": {
+    "packages": [
+      "apps/*",
+      "packages/*"
+    ],
+    "catalog": {
+      "@effect/atom-react": "^4.1.3",
+      "@effect/language-service": "0.87.5",
+      "@effect/platform-bun": "^4.1.3",
+      "@effect/sql-sqlite-bun": "^4.1.3",
+      "@oxlint/plugins": "^1.93.0",
+      "@tanstack/react-router": "^1.170.46",
+      "@tanstack/react-start": "^1.169.5",
+      "@types/bun": "latest",
+      "@types/node": "^26.6.6",
+      "@types/react": "^19.3.0",
+      "@types/react-dom": "^19.3.0",
+      "@vitejs/plugin-react": "^6.3.0",
+      "dprint": "^0.64.3",
+      "drizzle-kit": "1.0.0-rc.5",
+      "drizzle-orm": "1.0.0-rc.5",
+      "effect": "^4.1.4",
+      "lefthook": "^2.2.2",
+      "oxlint": "^1.93.0",
+      "react": "^19.3.1",
+      "react-dom": "^19.3.1",
+      "scheduler": "^0.26.0",
+      "turbo": "^2.11.10",
+      "typescript": "^6.0.3",
+      "vite": "^8.3.8"
+    }
+  },
+  "scripts": {
+    "dev": "turbo run dev --filter=@ets/web",
+    "dev:web": "turbo run dev --filter=@ets/web",
+    "dev:server": "turbo run dev --filter=@ets/server",
+    "check-types": "turbo run check-types",
+    "test": "turbo run test",
+    "lint": "oxlint -c .oxlintrc.json -f unix apps packages && dprint check",
+    "lint-fix": "oxlint -c .oxlintrc.json --fix apps packages && dprint fmt",
+    "check": "bun run lint && bun run check-types && bun run test",
+    "db:generate": "turbo run db:generate --filter=@ets/db",
+    "effect:diagnostics": "effect-language-service diagnostics --format json",
+    "effect:diagnostics:server": "effect-language-service diagnostics --project apps/server/tsconfig.json --format json",
+    "effect:diagnostics:web": "effect-language-service diagnostics --project apps/web/tsconfig.json --format json",
+    "prepare": "effect-language-service patch && lefthook install"
+  },
+  "devDependencies": {
+    "@effect/language-service": "catalog:",
+    "@oxlint/plugins": "catalog:",
+    "dprint": "catalog:",
+    "effect": "catalog:",
+    "lefthook": "catalog:",
+    "oxlint": "catalog:",
+    "turbo": "catalog:",
+    "typescript": "catalog:"
+  },
+  "packageManager": "bun@1.4.4"
+}

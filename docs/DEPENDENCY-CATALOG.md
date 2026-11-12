@@ -1,15 +1,15 @@
 # Dependency Catalog
 
-Single pin source for the Golden Sample (and later templates). Versions live in the root [`package.json`](../package.json) under `workspaces.catalog`; workspace packages reference them with `"catalog:"`.
+Single pin source for the Golden Sample (and later templates). Versions live in [`examples/golden/package.json`](../examples/golden/package.json) under `workspaces.catalog`; workspace packages reference them with `"catalog:"`.
 
 See [ADR-0002](./adr/0002-dependency-currency.md).
 
 ## How to bump
 
-1. Edit `workspaces.catalog` in the root `package.json`
-2. `bun install`
-3. `bun run check`
-4. If an intentional lag changes, update this file and `ets.jsonc` notes
+1. Edit `workspaces.catalog` in `examples/golden/package.json`
+2. `bun install --cwd examples/golden`
+3. `bun run check:golden` (and `bun run check` at Scaffold Product root)
+4. If an intentional lag changes, update this file and `examples/golden/ets.jsonc` notes
 
 ## Intentional lags
 

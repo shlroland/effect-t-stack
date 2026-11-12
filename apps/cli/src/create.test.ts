@@ -1,0 +1,113 @@
+import * as BunServices from "@effect/platform-bun/BunServices"
+import { afterAll, describe, expect, test } from "bun:test"
+import * as Effect from "effect/Effect"
+import * as Exit from "effect/Exit"
+import { mkdir, mkdtemp, readFile, rm, stat } from "node:fs/promises"
+import { tmpdir } from "node:os"
+import { join } from "node:path"
+import { resolveTargetDirectory } from "./copyGolden.ts"
+import { createProject } from "./create.ts"
+import { CreateError } from "./CreateError.ts"
+import { resolveGoldenRoot } from "./paths.ts"
+
+const provideBun = <A, E, R>(effect: Effect.Effect<A, E, R>) =>
+  effect.pipe(Effect.provide(BunServices.layer)) as Effect.Effect<A, E>
+
+describe("createProject (Effect)", () => {
+  const temps: Array<string> = []
+
+  afterAll(async () => {
+    await Promise.all(temps.map((dir) => rm(dir, { recursive: true, force: true })))
+  })
+
+  test("dry-run plans copy without writing", async () => {
+    const cwd = await mkdtemp(join(tmpdir(), "ets-cli-dry-"))
+    temps.push(cwd)
+    const result = await Effect.runPromise(
+      provideBun(
+        createProject({
+          projectName: "demo",
+          yes: false,
+          dryRun: true,
+          install: false,
+          git: false,
+          directoryConflict: "error",
+          cwd
+        })
+      )
+    )
+    expect(result.dryRun).toBe(true)
+    expect(result.fileCount).toBeGreaterThan(10)
+    expect(result.scope).toBe("demo")
+    await expect(stat(join(cwd, "demo"))).rejects.toThrow()
+  })
+
+  test("conflict error when target exists", async () => {
+    const cwd = await mkdtemp(join(tmpdir(), "ets-cli-conflict-"))
+    temps.push(cwd)
+    await mkdir(join(cwd, "taken"), { recursive: true })
+    const exit = await Effect.runPromise(
+      provideBun(resolveTargetDirectory(cwd, "taken", "error")).pipe(Effect.exit)
+    )
+    expect(Exit.isFailure(exit)).toBe(true)
+    expect(String(exit)).toContain("CreateError")
+  })
+
+  test("copies and renames @ets scope without install", async () => {
+    const cwd = await mkdtemp(join(tmpdir(), "ets-cli-copy-"))
+    temps.push(cwd)
+    const result = await Effect.runPromise(
+      provideBun(
+        createProject({
+          projectName: "acme",
+          yes: true,
+          dryRun: false,
+          install: false,
+          git: false,
+          directoryConflict: "error",
+          cwd
+        })
+      )
+    )
+    expect(result.targetDir).toBe(join(cwd, "acme"))
+    const rootPkg = JSON.parse(await readFile(join(result.targetDir, "package.json"), "utf8")) as {
+      name: string
+    }
+    expect(rootPkg.name).toBe("acme")
+    const domainPkg = JSON.parse(
+      await readFile(join(result.targetDir, "packages/domain/package.json"), "utf8")
+    ) as { name: string }
+    expect(domainPkg.name).toBe("@acme/domain")
+    const ets = await readFile(join(result.targetDir, "ets.jsonc"), "utf8")
+    expect(ets).toContain("\"name\": \"acme\"")
+    expect(ets).toContain("\"cliVersion\"")
+    expect(ets).not.toContain("@ets/")
+    await expect(stat(join(result.targetDir, "repos"))).rejects.toThrow()
+  })
+
+  test("resolveGoldenRoot points at examples/golden", async () => {
+    const golden = resolveGoldenRoot()
+    const pkg = JSON.parse(await readFile(join(golden, "package.json"), "utf8")) as {
+      description: string
+    }
+    expect(pkg.description).toContain("Golden Sample")
+  })
+
+  test("requires --yes when not dry-run", async () => {
+    const exit = await Effect.runPromise(
+      provideBun(
+        createProject({
+          projectName: "x",
+          yes: false,
+          dryRun: false,
+          install: false,
+          git: false,
+          directoryConflict: "error"
+        })
+      ).pipe(Effect.exit)
+    )
+    expect(Exit.isFailure(exit)).toBe(true)
+    expect(String(exit)).toContain("CreateError")
+    expect(new CreateError({ message: "x" })).toBeInstanceOf(CreateError)
+  })
+})

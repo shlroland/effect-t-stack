@@ -2,7 +2,7 @@
 
 Generated projects should ship **current stable** dependency versions by default (Better-T-Stack parity). We maintain a central **Dependency Catalog** as the single pin source for the Golden Sample and, later, templates — with a recurring bump → sync → `check` loop — rather than one-off edits scattered across `package.json` files. **Exception:** TypeScript stays on **6.x** with `@effect/language-service` as the stepping stone; opt into TS 7 / `@effect/tsgo` only when the whole stack is ready (see `ets.jsonc` `addonOptions.language-service`).
 
-**Implementation (L0):** Bun `workspaces.catalog` in the root `package.json`; workspace packages use `"catalog:"`. Human lag notes and bump steps: [docs/DEPENDENCY-CATALOG.md](../DEPENDENCY-CATALOG.md).
+**Implementation (L0/L1):** Bun `workspaces.catalog` in [`examples/golden/package.json`](../../examples/golden/package.json); workspace packages use `"catalog:"`. Human lag notes and bump steps: [docs/DEPENDENCY-CATALOG.md](../DEPENDENCY-CATALOG.md).
 
 ## Considered options
 

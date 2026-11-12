@@ -1,10 +1,23 @@
-# Git hooks for effect-style (dprint + oxlint). See ets.jsonc → addonOptions.effect-style.
+# Scaffold Product hooks. Golden also ships lefthook.yml for generated apps.
 pre-commit:
   parallel: true
   commands:
     oxlint:
       glob: "*.{ts,tsx,js,jsx}"
-      run: bunx oxlint -c .oxlintrc.json --fix --deny-warnings {staged_files}
+      exclude:
+        - repos/**
+        - examples/golden/repos/**
+        - "**/node_modules/**"
+      run: |
+        files="{staged_files}"
+        golden=$(echo "$files" | tr ' ' '\n' | grep '^examples/golden/' || true)
+        cli=$(echo "$files" | tr ' ' '\n' | grep '^apps/cli/' || true)
+        if [ -n "$golden" ]; then
+          bunx oxlint -c examples/golden/.oxlintrc.json --fix --deny-warnings $golden
+        fi
+        if [ -n "$cli" ]; then
+          bunx oxlint -c apps/cli/.oxlintrc.json --fix --deny-warnings $cli
+        fi
       stage_fixed: true
     dprint:
       glob: "*.{ts,tsx,js,jsx,json,md}"

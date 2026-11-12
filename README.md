@@ -1,8 +1,37 @@
-# effect-t-stack（金样基础模板）
+# effect-t-stack
 
-Effect **v4** 全栈脚手架的 **L0 Golden Sample**（已签离，可被未来 CLI 复制）：可运行 monorepo；Scaffold CLI 属于 L1，尚未包含。
+Effect **v4** Scaffold Product for **`create-effect-t-stack`**. L0 Golden Sample is signed off and lives under [`examples/golden`](./examples/golden); L1 thin MVP ships a local CLI that whole-tree copies that golden.
 
-## 默认栈
+## Layout
+
+```
+apps/cli              create-effect-t-stack (L1 thin MVP)
+examples/golden       runnable default-stack Golden Sample (SoT for --yes)
+docs/                 ADRs, Capability Tiers, fingerprint guide
+repos/effect          vendored Effect reference (not copied into generated apps)
+```
+
+## Create a project (CLI)
+
+From the Scaffold Product root (after `bun install`):
+
+```sh
+bun run create -- my-app --yes --no-git
+# or
+bun run apps/cli/src/bin.ts my-app --yes
+```
+
+This copies `examples/golden` → `./my-app`, renames `@ets/*` → `@my-app/*`, and stamps `ets.jsonc` create meta. Use `--dry-run` to preview; `--no-install` to skip `bun install`.
+
+Gated generated-build smoke (slow):
+
+```sh
+ETS_GENERATED_BUILD=1 bun test apps/cli/src/generated-build.smoke.test.ts
+```
+
+## Golden Sample
+
+Default stack (see [`examples/golden/ets.jsonc`](./examples/golden/ets.jsonc)):
 
 | 维度     | 选择                                                                          |
 | -------- | ----------------------------------------------------------------------------- |
@@ -14,47 +43,25 @@ Effect **v4** 全栈脚手架的 **L0 Golden Sample**（已签离，可被未来
 | Backend  | self（`apps/web`）；备选 `apps/server`                                        |
 | Monorepo | turborepo                                                                     |
 
-## 快速开始
-
 ```sh
-bun install
-cp apps/web/.env.example apps/web/.env
-bun run check
-bun run dev          # http://localhost:5173  · UI (AtomRpc) · Rpc `/rpc` · HttpApi `/api` · docs: /api/docs
+bun install --cwd examples/golden
+cp examples/golden/apps/web/.env.example examples/golden/apps/web/.env
+bun run check:golden
+bun run dev:golden    # http://localhost:5173
 ```
 
-备选：单独起 Bun server（`:3737`），并在 web 设 `VITE_API_URL=http://localhost:3737`：
+## Ownership (golden vs templates)
 
-```sh
-cp apps/server/.env.example apps/server/.env
-bun run dev:server
-```
+- **Golden** = one runnable default combo; edit here first for shared Effect Core spine + Dependency Catalog pins.
+- **Other matrix combos** (L3+) = `.hbs` + template-only overlays; prove with generated-builds — not N extra goldens.
+- **Sync (L3):** golden → regenerate overlapping templates.
 
-## 目录
+## Docs
 
-```
-apps/web        TanStack Start（UI = AtomRpc；同源挂载 `/rpc` + `/api`）
-apps/server     Services/Layers；Rpc + HttpApi handlers；亦可作独立 Bun 模板
-packages/domain Schema / branded types / domain errors
-packages/protocol `rpc/`（`AppRpcs` → `/rpc` 主）+ `http-api/`（`/api` 次）
-packages/db     Drizzle schema / migrations / repositories（可选 `@ets/db/effect-sql`）
-packages/client `@ets/client/rpc` + `@ets/client/http-api`
-packages/config 共享 tsconfig + ServerEnv
-```
-
-架构边界见 [`AGENTS.md`](./AGENTS.md)；选型指纹见 [`ets.jsonc`](./ets.jsonc)；API primary 决策见 [`docs/adr/0006-api-primary-rpc-with-httpapi-secondary.md`](./docs/adr/0006-api-primary-rpc-with-httpapi-secondary.md)。
-
-## 示例 API（HttpApi secondary）
-
-```sh
-curl http://localhost:5173/api/health
-curl -X POST http://localhost:5173/api/todos \
-  -H 'content-type: application/json' \
-  -d '{"title":"ship the starter"}'
-curl http://localhost:5173/api/todos
-```
-
-Todo UI 走 Effect Rpc `/rpc`（NDJSON）via `AtomRpc` / `@ets/client/rpc`；HttpApi 用 `@ets/client/http-api`（OpenAPI：`/api/docs`）。
+- Boundaries: [`AGENTS.md`](./AGENTS.md)
+- Tiers: [`docs/CAPABILITY-TIERS.md`](./docs/CAPABILITY-TIERS.md)
+- Fingerprint: [`docs/fingerprint.md`](./docs/fingerprint.md)
+- API primary: [`docs/adr/0006-api-primary-rpc-with-httpapi-secondary.md`](./docs/adr/0006-api-primary-rpc-with-httpapi-secondary.md)
 
 ## 许可
 

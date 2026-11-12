@@ -17,8 +17,11 @@ jobs:
         with:
           bun-version: "1.4.4"
 
-      - name: Install
+      - name: Install Scaffold Product
         run: bun install --frozen-lockfile
 
-      - name: Lint, typecheck, test
+      - name: Install Golden Sample
+        run: bun install --frozen-lockfile --cwd examples/golden
+
+      - name: Lint, typecheck, test (CLI + Golden)
         run: bun run check

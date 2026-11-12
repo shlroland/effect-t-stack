@@ -1,0 +1,29 @@
+{
+  "name": "@ets/cli",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "create-effect-t-stack CLI (L1 thin MVP) via effect/cli",
+  "bin": {
+    "create-effect-t-stack": "./src/bin.ts"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "start": "bun run src/bin.ts",
+    "check-types": "tsc --noEmit -p tsconfig.json",
+    "test": "bun test",
+    "lint": "oxlint -c .oxlintrc.json -f unix src",
+    "check": "bun run lint && bun run check-types && bun run test"
+  },
+  "dependencies": {
+    "@effect/platform-bun": "catalog:",
+    "effect": "catalog:"
+  },
+  "devDependencies": {
+    "@types/bun": "catalog:",
+    "oxlint": "catalog:",
+    "typescript": "catalog:"
+  }
+}
