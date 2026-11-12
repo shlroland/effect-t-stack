@@ -28,17 +28,25 @@ describe("generated-build smoke", () => {
       createProject({
         projectName: "smoke",
         yes: true,
+        yolo: false,
         dryRun: false,
         install: true,
         git: false,
+        verbose: false,
+        renderTitle: false,
+        open: undefined,
+        manualDb: false,
         directoryConflict: "error",
+        packageManager: "bun",
+        api: "rpc",
+        effectStyle: true,
         cwd
       }).pipe(Effect.provide(BunServices.layer)) as Effect.Effect<{
         readonly targetDir: string
         readonly scope: string
         readonly fileCount: number
         readonly dryRun: boolean
-      }>
+      }, unknown>
     )
     const pkg = JSON.parse(await readFile(join(result.targetDir, "package.json"), "utf8")) as {
       name: string

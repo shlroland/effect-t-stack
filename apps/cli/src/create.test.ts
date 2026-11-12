@@ -8,10 +8,28 @@ import { join } from "node:path"
 import { resolveTargetDirectory } from "./copyGolden.ts"
 import { createProject } from "./create.ts"
 import { CreateError } from "./CreateError.ts"
+import type { CreateOptions } from "./CreateOptions.ts"
 import { resolveGoldenRoot } from "./paths.ts"
 
 const provideBun = <A, E, R>(effect: Effect.Effect<A, E, R>) =>
   effect.pipe(Effect.provide(BunServices.layer)) as Effect.Effect<A, E>
+
+const base = (overrides: Partial<CreateOptions> & Pick<CreateOptions, "projectName" | "cwd">): CreateOptions => ({
+  yes: true,
+  yolo: false,
+  install: false,
+  git: false,
+  dryRun: false,
+  verbose: false,
+  renderTitle: false,
+  open: undefined,
+  manualDb: false,
+  directoryConflict: "error",
+  packageManager: "bun",
+  api: "rpc",
+  effectStyle: true,
+  ...overrides
+})
 
 describe("createProject (Effect)", () => {
   const temps: Array<string> = []
@@ -24,22 +42,22 @@ describe("createProject (Effect)", () => {
     const cwd = await mkdtemp(join(tmpdir(), "ets-cli-dry-"))
     temps.push(cwd)
     const result = await Effect.runPromise(
-      provideBun(
-        createProject({
-          projectName: "demo",
-          yes: false,
-          dryRun: true,
-          install: false,
-          git: false,
-          directoryConflict: "error",
-          cwd
-        })
-      )
+      provideBun(createProject(base({ projectName: "demo", cwd, dryRun: true, yes: false })))
     )
     expect(result.dryRun).toBe(true)
     expect(result.fileCount).toBeGreaterThan(10)
     expect(result.scope).toBe("demo")
     await expect(stat(join(cwd, "demo"))).rejects.toThrow()
+  })
+
+  test("verbose dry-run returns phases", async () => {
+    const cwd = await mkdtemp(join(tmpdir(), "ets-cli-verbose-"))
+    temps.push(cwd)
+    const result = await Effect.runPromise(
+      provideBun(createProject(base({ projectName: "v", cwd, dryRun: true, verbose: true })))
+    )
+    expect(result.phases).toContain("dry-run")
+    expect(result.packageManager).toBe("bun")
   })
 
   test("conflict error when target exists", async () => {
@@ -57,17 +75,7 @@ describe("createProject (Effect)", () => {
     const cwd = await mkdtemp(join(tmpdir(), "ets-cli-copy-"))
     temps.push(cwd)
     const result = await Effect.runPromise(
-      provideBun(
-        createProject({
-          projectName: "acme",
-          yes: true,
-          dryRun: false,
-          install: false,
-          git: false,
-          directoryConflict: "error",
-          cwd
-        })
-      )
+      provideBun(createProject(base({ projectName: "acme", cwd })))
     )
     expect(result.targetDir).toBe(join(cwd, "acme"))
     const rootPkg = JSON.parse(await readFile(join(result.targetDir, "package.json"), "utf8")) as {
@@ -85,6 +93,58 @@ describe("createProject (Effect)", () => {
     await expect(stat(join(result.targetDir, "repos"))).rejects.toThrow()
   })
 
+  test("manual-db stamps fingerprint", async () => {
+    const cwd = await mkdtemp(join(tmpdir(), "ets-cli-manualdb-"))
+    temps.push(cwd)
+    const result = await Effect.runPromise(
+      provideBun(createProject(base({ projectName: "mdb", cwd, manualDb: true })))
+    )
+    const ets = await readFile(join(result.targetDir, "ets.jsonc"), "utf8")
+    expect(ets).toContain("\"dbSetupOptions\"")
+    expect(ets).toContain("\"manual\"")
+  })
+
+  test("pnpm emits workspace yaml (local version or @latest)", async () => {
+    const cwd = await mkdtemp(join(tmpdir(), "ets-cli-pnpm-"))
+    temps.push(cwd)
+    const result = await Effect.runPromise(
+      provideBun(createProject(base({ projectName: "pn", cwd, packageManager: "pnpm" })))
+    )
+    const yaml = await readFile(join(result.targetDir, "pnpm-workspace.yaml"), "utf8")
+    expect(yaml).toContain("apps/*")
+    const pkg = JSON.parse(await readFile(join(result.targetDir, "package.json"), "utf8")) as {
+      packageManager: string
+    }
+    // BTS-style: local pin or Corepack "pnpm@latest" — never leave golden bun@
+    expect(pkg.packageManager === "pnpm@latest" || /^pnpm@\d+\.\d+\.\d+/.test(pkg.packageManager))
+      .toBe(true)
+  })
+
+  test("npm stamps packageManager from PATH (or @latest)", async () => {
+    const cwd = await mkdtemp(join(tmpdir(), "ets-cli-npm-"))
+    temps.push(cwd)
+    const result = await Effect.runPromise(
+      provideBun(createProject(base({ projectName: "nm", cwd, packageManager: "npm" })))
+    )
+    const pkg = JSON.parse(await readFile(join(result.targetDir, "package.json"), "utf8")) as {
+      packageManager: string
+      workspaces: unknown
+    }
+    expect(pkg.packageManager === "npm@latest" || /^npm@\d+\.\d+\.\d+/.test(pkg.packageManager))
+      .toBe(true)
+    expect(Array.isArray(pkg.workspaces)).toBe(true)
+  })
+
+  test("api=httpapi fails clearly in L1", async () => {
+    const exit = await Effect.runPromise(
+      provideBun(createProject(base({ projectName: "x", cwd: tmpdir(), api: "httpapi" }))).pipe(
+        Effect.exit
+      )
+    )
+    expect(Exit.isFailure(exit)).toBe(true)
+    expect(String(exit)).toContain("httpapi")
+  })
+
   test("resolveGoldenRoot points at examples/golden", async () => {
     const golden = resolveGoldenRoot()
     const pkg = JSON.parse(await readFile(join(golden, "package.json"), "utf8")) as {
@@ -93,21 +153,7 @@ describe("createProject (Effect)", () => {
     expect(pkg.description).toContain("Golden Sample")
   })
 
-  test("requires --yes when not dry-run", async () => {
-    const exit = await Effect.runPromise(
-      provideBun(
-        createProject({
-          projectName: "x",
-          yes: false,
-          dryRun: false,
-          install: false,
-          git: false,
-          directoryConflict: "error"
-        })
-      ).pipe(Effect.exit)
-    )
-    expect(Exit.isFailure(exit)).toBe(true)
-    expect(String(exit)).toContain("CreateError")
+  test("CreateError tag", () => {
     expect(new CreateError({ message: "x" })).toBeInstanceOf(CreateError)
   })
 })

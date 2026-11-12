@@ -3,6 +3,7 @@ import * as FileSystem from "effect/FileSystem"
 import * as Path from "effect/Path"
 import type * as PlatformError from "effect/PlatformError"
 import { CreateError } from "./CreateError.ts"
+import type { DirectoryConflict } from "./CreateOptions.ts"
 import { isDeniedName } from "./denylist.ts"
 import { applyRename, shouldRewriteFile } from "./rename.ts"
 
@@ -99,7 +100,7 @@ const stampFingerprint = (content: string, scope: string): string => {
 export const resolveTargetDirectory = Effect.fn("resolveTargetDirectory")(function*(
   cwd: string,
   projectName: string,
-  conflict: "error" | "overwrite" | "increment"
+  conflict: DirectoryConflict
 ) {
   const fs = yield* FileSystem.FileSystem
   const path = yield* Path.Path
@@ -113,6 +114,10 @@ export const resolveTargetDirectory = Effect.fn("resolveTargetDirectory")(functi
   }
   if (conflict === "overwrite") {
     yield* fs.remove(target, { recursive: true, force: true })
+    return target
+  }
+  if (conflict === "merge") {
+    // Keep existing tree; executeCopy overwrites individual files in place.
     return target
   }
   let i = 1

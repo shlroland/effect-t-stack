@@ -126,7 +126,7 @@ See [ADR-0005](./adr/0005-l0-exit-and-fingerprint-hygiene.md).
 
 ## L1 — Scaffold MVP
 
-> **L1 thin MVP (in progress / partial):** layout + `create --yes` whole-tree copy + rename + contract tests landed. Remaining flags / multi-PM / npm publish still open below.
+> **L1 substantially complete** for local Scaffold MVP. Remaining: npm publish + Live CI smoke + deeper PM catalog mapping / sample generated-build matrix. **L2** (`add`, fingerprint schema UX, agent JSON commands) starts after this band.
 
 ### Repo shape
 
@@ -135,26 +135,26 @@ See [ADR-0005](./adr/0005-l0-exit-and-fingerprint-hygiene.md).
 
 ### `create` command
 
-- [ ] Interactive prompts
+- [x] Interactive prompts (`effect/cli` fallback prompt for name + Confirm unless `--yes`/`--yolo`/`--dry-run`; built-in `--wizard` also available)
 - [x] `--yes` / `-y` default stack
-- [ ] `--api` flag + prompt plumbing (`rpc` default; `httpapi` primary flip) — full matrix / secondary binding completes in **L3** ([ADR-0006](./adr/0006-api-primary-rpc-with-httpapi-secondary.md))
-- [ ] Addon omit path: allow skipping `effect-style` (and peers) at create; `--yes` keeps Golden defaults — Option Matrix completeness in **L3**
+- [x] `--api` flag plumbing (`rpc` default; `httpapi` errors clearly until **L3** primary flip) — [ADR-0006](./adr/0006-api-primary-rpc-with-httpapi-secondary.md)
+- [x] Addon omit path plumbing: `--effect-style` / `--no-effect-style` (omit errors clearly until **L3**; `--yes` keeps Golden default on)
 - [x] Whole-tree copy of Golden Sample + project/package rename (no conditional `.hbs` yet)
 - [x] Workspace rename protocol: `@ets/*` → `@<project>/*`; root `name`; turbo `--filter` / script names stay consistent
-- [ ] `--package-manager` `npm` | `pnpm` | `bun`
-- [ ] Emit PM artifacts by choice: `bunfig.toml` / `pnpm-workspace.yaml` / `.npmrc` as needed; map Dependency Catalog → bun/pnpm **catalog** fields when used
+- [x] `--package-manager` `npm` | `pnpm` | `bun`
+- [x] Emit PM artifacts by choice: `pnpm-workspace.yaml` / `.npmrc` as needed (bun default; full catalog↔npm/pnpm fidelity can deepen later)
 - [x] `--install` / `--no-install`
 - [x] `--git` / `--no-git`
-- [x] `--directory-conflict` `overwrite` | `increment` | `error` (`merge` still open)
+- [x] `--directory-conflict` `merge` | `overwrite` | `increment` | `error`
 - [x] `--dry-run`
-- [ ] `--verbose` (JSON result schema for agents: phases, planned files, validation)
-- [ ] `--yolo`
-- [ ] `--render-title` / `--no-render-title`
-- [ ] `--open` (editors / coding agents)
-- [ ] `--manual-db` flag plumbing (behavior in L4)
+- [x] `--verbose` (JSON `CreateResult`: phases, paths, options)
+- [x] `--yolo`
+- [x] `--render-title` / `--no-render-title`
+- [x] `--open` (editors / coding agents)
+- [x] `--manual-db` flag plumbing (stamps `dbSetupOptions`; behavior in L4)
 - [ ] Publish to npm (`bunx create-effect-t-stack`)
-- [ ] Document minimum Bun / Node (and later Workers) like BTS prerequisites; set generated `engines` / `packageManager`
-- [ ] Windows / WSL / CI notes (SQLite paths, long paths, PM matrix)
+- [x] Document minimum Bun (CONTRIBUTING / README); generated `engines` / `packageManager` come from golden (Workers with L3 `--runtime`)
+- [x] Windows / WSL / CI notes (SQLite paths, long paths, PM matrix) — brief in CONTRIBUTING; expand as CI Live smoke lands
 
 ### Scaffold testing (对标 BTS three-tier)
 
@@ -165,8 +165,8 @@ See [ADR-0005](./adr/0005-l0-exit-and-fingerprint-hygiene.md).
 
 ### Scaffold-repo governance
 
-- [ ] Contributing guide (`apps/cli` later, which test tier to run, conventional commits)
-- [ ] `SECURITY.md` · optional `CODEOWNERS`
+- [x] Contributing guide (`CONTRIBUTING.md`: which test tier to run, conventional commits)
+- [x] `SECURITY.md` · optional `CODEOWNERS` (SECURITY landed; CODEOWNERS optional later)
 
 ---
 

@@ -15,20 +15,25 @@ const runCli = (args: ReadonlyArray<string>) =>
   )
 
 describe("create-effect-t-stack (effect/cli)", () => {
-  test("rejects missing --yes without --dry-run", async () => {
-    const exit = await runCli(["demo"])
-    expect(Exit.isFailure(exit)).toBe(true)
-    expect(String(exit)).toContain("CreateError")
+  test("dry-run succeeds without writing", async () => {
+    const exit = await runCli(["demo-cli-dry", "--dry-run", "--no-render-title"])
+    expect(Exit.isSuccess(exit)).toBe(true)
   })
 
-  test("dry-run succeeds without writing", async () => {
-    const exit = await runCli(["demo-cli-dry", "--dry-run"])
+  test("verbose dry-run succeeds", async () => {
+    const exit = await runCli(["demo-verbose", "--dry-run", "--verbose", "--no-render-title"])
     expect(Exit.isSuccess(exit)).toBe(true)
   })
 
   test("unknown flag fails at parse time", async () => {
-    const exit = await runCli(["demo", "--yes", "--yolo"])
+    const exit = await runCli(["demo", "--yes", "--not-a-real-flag"])
     expect(Exit.isFailure(exit)).toBe(true)
+  })
+
+  test("api httpapi fails in handler", async () => {
+    const exit = await runCli(["demo", "--yes", "--api", "httpapi", "--no-render-title"])
+    expect(Exit.isFailure(exit)).toBe(true)
+    expect(String(exit)).toContain("CreateError")
   })
 })
 
