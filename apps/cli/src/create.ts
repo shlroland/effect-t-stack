@@ -1,6 +1,6 @@
 import * as Effect from "effect/Effect"
 import { confirmCreate } from "./confirmCreate.ts"
-import { planCopy, resolveTargetDirectory } from "./copyGolden.ts"
+import { type CopyPlan, planCopy, resolveTargetDirectory } from "./copyGolden.ts"
 import type { CreateOptions } from "./CreateOptions.ts"
 import { effectiveDirectoryConflict } from "./CreateOptions.ts"
 import { buildResult, emitResult, printPlanSummary, printTitle } from "./createReport.ts"
@@ -11,61 +11,105 @@ import { validateCreateOptions } from "./validateCreate.ts"
 export type { CreateOptions, DirectoryConflict } from "./CreateOptions.ts"
 export type { CreateResult } from "./CreateResult.ts"
 
+type CreatePrepared = {
+  readonly options: CreateOptions
+  readonly phases: ReadonlyArray<string>
+  readonly cwd: string
+  readonly goldenRoot: string
+  readonly scope: string
+}
+
+type CreatePlanned = CreatePrepared & {
+  readonly targetDir: string
+  readonly plan: CopyPlan
+}
+
+const prepare = (options: CreateOptions) =>
+  printTitle(options).pipe(
+    Effect.andThen(validateCreateOptions(options)),
+    Effect.andThen(resolveCreateContext(options)),
+    Effect.tap((ctx) => confirmCreate(options, ctx.scope)),
+    Effect.map((ctx): CreatePrepared => ({
+      options,
+      phases: [],
+      cwd: ctx.cwd,
+      goldenRoot: ctx.goldenRoot,
+      scope: ctx.scope
+    }))
+  )
+
+const planProject = (prepared: CreatePrepared) =>
+  resolveTargetDirectory(
+    prepared.cwd,
+    prepared.scope,
+    effectiveDirectoryConflict(prepared.options)
+  ).pipe(
+    Effect.map((targetDir) => ({
+      ...prepared,
+      phases: [...prepared.phases, "resolve-target"],
+      targetDir
+    })),
+    Effect.flatMap((state) =>
+      planCopy(state.goldenRoot, state.targetDir, state.scope).pipe(
+        Effect.map((plan): CreatePlanned => ({
+          ...state,
+          phases: [...state.phases, "plan-copy"],
+          plan
+        }))
+      )
+    ),
+    Effect.tap((state) =>
+      printPlanSummary({
+        options: state.options,
+        goldenRoot: state.goldenRoot,
+        targetDir: state.targetDir,
+        scope: state.scope,
+        fileCount: state.plan.files.length
+      })
+    )
+  )
+
+const report = (
+  state: CreatePlanned,
+  phases: ReadonlyArray<string>,
+  dryRun: boolean,
+  humanMessage: string
+) => {
+  const result = buildResult({
+    options: state.options,
+    targetDir: state.targetDir,
+    scope: state.scope,
+    fileCount: state.plan.files.length,
+    dryRun,
+    phases
+  })
+  return emitResult(state.options, result, humanMessage).pipe(Effect.as(result))
+}
+
+const finishDryRun = (state: CreatePlanned) => report(state, [...state.phases, "dry-run"], true, "Dry run — no writes.")
+
+const finishWrite = (state: CreatePlanned) =>
+  materializeProject(state).pipe(
+    Effect.flatMap((written) =>
+      report(
+        written,
+        written.phases,
+        false,
+        `Done. Next: cd ${written.targetDir} && bun run dev`
+      )
+    )
+  )
+
+const finish = (state: CreatePlanned) => state.options.dryRun ? finishDryRun(state) : finishWrite(state)
+
 /**
  * Create a project by whole-tree copying the Golden Sample.
  *
- * Pipeline: title → validate → resolve → confirm → plan → dry-run | materialize → report
+ * Pipeline: prepare → plan → dry-run | materialize → report
  */
-export const createProject = Effect.fn("createProject")(function*(options: CreateOptions) {
-  const phases: Array<string> = []
-
-  yield* printTitle(options)
-  yield* validateCreateOptions(options)
-
-  const { cwd, goldenRoot, scope } = yield* resolveCreateContext(options)
-  yield* confirmCreate(options, scope)
-
-  phases.push("resolve-target")
-  const targetDir = yield* resolveTargetDirectory(
-    cwd,
-    scope,
-    effectiveDirectoryConflict(options)
+export const createProject = (options: CreateOptions) =>
+  prepare(options).pipe(
+    Effect.flatMap(planProject),
+    Effect.flatMap(finish),
+    Effect.withSpan("createProject")
   )
-
-  phases.push("plan-copy")
-  const plan = yield* planCopy(goldenRoot, targetDir, scope)
-  yield* printPlanSummary({
-    options,
-    goldenRoot,
-    targetDir,
-    scope,
-    fileCount: plan.files.length
-  })
-
-  if (options.dryRun) {
-    phases.push("dry-run")
-    const result = buildResult({
-      options,
-      targetDir,
-      scope,
-      fileCount: plan.files.length,
-      dryRun: true,
-      phases
-    })
-    yield* emitResult(options, result, "Dry run — no writes.")
-    return result
-  }
-
-  yield* materializeProject({ options, cwd, plan, phases })
-
-  const result = buildResult({
-    options,
-    targetDir,
-    scope,
-    fileCount: plan.files.length,
-    dryRun: false,
-    phases
-  })
-  yield* emitResult(options, result, `Done. Next: cd ${targetDir} && bun run dev`)
-  return result
-})
