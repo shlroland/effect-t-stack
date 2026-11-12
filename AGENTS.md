@@ -44,7 +44,7 @@ git subtree pull --prefix=repos/effect https://github.com/Effect-TS/effect.git m
 
 ## 栈指纹
 
-见根目录 `ets.jsonc`（金样构建步骤 / 选型真相源）：Effect **v4** · Bun · **Rpc 主 / HttpApi 次**（ADR-0006）· SQLite + **Drizzle 1.0 RC**（默认：`drizzle-orm/effect-sqlite-bun` + `@effect/sql-sqlite-bun`；第二选项：Effect SQL via `@ets/db/effect-sql`）· auth **none** · frontend **TanStack Start**（Todo UI = `AtomRpc`）· backend **self**（`/rpc`+`/api` 由 Start 同源托管；独立 `apps/server` BunHttpServer 为第二选项）· env `@ets/config`（`ServerEnv` / `loadServerEnv`）· addons `turborepo` + `skills`（`Effect-TS/skills`）+ `repos`（`repos/effect` subtree）+ `language-service`（`@effect/language-service` on TypeScript 5.x）+ `mcp`（`effect-mcp` docs server；`effect-solutions` 默认关闭）+ `effect-style`（`dprint` + `oxlint`/`@effect/oxc`，金样默认开）。
+见根目录 `ets.jsonc`（金样构建步骤 / 选型真相源）：Effect **v4** · Bun · **Rpc 主 / HttpApi 次**（ADR-0006）· SQLite + **Drizzle 1.0 RC**（默认：`drizzle-orm/effect-sqlite-bun` + `@effect/sql-sqlite-bun`；第二选项：Effect SQL via `@ets/db/effect-sql`）· auth **none** · frontend **TanStack Start**（Todo UI = `AtomRpc`）· backend **self**（`/rpc`+`/api` 由 Start 同源托管；独立 `apps/server` BunHttpServer 为第二选项）· env `@ets/config`（`ServerEnv` / `loadServerEnv`）· addons `turborepo` + `skills`（`Effect-TS/skills`）+ `repos`（`repos/effect` subtree）+ `language-service`（`@effect/language-service` on TypeScript 6.x）+ `mcp`（`effect-mcp` docs server；`effect-solutions` 默认关闭）+ `effect-style`（`dprint` + `oxlint`/`@effect/oxc`，金样默认开）。
 
 新增金样能力时，先改可跑代码，再同步写入 `ets.jsonc` 的 `addons` / `addonOptions`。指纹字段分类见 `docs/fingerprint.md`；共享版本钉在根 `package.json` `workspaces.catalog`（`docs/DEPENDENCY-CATALOG.md`）。
 
@@ -99,7 +99,7 @@ repo (Rpc primary / HttpApi secondary, Drizzle, domain → protocol → db → s
 
 ## Effect language service
 
-This project uses `@effect/language-service` on **TypeScript 5.x** for Effect-specific static diagnostics and quick fixes. The golden base intentionally stays off TypeScript 7 / `@effect/tsgo` by default, because not every app/tooling chain supports TS 7 yet. Prefer upgrading a generated app to `@effect/tsgo` only when that app’s whole stack is ready for TS 7.
+This project uses `@effect/language-service` on **TypeScript 6.x** for Effect-specific static diagnostics and quick fixes. TS 6 is the stepping stone toward TypeScript 7; the golden base intentionally stays off TS 7 / `@effect/tsgo` by default until the whole app/tooling chain is ready. Prefer upgrading a generated app to `@effect/tsgo` only when that app’s whole stack is ready for TS 7.
 
 After writing or changing Effect code, prefer this agent loop:
 

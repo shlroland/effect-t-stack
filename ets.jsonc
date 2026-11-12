@@ -162,10 +162,10 @@
         }
       ]
     },
-    // TS 5.x + language-service (intentional lag; see DEPENDENCY-CATALOG.md).
+    // TS 6.x + language-service (step toward TS 7; see DEPENDENCY-CATALOG.md).
     "language-service": {
       "package": "@effect/language-service",
-      "typescriptMajor": 5,
+      "typescriptMajor": 6,
       "plugin": "@effect/language-service",
       "tsconfig": "packages/config/tsconfig.base.json",
       "prepare": "effect-language-service patch",

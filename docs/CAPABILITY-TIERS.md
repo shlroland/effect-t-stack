@@ -81,12 +81,12 @@ From review vs `AGENTS.md` / `repos/effect` / `LLMS.md` (2026-11-10). Cleared or
 
 ### Dependency currency (ongoing — 对标 BTS “latest dependencies”)
 
-- [x] One-time bump of Golden Sample deps to current stable (Vite/TanStack/turbo/react/effect/drizzle/…); **TypeScript stays on 5.x** + `@effect/language-service` until an ADR opts into TS 7 / `@effect/tsgo`
+- [x] One-time bump of Golden Sample deps to current stable (Vite/TanStack/turbo/react/effect/drizzle/…); **TypeScript on 6.x** + `@effect/language-service` (stepping stone; TS 7 / `@effect/tsgo` waits for ADR)
 - [x] Central **Dependency Catalog** (single source of version pins for Golden Sample and later templates — Bun `workspaces.catalog`)
 - [x] Document which packages may lag on purpose (today: TypeScript major, anything with peer-range locks)
 - [x] Recurring upgrade loop: bump catalog → sync Golden Sample (and templates when they exist) → `bun run check` (+ later generated-build tests) — documented in DEPENDENCY-CATALOG.md
-- [ ] Optional CI: outdated check / Dependabot-or-Renovate scoped to the catalog
-- [ ] When L3 extracts `.hbs`, templates consume the catalog — never hand-pin versions in scattered template files
+- [x] L3 ownership noted: when `.hbs` extracts, templates consume the catalog — never hand-pin versions in scattered template files (tracked under L3 Template engine)
+- Optional Dependabot / outdated CI → **Parked (later)** below (not an L0 exit item)
 
 See [ADR-0002](./adr/0002-dependency-currency.md).
 
@@ -102,7 +102,7 @@ Fingerprint: listed under `addons` + detailed under `addonOptions.effect-style` 
   - [x] CI workflow gate when addon is enabled (`.github/workflows/check.yml`)
   - [x] `AGENTS.md`: naming/modules/API conventions follow `repos/effect` + `LLMS.md` (PascalCase modules, `Context.Service`, `Schema.TaggedError`, `Effect.fn`, readonly options, `.ts` imports, …)
 - [x] Golden Sample: **`effect-style` in `addons` by default** with `addonOptions` documenting versions/scripts/reproduce steps
-- [ ] CLI Option Matrix: `effect-style` is **optional** (`create` / `add` can omit it); default prompt/`--yes` follows Golden Sample (enabled)
+- CLI Option Matrix: optional `effect-style` at `create` / `add` → **L1 wiring + L3 Addons** (default/`--yes` stays enabled)
 - [x] Mutual exclusion: `effect-style` conflicts with alternate formatters/linters (`biome`, `ultracite`, plain `oxlint`-only) unless an ADR says otherwise
 - [x] Without `effect-style`: no dprint/oxlint gate required (language-service may still apply if that addon is present)
 
@@ -135,6 +135,8 @@ See [ADR-0005](./adr/0005-l0-exit-and-fingerprint-hygiene.md).
 
 - [ ] Interactive prompts
 - [ ] `--yes` / `-y` default stack
+- [ ] `--api` flag + prompt plumbing (`rpc` default; `httpapi` primary flip) — full matrix / secondary binding completes in **L3** ([ADR-0006](./adr/0006-api-primary-rpc-with-httpapi-secondary.md))
+- [ ] Addon omit path: allow skipping `effect-style` (and peers) at create; `--yes` keeps Golden defaults — Option Matrix completeness in **L3**
 - [ ] Whole-tree copy of Golden Sample + project/package rename (no conditional `.hbs` yet)
 - [ ] Workspace rename protocol: `@ets/*` → `@<project>/*`; root `name`; turbo `--filter` / script names stay consistent
 - [ ] `--package-manager` `npm` | `pnpm` | `bun`
@@ -286,7 +288,7 @@ Introduce `packages/template-generator` + `.hbs` when combinations explode (expe
 - [ ] Desktop / extension: `pwa` · `tauri` · `electrobun` · `wxt` · `opentui`
 - [ ] Agent: `skills` (have) · `mcp` (have: coding-agent `effect-docs`；`effect-solutions` optional/off)
 - [ ] Observability: `evlog` · `axiom` (adapted to Effect HttpApi, not Hono-only)
-- [ ] ETS-specific: `repos` · `language-service` · **`effect-style`** (default on in Golden Sample; optional at create/add)
+- [ ] ETS-specific: `repos` · `language-service` · **`effect-style`** (default on in Golden Sample; **optional** at `create` / `add` — omit path wired in L1)
 
 ### Presets
 
@@ -359,6 +361,19 @@ Introduce `packages/template-generator` + `.hbs` when combinations explode (expe
 - [ ] ~~L6c Parallel tRPC/oRPC~~ **non-goal**
 - [ ] ~~L6d Convex~~ **non-goal**
 - [x] Start self-host Rpc+HttpApi (`backend=self`) — Golden Sample default; standalone Bun server secondary
+
+---
+
+## Parked (later — not scheduled; revisit after L1+)
+
+Frozen out of L0 exit; do **not** pull into L1 MVP unless a maintainer reopens.
+
+- [ ] Optional CI: outdated check / Dependabot-or-Renovate scoped to the Dependency Catalog
+- [ ] Browser E2E (Playwright) for `apps/web` — Golden smoke stays import/loader-only until then
+- [ ] TypeScript 7 / `@effect/tsgo` — intentional lag until whole-stack ADR (Golden Sample is on TS 6.x)
+- [ ] `@effect/oxc` published on npm — until then keep vendored `repos/effect/.../oxc` + `repos` addon
+
+Mirror: [`docs/L0-KNOWN-ISSUES.md`](./L0-KNOWN-ISSUES.md) Deferred.
 
 ---
 
