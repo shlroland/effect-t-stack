@@ -9,17 +9,26 @@ pre-commit:
         - examples/golden/repos/**
         - "**/node_modules/**"
       run: |
+        set -eu
+        # Lefthook substitutes {staged_files} as a space-separated list.
+        # Feed paths through NUL xargs so they are never executed as shell commands.
         files="{staged_files}"
-        golden=$(echo "$files" | tr ' ' '\n' | grep '^examples/golden/' || true)
-        cli=$(echo "$files" | tr ' ' '\n' | grep '^apps/cli/' || true)
-        if [ -n "$golden" ]; then
-          bunx oxlint -c examples/golden/.oxlintrc.json --fix --deny-warnings $golden
+        if [ -z "${files}" ]; then
+          exit 0
         fi
-        if [ -n "$cli" ]; then
-          bunx oxlint -c apps/cli/.oxlintrc.json --fix --deny-warnings $cli
+        # shellcheck disable=SC2086 -- intentional split of Lefthook's space-separated list
+        golden=$(printf '%s\n' ${files} | grep '^examples/golden/' || true)
+        cli=$(printf '%s\n' ${files} | grep '^apps/cli/' || true)
+        if [ -n "${golden}" ]; then
+          printf '%s\n' "${golden}" | tr '\n' '\0' | xargs -0 bunx oxlint -c examples/golden/.oxlintrc.json --fix --deny-warnings
+        fi
+        if [ -n "${cli}" ]; then
+          printf '%s\n' "${cli}" | tr '\n' '\0' | xargs -0 bunx oxlint -c apps/cli/.oxlintrc.json --fix --deny-warnings
         fi
       stage_fixed: true
     dprint:
       glob: "*.{ts,tsx,js,jsx,json,md}"
-      run: bunx dprint fmt {staged_files}
+      run: |
+        set -eu
+        bunx dprint fmt {staged_files}
       stage_fixed: true

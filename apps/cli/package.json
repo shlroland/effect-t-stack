@@ -41,9 +41,10 @@
     "pack:golden": "bun run scripts/pack-golden.ts",
     "prepack": "bun run pack:golden",
     "check-types": "tsc --noEmit -p tsconfig.json",
+    "assert:test-layout": "bun run scripts/assert-no-src-tests.ts",
     "test": "bun test test",
     "lint": "oxlint -c .oxlintrc.json -f unix src scripts test",
-    "check": "bun run lint && bun run check-types && bun run test"
+    "check": "bun run assert:test-layout && bun run lint && bun run check-types && bun run test"
   },
   "dependencies": {
     "@effect/platform-bun": "^4.1.3",

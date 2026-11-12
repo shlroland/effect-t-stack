@@ -68,10 +68,12 @@ bun run dev:golden    # http://localhost:5173
 
 ## Docs
 
-- Boundaries: [`AGENTS.md`](./AGENTS.md)
+- Boundaries: [`AGENTS.md`](./AGENTS.md) · golden packages: [`docs/golden-boundaries.md`](./docs/golden-boundaries.md)
+- CLI layout: [`apps/cli/README.md`](./apps/cli/README.md)
 - Tiers: [`docs/CAPABILITY-TIERS.md`](./docs/CAPABILITY-TIERS.md)
 - Fingerprint: [`docs/fingerprint.md`](./docs/fingerprint.md)
 - Compatibility: [`docs/compatibility.md`](./docs/compatibility.md)
+- Review standards: [`CODING_STANDARDS.md`](./CODING_STANDARDS.md)
 - API primary: [`docs/adr/0006-api-primary-rpc-with-httpapi-secondary.md`](./docs/adr/0006-api-primary-rpc-with-httpapi-secondary.md)
 
 ## 许可
