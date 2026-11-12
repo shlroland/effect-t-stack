@@ -14,3 +14,7 @@ coverage
 *.tsbuildinfo
 # Local create targets
 /tmp-ets-*
+
+# CLI publish staging (copied from examples/golden by pack:golden)
+apps/cli/templates/
+*.tgz

@@ -151,6 +151,21 @@ describe("createProject (Effect)", () => {
       description: string
     }
     expect(pkg.description).toContain("Golden Sample")
+    expect(golden.replaceAll("\\", "/")).toMatch(/examples\/golden$/)
+  })
+
+  test("ETS_GOLDEN_ROOT overrides resolveGoldenRoot", () => {
+    const prev = process.env["ETS_GOLDEN_ROOT"]
+    process.env["ETS_GOLDEN_ROOT"] = "/tmp/fake-golden"
+    try {
+      expect(resolveGoldenRoot()).toBe("/tmp/fake-golden")
+    } finally {
+      if (prev === undefined) {
+        delete process.env["ETS_GOLDEN_ROOT"]
+      } else {
+        process.env["ETS_GOLDEN_ROOT"] = prev
+      }
+    }
   })
 
   test("CreateError tag", () => {

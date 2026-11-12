@@ -1,6 +1,6 @@
 # effect-t-stack
 
-Effect **v4** Scaffold Product for **`create-effect-t-stack`**. L0 Golden Sample is signed off and lives under [`examples/golden`](./examples/golden); L1 thin MVP ships a local CLI that whole-tree copies that golden.
+Effect **v4** Scaffold Product for **`create-effect-t-stack`**. L0 Golden Sample is signed off under [`examples/golden`](./examples/golden); **L1 Scaffold MVP is closed** (local create + publish packaging + gated Live smoke).
 
 ## Layout
 
@@ -21,19 +21,23 @@ bun run create -- my-app --yes --no-git
 bun run create --
 # agents:
 bun run create -- my-app --yes --verbose --no-render-title
+# after npm publish:
+bunx create-effect-t-stack@latest my-app --yes
 ```
 
-This copies `examples/golden` → `./my-app`, renames `@ets/*` → `@my-app/*`, and stamps `ets.jsonc` create meta. Notable flags: `--dry-run`, `--package-manager bun|npm|pnpm`, `--directory-conflict`, `--open <bin>`, `--manual-db`. `--api httpapi` / `--no-effect-style` are plumbed but error until L3.
+This copies the Golden Sample → `./my-app`, renames `@ets/*` → `@my-app/*`, and stamps `ets.jsonc` create meta. Notable flags: `--dry-run`, `--package-manager bun|npm|pnpm`, `--directory-conflict`, `--open <bin>`, `--manual-db`. `--api httpapi` / `--no-effect-style` are plumbed but error until L3.
 
 **Requires Bun ≥ 1.4.4.** See [`CONTRIBUTING.md`](./CONTRIBUTING.md) and [`SECURITY.md`](./SECURITY.md).
 
-Gated generated-build smoke (slow):
+Smoke tiers:
 
 ```sh
+# Generated-build (gated, slow)
 ETS_GENERATED_BUILD=1 bun test apps/cli/src/generated-build.smoke.test.ts
+# Live CI: Actions → live-smoke (workflow_dispatch / weekly)
 ```
 
-**Why not L2 yet?** Capability Tiers are strict: L2 (`add`, fingerprint `$schema`, `create-json` / agent contract) starts after L1 Scaffold MVP is closed enough to publish and smoke. L2 content is already listed in [`docs/CAPABILITY-TIERS.md`](./docs/CAPABILITY-TIERS.md).
+**Next:** L2 (`add`, fingerprint `$schema`, agent JSON) — see [`docs/CAPABILITY-TIERS.md`](./docs/CAPABILITY-TIERS.md).
 
 ## Golden Sample
 

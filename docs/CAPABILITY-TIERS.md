@@ -126,7 +126,7 @@ See [ADR-0005](./adr/0005-l0-exit-and-fingerprint-hygiene.md).
 
 ## L1 — Scaffold MVP
 
-> **L1 substantially complete** for local Scaffold MVP. Remaining: npm publish + Live CI smoke + deeper PM catalog mapping / sample generated-build matrix. **L2** (`add`, fingerprint schema UX, agent JSON commands) starts after this band.
+> **L1 closed** for Scaffold MVP (local create + publish packaging + gated Live smoke). First registry `npm publish` is a maintainer one-shot (see `apps/cli/README.md`). Deeper PM catalog mapping / generated-build matrix can deepen later. **L2** starts next.
 
 ### Repo shape
 
@@ -152,15 +152,15 @@ See [ADR-0005](./adr/0005-l0-exit-and-fingerprint-hygiene.md).
 - [x] `--render-title` / `--no-render-title`
 - [x] `--open` (editors / coding agents)
 - [x] `--manual-db` flag plumbing (stamps `dbSetupOptions`; behavior in L4)
-- [ ] Publish to npm (`bunx create-effect-t-stack`)
+- [x] Publish packaging for `create-effect-t-stack` (`pack:golden` → `templates/golden`, `files`/`bin`/`engines`; `bunx` after maintainer `npm publish`)
 - [x] Document minimum Bun (CONTRIBUTING / README); generated `engines` / `packageManager` come from golden (Workers with L3 `--runtime`)
-- [x] Windows / WSL / CI notes (SQLite paths, long paths, PM matrix) — brief in CONTRIBUTING; expand as CI Live smoke lands
+- [x] Windows / WSL / CI notes (SQLite paths, long paths, PM matrix) — brief in CONTRIBUTING; Live CI expands coverage
 
 ### Scaffold testing (对标 BTS three-tier)
 
 - [x] **Contract tests**: CLI option parsing / compatibility — never assert raw copied template string equality
 - [x] **Generated-builds** (thin): gated smoke `ETS_GENERATED_BUILD=1` → create + `check-types` — expand to sample catalog / shardable matrix later
-- [ ] **Live** pre-release smoke (manual or gated CI)
+- [x] **Live** pre-release smoke (`.github/workflows/live-smoke.yml`: `workflow_dispatch` + weekly; create → `check-types`)
 - [x] ADR / AGENTS: compile/boot probes are the proof, not snapshot diffs of generated file text
 
 ### Scaffold-repo governance

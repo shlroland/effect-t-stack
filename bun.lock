@@ -12,19 +12,19 @@
       },
     },
     "apps/cli": {
-      "name": "@ets/cli",
+      "name": "create-effect-t-stack",
       "version": "0.1.0",
       "bin": {
         "create-effect-t-stack": "./src/bin.ts",
       },
       "dependencies": {
-        "@effect/platform-bun": "catalog:",
-        "effect": "catalog:",
+        "@effect/platform-bun": "^4.1.3",
+        "effect": "^4.1.4",
       },
       "devDependencies": {
-        "@types/bun": "catalog:",
-        "oxlint": "catalog:",
-        "typescript": "catalog:",
+        "@types/bun": "latest",
+        "oxlint": "^1.93.0",
+        "typescript": "^6.0.3",
       },
     },
   },
@@ -81,8 +81,6 @@
 
     "@effect/platform-node-shared": ["@effect/platform-node-shared@4.1.4", "", { "dependencies": { "@types/ws": "^8.18.2", "ws": "^8.22.1" }, "peerDependencies": { "effect": "^4.1.4" } }, "sha512-DWdfphHGOFJNj/mYadgpT3jIm8aRXDcPrQiGXFBH4p2H4XmA7iYMrPsI8NxVgZ7kNX0q1+FGJZJama0tINHRAg=="],
 
-    "@ets/cli": ["@ets/cli@workspace:apps/cli"],
-
     "@oxlint/binding-android-arm-eabi": ["@oxlint/binding-android-arm-eabi@1.93.0", "", { "os": "android", "cpu": "arm" }, "sha512-KKw70pbD5Pvq3G2lJ+WQ71XPMjCmg37rkSe2+mDqCRP3PoTSdDMuEi4UOnE8JBtyNM7bek61EC2s0Jt7S7u+Sg=="],
 
     "@oxlint/binding-android-arm64": ["@oxlint/binding-android-arm64@1.93.0", "", { "os": "android", "cpu": "arm64" }, "sha512-fvr1fTUZGelwRxKDt64pf28aL1WaWgviwz3X+E/FcRYvrlEahH0NECRz/c1SY+K+KWmZk5uAf6h1kQnyBkp/2A=="],
@@ -128,6 +126,8 @@
     "@types/ws": ["@types/ws@8.18.2", "", { "dependencies": { "@types/node": "*" } }, "sha512-67MQl+fpWKVTT1NYdnmo3U4sc/xPo/zQBncVnI74qmQa0z/b+1g6iYqNmGCPbxO+zz2aklb08a0oHfegiVd0/w=="],
 
     "bun-types": ["bun-types@1.4.4", "", { "dependencies": { "@types/node": "*", "undici-types": "*" } }, "sha512-yjrJh5oGX7mMPKGd19YXyIjmEuj4G4zNC30bs7PM9Az7NQ3ndF3j6hbeRdvJTRQEhJ/FYQwW0a2moweEi2hMxQ=="],
+
+    "create-effect-t-stack": ["create-effect-t-stack@workspace:apps/cli"],
 
     "dprint": ["dprint@0.64.3", "", { "optionalDependencies": { "@dprint/android-arm64": "0.64.3", "@dprint/android-x64": "0.64.3", "@dprint/darwin-arm64": "0.64.3", "@dprint/darwin-x64": "0.64.3", "@dprint/freebsd-arm64": "0.64.3", "@dprint/freebsd-x64": "0.64.3", "@dprint/linux-arm64-glibc": "0.64.3", "@dprint/linux-arm64-musl": "0.64.3", "@dprint/linux-loong64-glibc": "0.64.3", "@dprint/linux-loong64-musl": "0.64.3", "@dprint/linux-ppc64-glibc": "0.64.3", "@dprint/linux-ppc64-musl": "0.64.3", "@dprint/linux-riscv64-glibc": "0.64.3", "@dprint/linux-riscv64-musl": "0.64.3", "@dprint/linux-s390x-glibc": "0.64.3", "@dprint/linux-x64-glibc": "0.64.3", "@dprint/linux-x64-musl": "0.64.3", "@dprint/win32-arm64": "0.64.3", "@dprint/win32-x64": "0.64.3" }, "hasInstallScript": true, "bin": { "dprint": "bin.cjs" } }, "sha512-/ENhr1iBM1ZfDBdLRCwSuOZ6SCv6cN6Tl3xvtJDHJbFJYjiYy6AHrzPtU/FSCvEG16YTcCNqkO/xDBxaDHIh8w=="],
 
