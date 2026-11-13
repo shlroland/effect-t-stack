@@ -7,8 +7,14 @@
   "exports": {
     "./oxlint": "./src/oxlint/index.ts"
   },
+  "scripts": {
+    "check-types": "tsc --noEmit -p tsconfig.json"
+  },
   "dependencies": {
     "@oxlint/plugins": "^1.93.0",
     "typescript": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6"
   }
 }

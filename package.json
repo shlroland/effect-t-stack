@@ -25,7 +25,7 @@
   },
   "scripts": {
     "create": "bun apps/cli/src/bin.ts",
-    "check": "bun run --filter=create-effect-t-stack check && bun run --filter=@effect-t-stack/template-generator check && bun run check:golden",
+    "check": "bun run --filter=@ets/effect-oxc check-types && bun run --filter=create-effect-t-stack check && bun run --filter=@effect-t-stack/template-generator check && bun run check:golden",
     "check:golden": "bun run --cwd examples/golden check",
     "check:cli": "bun run --filter=create-effect-t-stack check",
     "dev:golden": "bun run --cwd examples/golden dev",

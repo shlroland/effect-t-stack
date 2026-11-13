@@ -95,7 +95,7 @@ See [ADR-0002](./adr/0002-dependency-currency.md).
 Fingerprint: listed under `addons` + detailed under `addonOptions.effect-style` in `ets.jsonc`.
 
 - [x] Implement addon **`effect-style`**: mirror Effect repo toolchain
-  - [x] `dprint` (ASI, double quotes, no trailing commas, lineWidth 120 — align with `repos/effect/dprint.json`)
+  - [x] `dprint` (ASI, double quotes, no trailing commas, lineWidth 120 — same settings as the Effect repo)
   - [x] `oxlint` + `@effect/oxc` Effect rules via the owned copy in `packages/effect-oxc` (not on npm yet; switch to the official package when Effect publishes it)
   - [x] Wire `lint` / `lint-fix` scripts; include lint in `bun run check` when addon is enabled
   - [x] Pre-commit via **Lefthook** (`lefthook.yml`: staged `dprint fmt` + `oxlint --fix`; not husky/lint-staged)
