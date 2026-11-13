@@ -71,7 +71,7 @@ describe("createProject (Effect)", () => {
     expect(String(exit)).toContain("CreateError")
   })
 
-  test("copies and renames @ets scope without install", async () => {
+  test("generates the default stack with the project scope", async () => {
     const cwd = await mkdtemp(join(tmpdir(), "ets-cli-copy-"))
     temps.push(cwd)
     const result = await Effect.runPromise(

@@ -5,8 +5,8 @@
 | Path                          | Role                                                                                                                |
 | ----------------------------- | ------------------------------------------------------------------------------------------------------------------- |
 | `apps/cli`                    | `create-effect-t-stack` (`effect/cli`) — domain folders + `test/`; see [`apps/cli/README.md`](./apps/cli/README.md) |
-| `packages/template-generator` | Handlebars + VFS generator. First template is the Golden default stack. CLI create still copies golden.             |
-| `examples/golden`             | Golden Sample (SoT for `--yes` until CLI create switches)                                                           |
+| `packages/template-generator` | Handlebars + VFS generator. `create` reads this.                                                                    |
+| `examples/golden`             | Runnable default sample. Not the create source.                                                                     |
 | `docs/`                       | Capability Tiers, ADRs, fingerprint, compatibility                                                                  |
 | `repos/effect`                | Vendored Effect reference (read-only)                                                                               |
 
@@ -35,7 +35,7 @@ bun run check
 
 ## Publishing the CLI
 
-See [`apps/cli/README.md`](./apps/cli/README.md). Pack embeds `examples/golden` into `apps/cli/templates/golden` (gitignored).
+See [`apps/cli/README.md`](./apps/cli/README.md). `prepack` embeds `packages/template-generator` into `apps/cli/templates/template-generator` (gitignored).
 
 ## Style
 

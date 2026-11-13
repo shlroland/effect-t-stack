@@ -13,6 +13,7 @@
   ],
   "rules": {
     "eslint/no-await-in-loop": "off",
+    "eslint/no-underscore-dangle": "off",
     "import/no-default-export": "error",
     "typescript/consistent-type-imports": ["error", {
       "fixStyle": "inline-type-imports"

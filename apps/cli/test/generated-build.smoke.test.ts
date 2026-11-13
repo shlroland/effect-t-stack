@@ -31,7 +31,7 @@ describe("generated-build smoke", () => {
         yolo: false,
         dryRun: false,
         install: true,
-        git: false,
+        git: true,
         verbose: false,
         renderTitle: false,
         open: undefined,

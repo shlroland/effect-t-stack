@@ -1,6 +1,6 @@
 # create-effect-t-stack
 
-Scaffold an Effect **v4** app by whole-tree copying the [effect-t-stack](https://github.com/shlroland/effect-t-stack) Golden Sample (`@ets/*` → `@<name>/*`).
+Scaffold an Effect **v4** app by generating it from `packages/template-generator` (scope `@<name>/*`). `examples/golden` is not copied.
 
 ## Requirements
 
@@ -11,7 +11,7 @@ Scaffold an Effect **v4** app by whole-tree copying the [effect-t-stack](https:/
 | Path                                                 | Role                                                                     |
 | ---------------------------------------------------- | ------------------------------------------------------------------------ |
 | `src/bin.ts` · `src/Cli.ts` · `src/normalizeArgv.ts` | Entrypoint / root command / bare-argv UX                                 |
-| `src/create/`                                        | `create` pipeline, flags, copy/rename, PM artifacts                      |
+| `src/create/`                                        | `create` pipeline, flags, generator load, PM version stamp               |
 | `src/add/`                                           | `add` addon + `--package`                                                |
 | `src/agent/`                                         | `create-json` / `add-json` / `schema` / `history`                        |
 | `src/compatibility/`                                 | Illegal-combo engine + catalog (L2+)                                     |
@@ -20,7 +20,7 @@ Scaffold an Effect **v4** app by whole-tree copying the [effect-t-stack](https:/
 | `src/shared/`                                        | Shared tagged errors                                                     |
 | `test/`                                              | **All** CLI tests (`bun test test`) — never put `*.test.ts` under `src/` |
 | `schemas/`                                           | Fingerprint JSON Schema                                                  |
-| `scripts/`                                           | `pack:golden`, layout asserts                                            |
+| `scripts/`                                           | `pack:generator` (prepack), layout asserts                               |
 
 `check` runs `assert:test-layout` so `src/**/*.test.ts` fails the build.
 
@@ -57,9 +57,9 @@ From the repo root:
 
 ```sh
 bun install
-bun run --filter=create-effect-t-stack pack:golden
+bun run --filter=create-effect-t-stack pack:generator
 cd apps/cli && bun pm pack   # inspect tarball
 npm publish --access public  # requires npm auth; bumps version first
 ```
 
-`prepack` embeds `examples/golden` into `templates/golden` (denylist applied). Do not commit `templates/golden`.
+`prepack` runs `pack:generator`: it prebuilds templates and copies `packages/template-generator` into `templates/template-generator` (gitignored). The packed CLI loads that copy when the workspace package is not installed. `pack:golden` is an alias of the same script.

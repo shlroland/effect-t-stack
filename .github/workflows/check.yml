@@ -28,3 +28,6 @@ jobs:
 
       - name: Generated-build (template generator default stack)
         run: ETS_GENERATED_BUILD=1 bun test packages/template-generator/test/generated-build.test.ts
+
+      - name: Generated-build (create --yes via template generator)
+        run: ETS_GENERATED_BUILD=1 bun test apps/cli/test/generated-build.smoke.test.ts
