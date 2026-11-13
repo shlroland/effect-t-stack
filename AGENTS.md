@@ -41,13 +41,13 @@ Authority order when sources disagree:
 
 ## Vendored Repositories
 
-This project vendors external repositories under `repos/` (symlinked into golden as `examples/golden/repos` for oxlint).
+This project vendors external repositories under `repos/` (symlinked into golden as `examples/golden/repos` so the sample can sit next to Effect source). Oxlint ignores that tree. Effect-style rules load from `packages/effect-oxc`.
 
 - Use vendored repositories as **read-only reference material** when working with related libraries
 - Prefer examples and patterns from the vendored source code over generated guesses or web search results
 - Do **not** edit files under `repos/` unless explicitly asked
 - Do **not** import from `repos/` — application code must keep importing from normal package dependencies (`effect`, `@effect/*`)
-- CLI **does not copy** `repos/` into generated apps (denylist); `effect-style` still expects the `repos` addon when linting a generated tree
+- CLI **does not copy** `repos/` into generated apps. Effect-style lint loads `packages/effect-oxc` (owned copy of unpublished `@effect/oxc`). `repos/effect` is only for reading Effect source (`LLMS.md`, idioms, migration guides). Switch the lint plugin to the official npm package when Effect publishes it.
 
 Update Effect source when needed:
 

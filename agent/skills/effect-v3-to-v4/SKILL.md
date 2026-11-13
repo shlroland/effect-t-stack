@@ -8,6 +8,8 @@ description: Use this skill when migrating a codebase from Effect v3 to Effect
 
 Drive an Effect v3 → v4 migration from the generated migration reference that ships in the Effect repo. Every rename, removal, and signature change is answered by upstream data — do not guess replacements.
 
+Effect-style lint rules are not in this checkout. They live in `packages/effect-oxc`, an owned copy of unpublished `@effect/oxc`. When Effect publishes that package on npm, depend on it and delete the copy. The `.repos/effect` clones below are only for migration guides and source reading.
+
 ## Workflow
 
 Work through these steps in order; each one is detailed in the section named.

@@ -50,7 +50,7 @@ Tracked as [Task: Delete golden and rewrite SoT docs](https://github.com/shlrola
 1. Stop installing and `check`ing `examples/golden` in root scripts and `.github/workflows/check.yml`. The scaffold check becomes CLI + template-generator, with generated-build as the `--yes` proof.
 2. Drop the parity test and the catalog-equality test, or point them at `dependencyVersionMap` only. One pin table remains.
 3. Rewrite `AGENTS.md`, `GLOSSARY.md`, `docs/fingerprint.md`, `docs/CAPABILITY-TIERS.md` (L3 exit vs backlog), `docs/golden-boundaries.md`, and the ADRs that say the sample is copied or edited first. Ownership becomes: edit the template fragment or the post-processor, then prove with a generated-build.
-4. Delete `examples/golden` (including the `repos` symlink used only by golden lint). `repos/effect` at the repo root stays a read-only Effect reference until something else replaces that.
+4. Delete `examples/golden` (including the `repos` symlink, which only exposes the read-only Effect checkout next to the sample). `repos/effect` at the repo root stays a read-only Effect reference. Lint rules are `packages/effect-oxc`.
 5. Remove `copyGolden.ts`, `resolveGoldenRoot`, the copy denylist, and `stampCreateFingerprint` if nothing else calls them. Keep `add`'s allowlist of default addons, renamed off "golden" if the word is retired.
 6. effect-style’s oxlint plugin used to point at `./repos/effect/...`. [L3.1: Own effect-style package instead of referencing repos/effect](https://github.com/shlroland/effect-t-stack/issues/11) moves that plugin to `packages/effect-oxc`. `repos/effect` stays a read-only Effect reference.
 

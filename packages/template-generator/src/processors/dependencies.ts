@@ -121,8 +121,8 @@ export const processDependencies = (vfs: VirtualFileSystem, config: ProjectConfi
     addPackageDependency({
       vfs,
       packagePath: "packages/effect-oxc",
-      dependencies: ["@oxlint/plugins"],
-      devDependencies: ["typescript"]
+      dependencies: ["@oxlint/plugins", "typescript"],
+      devDependencies: ["@types/node", "typescript"]
     })
   }
 

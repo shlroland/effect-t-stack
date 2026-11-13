@@ -149,6 +149,8 @@ export const writeEtsConfig = (vfs: VirtualFileSystem, config: ProjectConfig, ve
       repos: {
         dir: "repos",
         editorExclude: true,
+        note:
+          "Read-only Effect source (LLMS.md, idioms, migration guides). Effect-style lint rules are packages/effect-oxc, an owned copy of unpublished @effect/oxc. Depend on the official npm package and delete that copy when Effect publishes it.",
         selections: [{
           name: "effect",
           prefix: "repos/effect",

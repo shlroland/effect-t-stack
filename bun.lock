@@ -35,6 +35,9 @@
         "@oxlint/plugins": "^1.93.0",
         "typescript": "catalog:",
       },
+      "devDependencies": {
+        "@types/node": "^26.6.6",
+      },
     },
     "packages/template-generator": {
       "name": "@effect-t-stack/template-generator",
