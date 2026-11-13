@@ -1,6 +1,6 @@
 /**
  * Secondary standalone Bun server template.
- * Primary golden path embeds HttpApi + Rpc via TanStack Start (`apps/web/src/server.ts`).
+ * The default app embeds HttpApi + Rpc via TanStack Start (`apps/web/src/server.ts`).
  */
 import { BunHttpServer, BunRuntime } from "@effect/platform-bun"
 import { Effect, Layer } from "effect"

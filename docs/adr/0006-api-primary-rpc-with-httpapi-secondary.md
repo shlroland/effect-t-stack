@@ -1,6 +1,6 @@
 # API primary is Rpc; HttpApi stays secondary; CLI chooses primary later
 
-Effect Core’s `api` dimension is `{httpapi, rpc}` with **primary label binding**: root `api`, default UI atoms/client, and the main protocol story follow the choice; the other surface may remain generated and mounted as **secondary** (not deleted). The Golden Sample and future `--yes` default are **`api=rpc`** (Todo UI via `AtomRpc` + `/rpc`); HttpApi under `/api` (OpenAPI/docs) stays secondary. This supersedes ADR-0001’s “HttpApi-only default” wording. CLI `--api` / prompts land in L1/L3 and do **not** block L0 sign-off — L0 only needs an honest golden + this decision recorded.
+Effect Core’s `api` dimension is `{httpapi, rpc}` with **primary label binding**: root `api`, default UI atoms/client, and the main protocol story follow the choice; the other surface may remain generated and mounted as **secondary** (not deleted). The `--yes` default is **`api=rpc`** (Todo UI via `AtomRpc` + `/rpc`); HttpApi under `/api` (OpenAPI/docs) stays secondary. This supersedes ADR-0001’s “HttpApi-only default” wording. CLI `--api` plumbing exists; the primary flip is backlog and does not change this default.
 
 ## Considered options
 

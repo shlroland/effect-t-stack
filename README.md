@@ -1,15 +1,15 @@
 # effect-t-stack
 
-Effect **v4** Scaffold Product for **`create-effect-t-stack`**. L0 Golden Sample is signed off under [`examples/golden`](./examples/golden); **L1 Scaffold MVP** and **L2** (fingerprint / `add` / agent JSON / compatibility engine) are closed. **L3** Option Matrix (`.hbs` + non-default cells) is next.
+Effect **v4** Scaffold Product for **`create-effect-t-stack`**. Generated apps come from [`packages/template-generator`](./packages/template-generator) ([ADR-0007](./docs/adr/0007-templates-are-the-source-of-truth.md)). L1 and L2 are closed. The default stack is the L3 exit; other Option Matrix cells are backlog.
 
 ## Layout
 
 ```
-apps/cli              create-effect-t-stack (L1 thin MVP)
-examples/golden       runnable default-stack sample (create does not copy it)
-packages/template-generator   Handlebars source for create
-docs/                 ADRs, Capability Tiers, fingerprint guide
-repos/effect          vendored Effect reference (not copied into generated apps)
+apps/cli                       create-effect-t-stack
+packages/template-generator   Handlebars source of truth for create
+packages/effect-oxc           owned copy of unpublished @effect/oxc
+docs/                         ADRs, Capability Tiers, fingerprint guide
+repos/effect                  vendored Effect reference (not copied into generated apps)
 ```
 
 ## Create a project (CLI)
@@ -40,9 +40,9 @@ ETS_GENERATED_BUILD=1 bun test apps/cli/test/generated-build.smoke.test.ts
 
 **L2 (closed):** `add` / `add --package`, `create-json` / `add-json`, `schema`, `history`, fingerprint `$schema`, compatibility engine — see [`docs/fingerprint.md`](./docs/fingerprint.md), [`docs/compatibility.md`](./docs/compatibility.md), [`docs/CAPABILITY-TIERS.md`](./docs/CAPABILITY-TIERS.md).
 
-## Golden Sample
+## Default stack
 
-Default stack (see [`examples/golden/ets.jsonc`](./examples/golden/ets.jsonc)):
+What `create --yes` emits (written into the generated `ets.jsonc`):
 
 | 维度     | 选择                                                                          |
 | -------- | ----------------------------------------------------------------------------- |
@@ -55,17 +55,18 @@ Default stack (see [`examples/golden/ets.jsonc`](./examples/golden/ets.jsonc)):
 | Monorepo | turborepo                                                                     |
 
 ```sh
-bun install --cwd examples/golden
-cp examples/golden/apps/web/.env.example examples/golden/apps/web/.env
-bun run check:golden
-bun run dev:golden    # http://localhost:5173
+bun run create -- my-app --yes --no-git
+cd my-app
+cp apps/web/.env.example apps/web/.env
+bun install
+bun run dev    # http://localhost:5173
 ```
 
-## Ownership (golden vs templates)
+## Ownership
 
-- **Templates** (`packages/template-generator`) = what `create --yes` emits.
-- **Golden** = one runnable default combo that still exists in-repo. Deleting it, and the docs that say "edit golden first", is a later ticket.
-- **Other matrix combos** = more `.hbs` cells; prove with generated-builds — not N extra goldens.
+- **Templates** (`packages/template-generator`) are the only product source of truth.
+- Edit a fragment or a post-processor, then prove it with a generated-build.
+- Other matrix cells are more `.hbs` fragments. Do not add a second sample monorepo.
 
 ## Docs
 

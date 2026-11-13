@@ -2,7 +2,7 @@
   "name": "@effect-t-stack/template-generator",
   "version": "0.1.0",
   "private": true,
-  "description": "Handlebars + in-memory VFS generator for create-effect-t-stack. First template is the Golden Sample default stack.",
+  "description": "Handlebars + in-memory VFS generator for create-effect-t-stack. These templates are the product source of truth.",
   "type": "module",
   "engines": {
     "bun": ">=1.4.4"

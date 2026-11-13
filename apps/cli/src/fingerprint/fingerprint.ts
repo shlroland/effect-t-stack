@@ -18,7 +18,7 @@ export type Fingerprint = {
   readonly [key: string]: unknown
 }
 
-/** Strip // line comments for JSONC parse (golden-style). */
+/** Strip // line comments for JSONC parse. */
 export const stripJsoncComments = (raw: string): string =>
   raw
     .split("\n")
@@ -147,8 +147,8 @@ export const recordAddon = (
   }
 }
 
-/** Addons that already ship in the Golden Sample — `add` only ensures fingerprint entry. */
-export const GOLDEN_ADDONS = [
+/** Addons the default `--yes` stack already includes. `add` only ensures the fingerprint entry. */
+export const DEFAULT_ADDONS = [
   "turborepo",
   "skills",
   "repos",
@@ -157,7 +157,7 @@ export const GOLDEN_ADDONS = [
   "effect-style"
 ] as const
 
-export type GoldenAddon = (typeof GOLDEN_ADDONS)[number]
+export type DefaultAddon = (typeof DEFAULT_ADDONS)[number]
 
-export const isGoldenAddon = (name: string): name is GoldenAddon =>
-  (GOLDEN_ADDONS as ReadonlyArray<string>).includes(name)
+export const isDefaultAddon = (name: string): name is DefaultAddon =>
+  (DEFAULT_ADDONS as ReadonlyArray<string>).includes(name)

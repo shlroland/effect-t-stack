@@ -26,7 +26,7 @@ describe("template generator contract", () => {
     if (result._tag === "Failure") expect(result.error.phase).toBe("initialization")
   })
 
-  test("refuses stacks other than the Golden default cell", () => {
+  test("refuses stacks other than the default cell", () => {
     const result = generate({
       config: projectConfig("smoke", { api: "httpapi" }),
       templates: EMBEDDED_TEMPLATES
@@ -71,15 +71,38 @@ describe("template generator contract", () => {
     expect([...EMBEDDED_TEMPLATES.keys()].sort()).toEqual([...fromDisk.keys()].sort())
   })
 
-  test("dependencyVersionMap matches the Golden Sample catalog", () => {
-    const golden = JSON.parse(readFileSync(join(repoRoot, "examples/golden/package.json"), "utf8")) as {
-      workspaces: { catalog: Record<string, string> }
-    }
+  test("dependencyVersionMap is the pin table", () => {
     const pins: Record<string, string> = dependencyVersionMap
-    expect(Object.keys(pins).sort()).toEqual(Object.keys(golden.workspaces.catalog).sort())
-    for (const [name, version] of Object.entries(golden.workspaces.catalog)) {
-      expect(pins[name]).toBe(version)
+    expect(pins["typescript"]).toBe("^6.0.3")
+    expect(pins["drizzle-orm"]).toBe("1.0.0-rc.5")
+    expect(pins["drizzle-kit"]).toBe("1.0.0-rc.5")
+    expect(pins["effect"]).toBe("^4.1.4")
+    expect(Object.keys(pins).length).toBeGreaterThan(10)
+  })
+
+  test("default generate includes the Effect Core spine", () => {
+    const tree = generateDefault("smoke", undefined, "0.1.0")
+    const paths = treePaths(tree)
+    for (
+      const required of [
+        "package.json",
+        "ets.jsonc",
+        "turbo.json",
+        ".oxlintrc.json",
+        "packages/domain/src/index.ts",
+        "packages/protocol/src/rpc/AppRpcs.ts",
+        "packages/db/src/TodosRepository.ts",
+        "packages/client/src/rpc/RpcClient.ts",
+        "packages/config/src/ServerEnv.ts",
+        "packages/effect-oxc/src/oxlint/index.ts",
+        "apps/server/src/services/Todos.ts",
+        "apps/web/src/server.ts"
+      ]
+    ) {
+      expect(paths).toContain(required)
     }
+    const domain = JSON.parse(readTreeFile(tree, "packages/domain/package.json")) as { name: string }
+    expect(domain.name).toBe("@smoke/domain")
   })
 
   test("missing pins throw instead of inventing a version", () => {

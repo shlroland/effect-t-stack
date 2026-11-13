@@ -1,6 +1,6 @@
 # L0 stays open until exit criteria; ets.jsonc is compacted per stage
 
-The Golden Sample is a living baseline: passing `check` is not L0 completion. L1 (CLI scaffolding) waits on explicit L0 exit criteria (quality debt cleared or ADR-waived, `effect-style` + Dependency Catalog, fingerprint tidy, AGENTS.md↔code match, maintainer sign-off).
+This ADR records the L0 exit. The sample it describes was later extracted into templates and deleted ([ADR-0007](./0007-templates-are-the-source-of-truth.md)). At the time, passing `check` was not L0 completion. L1 (CLI scaffolding) waits on explicit L0 exit criteria (quality debt cleared or ADR-waived, `effect-style` + Dependency Catalog, fingerprint tidy, AGENTS.md↔code match, maintainer sign-off).
 
 `ets.jsonc` is a versioned Fingerprint, not an append-only log. Root keys stay Option Matrix + meta; details nest under `addonOptions`. **Hygiene rhythm:** light tidy whenever an addon is added or `addonOptions` change; a fuller compact at each Capability Tier exit (prune stale options, bump schema `version` with migration notes when shape breaks, keep CLI aware of N/N-1). Generated apps gain `createdAt` / `reproducibleCommand`; the Golden Sample may omit create-time meta. Field classes: [docs/fingerprint.md](../fingerprint.md).
 

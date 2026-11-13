@@ -2,7 +2,7 @@ import { GeneratorError } from "../types.ts"
 
 /**
  * Single pin table for generated apps. Templates name dependencies; they do not hard-code versions.
- * Keep this aligned with `examples/golden/package.json` `workspaces.catalog` until golden is removed.
+ * This map is the only pin table. Templates do not hard-code versions.
  *
  * Intentional lags (see docs/DEPENDENCY-CATALOG.md): TypeScript 6.x, `@effect/language-service` 0.87.5,
  * `drizzle-orm` / `drizzle-kit` 1.0.0-rc.5. `@effect/oxc` is vendored, not pinned here.

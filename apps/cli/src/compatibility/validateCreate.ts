@@ -20,7 +20,7 @@ const validateCreateEnums = (options: CreateOptions): Effect.Effect<void, Create
   return Effect.void
 }
 
-/** Stage: combinations — L2 only implements the golden cell. */
+/** Stage: combinations — only the default stack cell is implemented. */
 const validateCreateCombinations = (options: CreateOptions): Effect.Effect<void, CreateError> => {
   if (options.api !== "rpc") {
     return Effect.fail(new CreateError({ message: ruleMessage("create.combinations.api.rpc-only") }))

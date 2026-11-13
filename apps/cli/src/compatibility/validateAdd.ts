@@ -1,5 +1,5 @@
 import * as Effect from "effect/Effect"
-import { GOLDEN_ADDONS, isGoldenAddon } from "../fingerprint/fingerprint.ts"
+import { DEFAULT_ADDONS, isDefaultAddon } from "../fingerprint/fingerprint.ts"
 import { CreateError } from "../shared/CreateError.ts"
 import { ruleMessage } from "./catalog.ts"
 
@@ -14,7 +14,7 @@ export type AddInputFields = {
 
 /**
  * Stage: auth/addons — mutual exclusion for CLI `add` and agent `add-json`.
- * Order within add: mutex → (package name rules in addPackage) | (golden allowlist + fingerprint).
+ * Order within add: mutex → (package name rules in addPackage) | (default-addon allowlist + fingerprint).
  */
 export const resolveAddInput = (
   input: AddInputFields
@@ -40,12 +40,12 @@ export const resolveAddInput = (
   )
 }
 
-export const validateGoldenAddon = (addon: string): Effect.Effect<void, CreateError> => {
-  if (!isGoldenAddon(addon)) {
+export const validateDefaultAddon = (addon: string): Effect.Effect<void, CreateError> => {
+  if (!isDefaultAddon(addon)) {
     return Effect.fail(
       new CreateError({
-        message: `Addon "${addon}" is not available yet. Golden addons: ${GOLDEN_ADDONS.join(", ")}. ${
-          ruleMessage("add.addons.golden-only")
+        message: `Addon "${addon}" is not available yet. Default addons: ${DEFAULT_ADDONS.join(", ")}. ${
+          ruleMessage("add.addons.default-only")
         }`
       })
     )

@@ -2,7 +2,7 @@
 
 Research note for [Research: BTS template-generator anatomy](https://github.com/shlroland/effect-t-stack/issues/2), part of [L3: BTS-mode template source of truth](https://github.com/shlroland/effect-t-stack/issues/1).
 
-This is reference material for [Task: Scaffold packages/template-generator skeleton](https://github.com/shlroland/effect-t-stack/issues/4). It does not change the generator, the CLI copy path, or the Golden Sample. L3 exit stays: templates become the only product source of truth; the Golden Sample is extracted once, then deleted.
+This is reference material for [Task: Scaffold packages/template-generator skeleton](https://github.com/shlroland/effect-t-stack/issues/4). It does not change the generator. The sample it was written against is deleted; templates are the source of truth ([ADR-0007](../adr/0007-templates-are-the-source-of-truth.md)).
 
 Better-T-Stack does not keep a runnable default monorepo. The product source of truth is `packages/template-generator`: a tree of Handlebars fragments, selected by a `ProjectConfig`, rendered into an in-memory filesystem, then rewritten by TypeScript post-processors. A generated app exists only after `generate()` plus `writeTree()`. The CLI default stack is a config constant that picks those fragments. Proof is a generated-build (install, typecheck, build, optional boot), never a string snapshot of template text.
 
@@ -254,4 +254,4 @@ Do not copy BTS product choices:
 - Some addons stay CLI post-steps after `writeTree` (BTS skills, mcp, fumadocs, starlight, tauri). effect-style’s dprint/oxlint/lefthook configs can be templates; `repos` and `language-service` need an explicit choice later (template files vs a post-step). They are not a reason to keep `examples/golden` as source of truth.
 - Alchemy, Vercel services, and native `appId` helpers are BTS-specific. Omit them until a deploy/native ticket exists.
 
-`examples/golden` is the current concrete monorepo that the CLI copies. Under this model it is extraction input for the first templates, then it goes away. After that, the default stack is authored the way BTS authors `DEFAULT_CONFIG` plus `templates/**`: edit the fragment or the processor, and let a generated-build prove `--yes`.
+`examples/golden` was the extraction input for the first templates and is deleted ([ADR-0007](../adr/0007-templates-are-the-source-of-truth.md)). The default stack is authored the way BTS authors `DEFAULT_CONFIG` plus `templates/**`: edit the fragment or the processor, and let a generated-build prove `--yes`.

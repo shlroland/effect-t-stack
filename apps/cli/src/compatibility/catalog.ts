@@ -18,7 +18,7 @@ export type CompatibilityRule = {
   readonly message: string
 }
 
-/** Addons that conflict with `effect-style` (golden `addonOptions.effect-style.conflictsWith`). */
+/** Addons that conflict with `effect-style`. */
 export const EFFECT_STYLE_CONFLICTS = ["biome", "ultracite", "oxlint-only", "husky"] as const
 
 export const CREATE_PACKAGE_MANAGERS = ["bun", "npm", "pnpm"] as const
@@ -54,7 +54,7 @@ export const COMPATIBILITY_RULES: ReadonlyArray<CompatibilityRule> = [
     status: "active",
     summary: "create api must be rpc until L3 primary flip",
     message:
-      "api=httpapi primary flip is not implemented yet (golden is rpc-primary). Flag accepted for plumbing; matrix completeness is L3."
+      "api=httpapi primary flip is not implemented yet (the default stack is rpc-primary). Flag accepted for plumbing; matrix completeness is later."
   },
   {
     id: "create.combinations.database.none+drizzle",
@@ -90,22 +90,22 @@ export const COMPATIBILITY_RULES: ReadonlyArray<CompatibilityRule> = [
     status: "active",
     summary: "create must keep effect-style until L3 omit path",
     message:
-      "Omitting effect-style at create is not implemented yet (golden ships with it). Keep --effect-style (default) until L3 addon omit path lands."
+      "Omitting effect-style at create is not implemented yet (the default stack enables it). Keep --effect-style (default) until the omit path lands."
   },
   {
-    id: "add.addons.golden-only",
+    id: "add.addons.default-only",
     stage: "authAddons",
     status: "active",
-    summary: "add <addon> only Golden Sample addons in L2",
-    message: "Non-golden addons need L3 template overlays."
+    summary: "add <addon> only default-stack addons until more template cells exist",
+    message: "Addons outside the default stack need template overlays."
   },
   {
     id: "add.addons.effect-style.requires-repos",
     stage: "authAddons",
-    status: "active",
-    summary: "effect-style requires repos (vendored @effect/oxc)",
+    status: "deferred",
+    summary: "repos is a read-only Effect checkout, not required for effect-style lint",
     message:
-      "Addon \"effect-style\" requires \"repos\" in ets.jsonc addons (vendored @effect/oxc). Re-enable repos or wait for published @effect/oxc (L3+)."
+      "effect-style lint uses packages/effect-oxc. The repos addon is optional reference source, not a lint dependency."
   },
   {
     id: "add.addons.effect-style.conflicts",

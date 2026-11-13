@@ -1,7 +1,7 @@
 import * as Console from "effect/Console"
 import * as Effect from "effect/Effect"
 import * as Path from "effect/Path"
-import { validateAddonAgainstFingerprint, validateGoldenAddon } from "../compatibility/index.ts"
+import { validateAddonAgainstFingerprint, validateDefaultAddon } from "../compatibility/index.ts"
 import { CLI_VERSION } from "../fingerprint/cliVersion.ts"
 import { loadFingerprint, recordAddon, writeFingerprint } from "../fingerprint/fingerprint.ts"
 import { appendHistory } from "../fingerprint/history.ts"
@@ -23,7 +23,7 @@ export const addAddon = Effect.fn("addAddon")(function*(options: AddAddonOptions
   const projectDir = path.resolve(options.projectDir)
   const addon = options.addon.trim()
 
-  yield* validateGoldenAddon(addon)
+  yield* validateDefaultAddon(addon)
 
   const { path: etsPath, fingerprint } = yield* loadFingerprint(projectDir)
   yield* validateAddonAgainstFingerprint(fingerprint, addon)
