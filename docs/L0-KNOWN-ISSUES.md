@@ -15,7 +15,7 @@ Frozen at L0 closeout (**signed off 2026-11-11**). Empty Active means no blocker
 
 - Dependabot / outdated CI scoped to the Dependency Catalog
 - Browser E2E (Playwright) for `apps/web` — smoke covers imports/loaders only
-- TypeScript 7 / `@effect/tsgo` — intentional lag until ADR (Golden Sample is on TS 6.x as the stepping stone)
+- TypeScript 7 / `@effect/tsgo` — intentional lag until ADR (the default stack is on TS 6.x as the stepping stone)
 - `@effect/oxc` on npm — vendored via `repos` until published
 
 ## Active

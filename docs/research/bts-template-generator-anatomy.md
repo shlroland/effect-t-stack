@@ -2,7 +2,7 @@
 
 Research note for [Research: BTS template-generator anatomy](https://github.com/shlroland/effect-t-stack/issues/2), part of [L3: BTS-mode template source of truth](https://github.com/shlroland/effect-t-stack/issues/1).
 
-This is reference material for [Task: Scaffold packages/template-generator skeleton](https://github.com/shlroland/effect-t-stack/issues/4). It does not change the generator, the CLI copy path, or the Golden Sample. L3 exit stays: templates become the only product source of truth; the Golden Sample is extracted once, then deleted.
+This is reference material for [Task: Scaffold packages/template-generator skeleton](https://github.com/shlroland/effect-t-stack/issues/4). It does not change the generator. The sample it was written against is deleted; templates are the source of truth ([ADR-0007](../adr/0007-templates-are-the-source-of-truth.md)).
 
 Better-T-Stack does not keep a runnable default monorepo. The product source of truth is `packages/template-generator`: a tree of Handlebars fragments, selected by a `ProjectConfig`, rendered into an in-memory filesystem, then rewritten by TypeScript post-processors. A generated app exists only after `generate()` plus `writeTree()`. The CLI default stack is a config constant that picks those fragments. Proof is a generated-build (install, typecheck, build, optional boot), never a string snapshot of template text.
 

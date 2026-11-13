@@ -384,7 +384,7 @@ Frozen out of L0 exit; do **not** pull into L1 MVP unless a maintainer reopens.
 
 - [ ] Optional CI: outdated check / Dependabot-or-Renovate scoped to the Dependency Catalog
 - [ ] Browser E2E (Playwright) for `apps/web` — Golden smoke stays import/loader-only until then
-- [ ] TypeScript 7 / `@effect/tsgo` — intentional lag until whole-stack ADR (Golden Sample is on TS 6.x)
+- [ ] TypeScript 7 / `@effect/tsgo` — intentional lag until whole-stack ADR (the default stack is on TS 6.x)
 - [ ] `@effect/oxc` published on npm — until then keep the owned copy in `packages/effect-oxc`
 
 Mirror: [`docs/L0-KNOWN-ISSUES.md`](./L0-KNOWN-ISSUES.md) Deferred.
