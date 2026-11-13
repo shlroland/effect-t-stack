@@ -151,6 +151,32 @@ describe("template generator contract", () => {
     expect(fingerprint["reproducibleCommand"]).toBe("bunx create-effect-t-stack@0.1.0 smoke --yes")
   })
 
+  test("effect-oxc template matches the owned package and lint does not load repos/effect", () => {
+    const owned = join(repoRoot, "packages/effect-oxc/src/oxlint")
+    const copied = join(
+      repoRoot,
+      "packages/template-generator/templates/addons/effect-style/packages/effect-oxc/src/oxlint"
+    )
+    const files = [
+      "index.ts",
+      "rules/no-bigint-literals.ts",
+      "rules/no-import-from-barrel-package.ts",
+      "rules/no-js-extension-imports.ts",
+      "rules/no-opaque-instance-fields.ts",
+      "rules/no-unused-internal.ts"
+    ]
+    for (const file of files) {
+      expect(readFileSync(join(copied, file), "utf8")).toBe(readFileSync(join(owned, file), "utf8"))
+    }
+    const tree = generateDefault("smoke", undefined, "0.1.0")
+    const oxlintrc = readTreeFile(tree, ".oxlintrc.json")
+    expect(oxlintrc).toContain("./packages/effect-oxc/src/oxlint/index.ts")
+    expect(oxlintrc).not.toContain("repos/effect")
+    const fingerprint = readTreeFile(tree, "ets.jsonc")
+    expect(fingerprint).not.toContain("repos/effect/packages/tools/oxc")
+    expect(fingerprint).toContain("packages/effect-oxc")
+  })
+
   test("omits ets.jsonc when no CLI version is passed", () => {
     const tree = generateDefault("smoke")
     expect(treePaths(tree).includes("ets.jsonc")).toBe(false)

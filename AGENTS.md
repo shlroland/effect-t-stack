@@ -76,7 +76,7 @@ git subtree pull --prefix=repos/effect https://github.com/Effect-TS/effect.git m
 
 Golden Sample enables **`effect-style`** by default (optional in the future Option Matrix). When present:
 
-- Format with **`dprint`** (ASI, double quotes, no trailing commas, lineWidth 120 — aligned with `repos/effect/dprint.json`)
+- Format with **`dprint`** (ASI, double quotes, no trailing commas, lineWidth 120 — same settings as the Effect repo)
 - Lint with **`oxlint`** + **`@effect/oxc`** rules (config: `examples/golden/.oxlintrc.json`)
 - Golden `bun run check` includes `lint`; Scaffold pre-commit via root **Lefthook**; CI via `.github/workflows/check.yml`
 - Naming / modules / API conventions follow `repos/effect` + `LLMS.md` (PascalCase modules, `Context.Service`, `Schema.TaggedError`, `Effect.fn`, `.ts` import extensions, …)
@@ -86,8 +86,7 @@ Golden Sample enables **`effect-style`** by default (optional in the future Opti
   - Tooling config files (`*.config.ts`)
 - Do **not** add competing formatters/linters (`biome`, etc.) alongside this addon
 
-`@effect/oxc` is not on npm yet; golden loads the oxlint JS plugin from
-`repos/effect/packages/tools/oxc` via the `repos` symlink/addon.
+`@effect/oxc` is not on npm yet. The owned copy is [`packages/effect-oxc`](./packages/effect-oxc). Switch to the official package when Effect publishes it (see that README).
 
 ## Effect MCP (`mcp` addon)
 
