@@ -1,6 +1,6 @@
 # AGENTS.md — effect-t-stack Scaffold Product + Golden Sample
 
-本仓库是 **effect-t-stack Scaffold Product**（**L2 closed**；下一刀 **L3** Option Matrix）：`apps/cli` 提供 `create-effect-t-stack`；**Golden Sample** 在 [`examples/golden`](./examples/golden)（L0 已签离，CLI 整树复制源）。
+本仓库是 **effect-t-stack Scaffold Product**（**L2 closed**；下一刀 **L3** Option Matrix）：`apps/cli` 提供 `create-effect-t-stack`（`create` 走 `packages/template-generator`，不再整树复制）；**Golden Sample** 在 [`examples/golden`](./examples/golden)（L0 已签离，仍是可跑的默认样例，删除见后续工单）。
 
 ## Navigation
 
@@ -57,12 +57,12 @@ git subtree pull --prefix=repos/effect https://github.com/Effect-TS/effect.git m
 
 ## Scaffold Product vs Golden
 
-| Area        | Path                                                  | Role                                                                                                                   |
-| ----------- | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| CLI         | `apps/cli`                                            | `create-effect-t-stack` via **`effect/cli`** + BunServices — copy + rename only; **no** domain/SQL/HTTP business logic |
-| Golden      | `examples/golden`                                     | Runnable `--yes` default stack; SoT until L3 `.hbs` extracts                                                           |
-| Docs / ADRs | `docs/`                                               | Capability Tiers, fingerprint, compatibility, decisions                                                                |
-| Catalog     | `examples/golden/package.json` → `workspaces.catalog` | Dependency pins                                                                                                        |
+| Area        | Path                                                  | Role                                                                                                                                             |
+| ----------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| CLI         | `apps/cli`                                            | `create-effect-t-stack` via **`effect/cli`** + BunServices — generates from `packages/template-generator`; **no** domain/SQL/HTTP business logic |
+| Golden      | `examples/golden`                                     | Runnable default sample. `create` does not copy it. Delete is a later ticket.                                                                    |
+| Docs / ADRs | `docs/`                                               | Capability Tiers, fingerprint, compatibility, decisions                                                                                          |
+| Catalog     | `examples/golden/package.json` → `workspaces.catalog` | Dependency pins                                                                                                                                  |
 
 **Ownership:** edit golden first for shared spine; L3 adds template-only overlays for non-default matrix cells. Do not invent a second golden monorepo per combo.
 

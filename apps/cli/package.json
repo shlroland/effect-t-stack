@@ -1,7 +1,7 @@
 {
   "name": "create-effect-t-stack",
   "version": "0.1.0",
-  "description": "Scaffold an Effect v4 full-stack app from the effect-t-stack Golden Sample",
+  "description": "Scaffold an Effect v4 full-stack app from effect-t-stack templates",
   "type": "module",
   "license": "MIT",
   "repository": {
@@ -38,19 +38,21 @@
   ],
   "scripts": {
     "start": "bun run src/bin.ts",
-    "pack:golden": "bun run scripts/pack-golden.ts",
-    "prepack": "bun run pack:golden",
+    "pack:generator": "bun run scripts/pack-generator.ts",
+    "pack:golden": "bun run pack:generator",
+    "prepack": "bun run pack:generator",
     "check-types": "tsc --noEmit -p tsconfig.json",
     "assert:test-layout": "bun run scripts/assert-no-src-tests.ts",
     "test": "bun test test",
     "lint": "oxlint -c .oxlintrc.json -f unix src scripts test",
-    "check": "bun run assert:test-layout && bun run lint && bun run check-types && bun run test"
+    "check": "bun run --filter=@effect-t-stack/template-generator prebuild && bun run assert:test-layout && bun run lint && bun run check-types && bun run test"
   },
   "dependencies": {
     "@effect/platform-bun": "^4.1.3",
     "effect": "^4.1.4"
   },
   "devDependencies": {
+    "@effect-t-stack/template-generator": "workspace:*",
     "@types/bun": "latest",
     "oxlint": "^1.93.0",
     "typescript": "^6.0.3"

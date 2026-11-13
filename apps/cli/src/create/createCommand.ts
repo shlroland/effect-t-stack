@@ -23,7 +23,7 @@ const yolo = Flag.Boolean("yolo").pipe(
 )
 
 const dryRun = Flag.Boolean("dry-run").pipe(
-  Flag.withDescription("Print the copy/rename plan without writing files"),
+  Flag.withDescription("Print the generate plan without writing files"),
   Flag.withDefault(false)
 )
 
@@ -104,7 +104,7 @@ export const createCommand = Command.make("create", {
   effectStyle
 }).pipe(
   Command.withDescription(
-    "Whole-tree copy of the Golden Sample with @ets/* → @<name>/* rename"
+    "Generate an Effect app from templates (@<name>/* scope)"
   ),
   Command.withHandler((config) =>
     createProject({

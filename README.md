@@ -6,7 +6,8 @@ Effect **v4** Scaffold Product for **`create-effect-t-stack`**. L0 Golden Sample
 
 ```
 apps/cli              create-effect-t-stack (L1 thin MVP)
-examples/golden       runnable default-stack Golden Sample (SoT for --yes)
+examples/golden       runnable default-stack sample (create does not copy it)
+packages/template-generator   Handlebars source for create
 docs/                 ADRs, Capability Tiers, fingerprint guide
 repos/effect          vendored Effect reference (not copied into generated apps)
 ```
@@ -25,7 +26,7 @@ bun run create -- my-app --yes --verbose --no-render-title
 bunx create-effect-t-stack@latest my-app --yes
 ```
 
-This copies the Golden Sample → `./my-app`, renames `@ets/*` → `@my-app/*`, and stamps `ets.jsonc` create meta. Notable flags: `--dry-run`, `--package-manager bun|npm|pnpm`, `--directory-conflict`, `--open <bin>`, `--manual-db`. `--api httpapi` / `--no-effect-style` are plumbed but error until L3.
+This generates `./my-app` from `packages/template-generator` (scope `@my-app/*`) and writes `ets.jsonc`. Notable flags: `--dry-run`, `--package-manager bun|npm|pnpm`, `--directory-conflict`, `--open <bin>`, `--manual-db`. `--api httpapi` / `--no-effect-style` are plumbed but error until L3.
 
 **Requires Bun ≥ 1.4.4.** See [`CONTRIBUTING.md`](./CONTRIBUTING.md) and [`SECURITY.md`](./SECURITY.md).
 
@@ -62,9 +63,9 @@ bun run dev:golden    # http://localhost:5173
 
 ## Ownership (golden vs templates)
 
-- **Golden** = one runnable default combo; edit here first for shared Effect Core spine + Dependency Catalog pins.
-- **Other matrix combos** (L3+) = `.hbs` + template-only overlays; prove with generated-builds — not N extra goldens.
-- **Sync (L3):** golden → regenerate overlapping templates.
+- **Templates** (`packages/template-generator`) = what `create --yes` emits.
+- **Golden** = one runnable default combo that still exists in-repo. Deleting it, and the docs that say "edit golden first", is a later ticket.
+- **Other matrix combos** = more `.hbs` cells; prove with generated-builds — not N extra goldens.
 
 ## Docs
 

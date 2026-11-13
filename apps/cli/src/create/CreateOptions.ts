@@ -20,6 +20,7 @@ export type CreateOptions = {
   readonly api: ApiPrimary
   readonly effectStyle: boolean
   readonly cwd?: string
+  /** Ignored. Create reads embedded templates, not a golden tree. */
   readonly goldenRoot?: string
 }
 

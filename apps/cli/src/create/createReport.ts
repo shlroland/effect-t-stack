@@ -1,6 +1,5 @@
 import * as Console from "effect/Console"
 import * as Effect from "effect/Effect"
-import { buildRenameMap } from "../template/rename.ts"
 import type { CreateOptions } from "./CreateOptions.ts"
 import type { CreateResult } from "./CreateResult.ts"
 import { formatVerbose, makeCreateResult } from "./CreateResult.ts"
@@ -8,7 +7,7 @@ import { formatVerbose, makeCreateResult } from "./CreateResult.ts"
 const TITLE = `
 ┌─────────────────────────────────────┐
 │     create-effect-t-stack           │
-│     Effect v4 · Golden Sample       │
+│     Effect v4 · Rpc primary         │
 └─────────────────────────────────────┘
 `
 
@@ -17,7 +16,6 @@ export const printTitle = (options: CreateOptions): Effect.Effect<void> =>
 
 export const printPlanSummary = (input: {
   readonly options: CreateOptions
-  readonly goldenRoot: string
   readonly targetDir: string
   readonly scope: string
   readonly fileCount: number
@@ -25,15 +23,11 @@ export const printPlanSummary = (input: {
   if (input.options.verbose) {
     return Effect.void
   }
-  const rename = buildRenameMap(input.scope)
-    .map(([from, to]) => `${from}→${to}`)
-    .join(", ")
   return Effect.gen(function*() {
-    yield* Console.log(`Golden:  ${input.goldenRoot}`)
     yield* Console.log(`Target:  ${input.targetDir}`)
     yield* Console.log(`Scope:   @${input.scope}`)
     yield* Console.log(`Files:   ${input.fileCount}`)
-    yield* Console.log(`Rename:  ${rename}`)
+    yield* Console.log(`Source:  template-generator`)
     yield* Console.log(`PM:      ${input.options.packageManager}`)
   })
 }

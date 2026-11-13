@@ -82,7 +82,7 @@ export const addAddon = Effect.fn("addAddon")(function*(options: AddAddonOptions
     yield* Console.log(JSON.stringify(result, null, 2))
   } else {
     yield* Console.log(
-      `Enabled "${addon}" in ets.jsonc (Golden Sample already ships its files; L3 adds non-default overlays).`
+      `Enabled "${addon}" in ets.jsonc (default create already includes this addon's files).`
     )
   }
   return result
