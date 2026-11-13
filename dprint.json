@@ -22,6 +22,8 @@
     "examples/golden/packages/db/drizzle/**",
     "repos/**",
     "examples/golden/repos/**",
+    "packages/template-generator/templates/**",
+    "packages/template-generator/src/templates.generated.ts",
     "node_modules/**",
     "**/node_modules/**",
     "**/.*"

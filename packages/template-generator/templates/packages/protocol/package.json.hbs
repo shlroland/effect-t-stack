@@ -1,0 +1,16 @@
+{
+  "name": "@{{projectName}}/protocol",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./http-api": "./src/http-api/index.ts",
+    "./rpc": "./src/rpc/index.ts"
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

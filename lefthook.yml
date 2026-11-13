@@ -19,11 +19,15 @@ pre-commit:
         # shellcheck disable=SC2086 -- intentional split of Lefthook's space-separated list
         golden=$(printf '%s\n' ${files} | grep '^examples/golden/' || true)
         cli=$(printf '%s\n' ${files} | grep '^apps/cli/' || true)
+        generator=$(printf '%s\n' ${files} | grep '^packages/template-generator/' || true)
         if [ -n "${golden}" ]; then
           printf '%s\n' "${golden}" | tr '\n' '\0' | xargs -0 bunx oxlint -c examples/golden/.oxlintrc.json --fix --deny-warnings
         fi
         if [ -n "${cli}" ]; then
           printf '%s\n' "${cli}" | tr '\n' '\0' | xargs -0 bunx oxlint -c apps/cli/.oxlintrc.json --fix --deny-warnings
+        fi
+        if [ -n "${generator}" ]; then
+          printf '%s\n' "${generator}" | tr '\n' '\0' | xargs -0 bunx oxlint -c packages/template-generator/.oxlintrc.json --fix --deny-warnings
         fi
       stage_fixed: true
     dprint:

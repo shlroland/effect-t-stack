@@ -23,5 +23,8 @@ jobs:
       - name: Install Golden Sample
         run: bun install --frozen-lockfile --cwd examples/golden
 
-      - name: Lint, typecheck, test (CLI + Golden)
+      - name: Lint, typecheck, test (CLI + template generator + Golden)
         run: bun run check
+
+      - name: Generated-build (template generator default stack)
+        run: ETS_GENERATED_BUILD=1 bun test packages/template-generator/test/generated-build.test.ts

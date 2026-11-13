@@ -17,4 +17,8 @@ coverage
 
 # CLI publish staging (copied from examples/golden by pack:golden)
 apps/cli/templates/
+
+# Template embed (produced by packages/template-generator prebuild)
+packages/template-generator/src/templates.generated.ts
+packages/template-generator/templates-binary/
 *.tgz

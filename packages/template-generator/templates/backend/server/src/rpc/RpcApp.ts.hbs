@@ -1,0 +1,14 @@
+import { AppRpcs, RpcPrefix } from "@{{projectName}}/protocol/rpc"
+import { Layer } from "effect"
+import { RpcSerialization, RpcServer } from "effect/rpc"
+import { AppRpcHandlers } from "./AppRpcHandlers.ts"
+
+/** Effect Rpc surface (HTTP + NDJSON) under {@link RpcPrefix}. */
+export const RpcRoutes = RpcServer.layerHttp({
+  group: AppRpcs,
+  path: RpcPrefix,
+  protocol: "http"
+}).pipe(
+  Layer.provide(AppRpcHandlers),
+  Layer.provide(RpcSerialization.layerNdjson)
+)

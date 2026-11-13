@@ -1,0 +1,36 @@
+import { Database, Migrations, TodosRepository } from "@{{projectName}}/db"
+import { Effect, Layer } from "effect"
+import { AppConfig } from "./config/AppConfig.ts"
+import { System } from "./services/System.ts"
+import { Todos } from "./services/Todos.ts"
+
+/**
+ * Prod app Layer for HTTP. Only Services (+ AppConfig) remain in the
+ * public context — Database / Migrations / Repository stay internal deps.
+ */
+export const makeAppLive = (config: {
+  readonly databaseUrl: string
+  readonly port?: number
+}) => {
+  const AppConfigLive = AppConfig.layerFrom(config)
+  const DatabaseLive = Database.layer(config.databaseUrl)
+  const MigrationsLive = Migrations.layer().pipe(Layer.provide(DatabaseLive))
+  const TodosRepositoryLive = TodosRepository.layerNoDeps.pipe(
+    Layer.provide(DatabaseLive)
+  )
+  const TodosLive = Todos.layerNoDeps.pipe(Layer.provide(TodosRepositoryLive))
+  const SystemLive = System.layerNoDeps.pipe(Layer.provide(MigrationsLive))
+
+  return Layer.mergeAll(
+    AppConfigLive,
+    TodosLive,
+    SystemLive
+  )
+}
+
+export const AppLive = Layer.unwrap(
+  Effect.gen(function*() {
+    const config = yield* AppConfig
+    return makeAppLive(config)
+  })
+).pipe(Layer.provide(AppConfig.layer))

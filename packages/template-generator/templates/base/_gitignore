@@ -1,0 +1,14 @@
+node_modules
+.turbo
+dist
+.output
+coverage
+*.tsbuildinfo
+*.log
+.DS_Store
+data.db
+data.db-shm
+data.db-wal
+.env
+.env.*
+!.env.example
