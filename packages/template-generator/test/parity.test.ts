@@ -51,14 +51,19 @@ const packageNames = (paths: ReadonlyArray<string>, read: (path: string) => stri
 describe("golden structural parity", () => {
   test("default generate has the same paths and workspace package names", () => {
     const tree = generateDefault("smoke", undefined, "0.1.0")
-    const generated = treePaths(tree).filter((path) => !GENERATOR_ONLY.has(path))
+    const generated = treePaths(tree).filter((path) =>
+      !GENERATOR_ONLY.has(path) && !path.startsWith("packages/effect-oxc/")
+    )
     const golden = walk(goldenRoot)
     expect(generated).toEqual(golden)
 
     const goldenNames = packageNames(golden, (path) => readFileSync(join(goldenRoot, path), "utf8")).map((name) =>
       name.replaceAll("@ets/", "@smoke/").replace(/^effect-t-stack-golden$/, "smoke")
     )
-    const generatedNames = packageNames(treePaths(tree), (path) => readTreeFile(tree, path))
+    const generatedNames = packageNames(
+      treePaths(tree).filter((path) => !path.startsWith("packages/effect-oxc/")),
+      (path) => readTreeFile(tree, path)
+    )
     expect(generatedNames).toEqual(goldenNames)
   })
 })

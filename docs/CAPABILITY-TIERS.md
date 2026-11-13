@@ -96,7 +96,7 @@ Fingerprint: listed under `addons` + detailed under `addonOptions.effect-style` 
 
 - [x] Implement addon **`effect-style`**: mirror Effect repo toolchain
   - [x] `dprint` (ASI, double quotes, no trailing commas, lineWidth 120 — align with `repos/effect/dprint.json`)
-  - [x] `oxlint` + `@effect/oxc` Effect rules via vendored `repos/effect/.../oxc` JS plugin (not on npm yet; requires `repos` addon)
+  - [x] `oxlint` + `@effect/oxc` Effect rules via the owned copy in `packages/effect-oxc` (not on npm yet; switch to the official package when Effect publishes it)
   - [x] Wire `lint` / `lint-fix` scripts; include lint in `bun run check` when addon is enabled
   - [x] Pre-commit via **Lefthook** (`lefthook.yml`: staged `dprint fmt` + `oxlint --fix`; not husky/lint-staged)
   - [x] CI workflow gate when addon is enabled (`.github/workflows/check.yml`)
@@ -375,7 +375,7 @@ Frozen out of L0 exit; do **not** pull into L1 MVP unless a maintainer reopens.
 - [ ] Optional CI: outdated check / Dependabot-or-Renovate scoped to the Dependency Catalog
 - [ ] Browser E2E (Playwright) for `apps/web` — Golden smoke stays import/loader-only until then
 - [ ] TypeScript 7 / `@effect/tsgo` — intentional lag until whole-stack ADR (Golden Sample is on TS 6.x)
-- [ ] `@effect/oxc` published on npm — until then keep vendored `repos/effect/.../oxc` + `repos` addon
+- [ ] `@effect/oxc` published on npm — until then keep the owned copy in `packages/effect-oxc`
 
 Mirror: [`docs/L0-KNOWN-ISSUES.md`](./L0-KNOWN-ISSUES.md) Deferred.
 

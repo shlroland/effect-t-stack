@@ -8,7 +8,7 @@ import { writeTree } from "../src/fs-writer.ts"
 import { generateDefault } from "./support.ts"
 
 /**
- * Generated-build: materialize the default stack, install, and typecheck.
+ * Generated-build: materialize the default stack, install, typecheck, and lint.
  * Skipped unless ETS_GENERATED_BUILD=1 (slow; needs a network install).
  */
 describe("generated-build", () => {
@@ -18,7 +18,7 @@ describe("generated-build", () => {
     await Promise.all(temps.map((dir) => rm(dir, { recursive: true, force: true })))
   })
 
-  test("default config installs and typechecks", async () => {
+  test("default config installs, typechecks, and lints without repos/", async () => {
     if (process.env["ETS_GENERATED_BUILD"] !== "1") return
     const projectDir = await mkdtemp(join(tmpdir(), "ets-tpl-"))
     temps.push(projectDir)
@@ -31,6 +31,7 @@ describe("generated-build", () => {
     await run("git", ["config", "user.name", "ets"], projectDir)
     await run("bun", ["install"], projectDir)
     await run("bun", ["run", "check-types"], projectDir)
+    await run("bun", ["run", "lint"], projectDir)
   }, 600_000)
 })
 

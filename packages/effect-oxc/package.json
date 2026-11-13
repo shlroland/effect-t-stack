@@ -1,0 +1,14 @@
+{
+  "name": "@ets/effect-oxc",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Owned copy of unpublished @effect/oxc. Replace with the npm package when Effect publishes it.",
+  "exports": {
+    "./oxlint": "./src/oxlint/index.ts"
+  },
+  "dependencies": {
+    "@oxlint/plugins": "^1.93.0",
+    "typescript": "catalog:"
+  }
+}

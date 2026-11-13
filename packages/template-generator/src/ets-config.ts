@@ -110,20 +110,25 @@ export const writeEtsConfig = (vfs: VirtualFileSystem, config: ProjectConfig, ve
     addonOptions: {
       "effect-style": {
         formatter: "dprint",
-        dprint: { config: "dprint.json", alignWith: "repos/effect/dprint.json" },
+        dprint: {
+          config: "dprint.json",
+          alignWith: "Effect repo dprint.json (ASI, double quotes, no trailing commas, lineWidth 120)"
+        },
         linter: "oxlint",
         oxlint: {
           config: ".oxlintrc.json",
           paths: ["apps", "packages"],
-          alignWith: "repos/effect/packages/tools/oxc/oxlintrc.json"
+          plugin: "packages/effect-oxc"
         },
         effectOxc: {
           package: "@effect/oxc",
           published: false,
-          install: "link:./repos/effect/packages/tools/oxc",
-          jsPlugin: "@effect/oxc/oxlint",
-          requiresAddon: "repos",
-          note: "Vendored until @effect/oxc publishes."
+          ownedCopy: "packages/effect-oxc",
+          jsPlugin: "./packages/effect-oxc/src/oxlint/index.ts",
+          upstream:
+            "https://github.com/Effect-TS/effect/tree/7865dbbb7b6a91691921dbb4febedf3ab94a348b/packages/tools/oxc",
+          note:
+            "Owned copy until @effect/oxc publishes on npm. Then depend on the official package and delete packages/effect-oxc."
         },
         conflictsWith: ["biome", "ultracite", "oxlint-only", "husky"],
         scripts: ["lint", "lint-fix"],

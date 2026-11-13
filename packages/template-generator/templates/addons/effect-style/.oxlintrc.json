@@ -15,10 +15,11 @@
     "**/routeTree.gen.ts",
     "packages/db/drizzle/**",
     "repos/**",
+    "packages/effect-oxc/**",
     "node_modules/**",
     "**/.*"
   ],
-  "jsPlugins": ["./repos/effect/packages/tools/oxc/src/oxlint/index.ts"],
+  "jsPlugins": ["./packages/effect-oxc/src/oxlint/index.ts"],
   "rules": {
     "effect/no-bigint-literals": "error",
     "effect/no-import-from-barrel-package": ["error", {

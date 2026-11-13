@@ -117,6 +117,15 @@ export const processDependencies = (vfs: VirtualFileSystem, config: ProjectConfi
     })
   }
 
+  if (hasAddon(config, "effect-style") && vfs.fileExists("packages/effect-oxc/package.json")) {
+    addPackageDependency({
+      vfs,
+      packagePath: "packages/effect-oxc",
+      dependencies: ["@oxlint/plugins"],
+      devDependencies: ["typescript"]
+    })
+  }
+
   if (hasFrontend(config, "tanstack-start") && vfs.fileExists("apps/web/package.json")) {
     addPackageDependency({
       vfs,
