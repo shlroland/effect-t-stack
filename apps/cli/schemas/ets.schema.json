@@ -43,7 +43,7 @@
     "createdAt": {
       "type": "string",
       "format": "date-time",
-      "description": "Create-time stamp (generated apps; golden may omit)"
+      "description": "Create-time stamp written by the generator"
     },
     "cliVersion": {
       "type": "string",

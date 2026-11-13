@@ -5,15 +5,15 @@ Vocabulary for the Effect full-stack scaffolder and the projects it generates.
 ## Language
 
 **Golden Sample**:
-The runnable default-stack monorepo under `examples/golden` that is the source of truth for what a `--yes` generated project should look like.
-_Avoid_: demo app, starter only, example repo (when meaning the canonical base)
+Historical name for the deleted default-stack monorepo (`examples/golden`). The source of truth for a `--yes` app is `packages/template-generator`. See [ADR-0007](./docs/adr/0007-templates-are-the-source-of-truth.md).
+_Avoid_: using it for a live path or as a reason to edit a sample before the templates
 
 **Fingerprint**:
 The project config file (`ets.jsonc`) that records stack choices so CLI create/add and agents can recognize and extend the project. It is versioned and periodically compacted; it is not an append-only notes file.
 _Avoid_: lockfile, package.json, stack config (ambiguous), etc.jsonc
 
 **L0 Exit**:
-The explicit checklist that must pass (or be ADR-waived) before the Golden Sample may be copied by the Scaffold CLI.
+Historical checklist that had to pass before the old sample could be copied by the CLI. The sample was later extracted into templates and deleted ([ADR-0007](./docs/adr/0007-templates-are-the-source-of-truth.md)).
 _Avoid_: Phase 1a done, check passing (alone)
 
 **Scaffold Product**:

@@ -2,7 +2,7 @@
 
 ## Supported versions
 
-This repository is the Scaffold Product for `create-effect-t-stack` plus the Golden Sample under `examples/golden`. Security fixes land on `main`.
+This repository is the Scaffold Product for `create-effect-t-stack`. Generated apps come from `packages/template-generator`. Security fixes land on `main`.
 
 ## Reporting a vulnerability
 

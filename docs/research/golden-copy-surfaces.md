@@ -1,5 +1,7 @@
 # Surfaces that assume a golden copy
 
+> **Historical.** `examples/golden` was deleted. Templates in `packages/template-generator` are the source of truth ([ADR-0007](../adr/0007-templates-are-the-source-of-truth.md)). This note records the inventory used to get there. Do not treat the paths below as live.
+
 Research note for [Research: ETS surfaces that assume golden copy](https://github.com/shlroland/effect-t-stack/issues/3), part of [L3: BTS-mode template source of truth](https://github.com/shlroland/effect-t-stack/issues/1).
 
 Question: which code, scripts, CI, publish packing, docs, and tests still assume a whole-tree copy of `examples/golden` (or treat golden as the permanent source of truth), and what has to change before golden can be deleted?
@@ -45,7 +47,7 @@ These keep `examples/golden` as a runnable sample or as a second pin table. They
 
 ## What has to change to delete golden
 
-Tracked as [Task: Delete golden and rewrite SoT docs](https://github.com/shlroland/effect-t-stack/issues/8). Not done here.
+Tracked as [Task: Delete golden and rewrite SoT docs](https://github.com/shlroland/effect-t-stack/issues/8). **Done.** The list is the inventory that was followed. `examples/golden`, the parity test, `copyGolden.ts`, and `resolveGoldenRoot` are gone. `dependencyVersionMap` is the only pin table. `DEFAULT_ADDONS` replaced `GOLDEN_ADDONS`. Rename helpers and the copy denylist remain as unused copy-era utilities with unit tests; `create` does not call them.
 
 1. Stop installing and `check`ing `examples/golden` in root scripts and `.github/workflows/check.yml`. The scaffold check becomes CLI + template-generator, with generated-build as the `--yes` proof.
 2. Drop the parity test and the catalog-equality test, or point them at `dependencyVersionMap` only. One pin table remains.

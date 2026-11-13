@@ -1,6 +1,6 @@
 name: live-smoke
 
-# Gated Live tier: create --yes → install → check-types (not full lint; repos addon is denylisted).
+# Gated Live tier: create --yes from templates → install → check-types.
 on:
   workflow_dispatch:
   schedule:

@@ -10,7 +10,7 @@ export {
   rulesByStage
 } from "./catalog.ts"
 export type { CompatibilityRule, RuleStatus, ValidationStage } from "./catalog.ts"
-export { resolveAddInput, validateGoldenAddon } from "./validateAdd.ts"
+export { resolveAddInput, validateDefaultAddon } from "./validateAdd.ts"
 export type { AddInputFields, ResolvedAddInput } from "./validateAdd.ts"
 export { validateCreateOptions } from "./validateCreate.ts"
 export { nextAddons, validateAddonAgainstFingerprint, validateAddonSet } from "./validateFingerprint.ts"

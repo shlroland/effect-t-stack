@@ -1,4 +1,4 @@
-/** Paths (relative to golden root) that must never ship into generated apps. */
+/** Path names that must not be copied into a generated app. */
 export const COPY_DENY_NAMES = new Set([
   "node_modules",
   ".git",

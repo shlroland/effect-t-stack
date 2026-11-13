@@ -5,11 +5,10 @@ import * as Exit from "effect/Exit"
 import { mkdir, mkdtemp, readFile, rm, stat } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
-import { resolveTargetDirectory } from "../src/create/copyGolden.ts"
+import { resolveTargetDirectory } from "../src/create/targetDirectory.ts"
 import { createProject } from "../src/create/create.ts"
 import type { CreateOptions } from "../src/create/CreateOptions.ts"
 import { CreateError } from "../src/shared/CreateError.ts"
-import { resolveGoldenRoot } from "../src/template/paths.ts"
 
 const provideBun = <A, E, R>(effect: Effect.Effect<A, E, R>) =>
   effect.pipe(Effect.provide(BunServices.layer)) as Effect.Effect<A, E>
@@ -117,7 +116,7 @@ describe("createProject (Effect)", () => {
     const pkg = JSON.parse(await readFile(join(result.targetDir, "package.json"), "utf8")) as {
       packageManager: string
     }
-    // BTS-style: local pin or Corepack "pnpm@latest" — never leave golden bun@
+    // BTS-style: local pin or Corepack "pnpm@latest"
     expect(pkg.packageManager === "pnpm@latest" || /^pnpm@\d+\.\d+\.\d+/.test(pkg.packageManager))
       .toBe(true)
   })
@@ -155,29 +154,6 @@ describe("createProject (Effect)", () => {
     )
     expect(Exit.isFailure(exit)).toBe(true)
     expect(String(exit)).toContain("effect-style")
-  })
-
-  test("resolveGoldenRoot points at examples/golden", async () => {
-    const golden = resolveGoldenRoot()
-    const pkg = JSON.parse(await readFile(join(golden, "package.json"), "utf8")) as {
-      description: string
-    }
-    expect(pkg.description).toContain("Golden Sample")
-    expect(golden.replaceAll("\\", "/")).toMatch(/examples\/golden$/)
-  })
-
-  test("ETS_GOLDEN_ROOT overrides resolveGoldenRoot", () => {
-    const prev = process.env["ETS_GOLDEN_ROOT"]
-    process.env["ETS_GOLDEN_ROOT"] = "/tmp/fake-golden"
-    try {
-      expect(resolveGoldenRoot()).toBe("/tmp/fake-golden")
-    } finally {
-      if (prev === undefined) {
-        delete process.env["ETS_GOLDEN_ROOT"]
-      } else {
-        process.env["ETS_GOLDEN_ROOT"] = prev
-      }
-    }
   })
 
   test("CreateError tag", () => {

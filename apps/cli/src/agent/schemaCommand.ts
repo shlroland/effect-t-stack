@@ -4,7 +4,7 @@ import * as FileSystem from "effect/FileSystem"
 import * as Path from "effect/Path"
 import { fileURLToPath } from "node:url"
 import type { CreateOptions } from "../create/CreateOptions.ts"
-import { GOLDEN_ADDONS } from "../fingerprint/fingerprint.ts"
+import { DEFAULT_ADDONS } from "../fingerprint/fingerprint.ts"
 import { CreateError } from "../shared/CreateError.ts"
 
 export type SchemaName = "all" | "createInput" | "addonOptions" | "fingerprint"
@@ -38,7 +38,7 @@ const addonOptionsSchema = {
   type: "object",
   description: "Per-addon options nested under ets.jsonc addonOptions",
   properties: Object.fromEntries(
-    GOLDEN_ADDONS.map((name) => [name, { type: "object", additionalProperties: true }])
+    DEFAULT_ADDONS.map((name) => [name, { type: "object", additionalProperties: true }])
   ),
   additionalProperties: true
 }

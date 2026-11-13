@@ -2,7 +2,7 @@
   "name": "effect-t-stack",
   "private": true,
   "version": "0.1.0",
-  "description": "Scaffold Product for create-effect-t-stack (L2 closed). Golden Sample lives under examples/golden.",
+  "description": "Scaffold Product for create-effect-t-stack. Generated apps come from packages/template-generator.",
   "type": "module",
   "engines": {
     "bun": ">=1.4.0"
@@ -25,15 +25,13 @@
   },
   "scripts": {
     "create": "bun apps/cli/src/bin.ts",
-    "check": "bun run --filter=@ets/effect-oxc check-types && bun run --filter=create-effect-t-stack check && bun run --filter=@effect-t-stack/template-generator check && bun run check:golden",
-    "check:golden": "bun run --cwd examples/golden check",
+    "check": "bun run --filter=@ets/effect-oxc check-types && bun run --filter=create-effect-t-stack check && bun run --filter=@effect-t-stack/template-generator check",
     "check:cli": "bun run --filter=create-effect-t-stack check",
-    "dev:golden": "bun run --cwd examples/golden dev",
-    "test": "bun run --filter=create-effect-t-stack test && bun run --cwd examples/golden test",
-    "lint": "bun run --filter=create-effect-t-stack lint && bun run --cwd examples/golden lint",
-    "check-types": "bun run --filter=create-effect-t-stack check-types && bun run --cwd examples/golden check-types",
+    "test": "bun run --filter=create-effect-t-stack test && bun run --filter=@effect-t-stack/template-generator test",
+    "lint": "bun run --filter=create-effect-t-stack lint && bun run --filter=@effect-t-stack/template-generator lint",
+    "check-types": "bun run --filter=@ets/effect-oxc check-types && bun run --filter=create-effect-t-stack check-types && bun run --filter=@effect-t-stack/template-generator check-types",
     "pack:cli": "bun run --filter=create-effect-t-stack prepack && bun pm pack --cwd apps/cli",
-    "install:all": "bun install && bun install --cwd examples/golden",
+    "install:all": "bun install",
     "prepare": "lefthook install"
   },
   "devDependencies": {

@@ -1,6 +1,6 @@
 # `@effect-t-stack/template-generator`
 
-In-memory generator for `create-effect-t-stack`. The first template is the Golden Sample default stack (Rpc primary, HttpApi secondary, Bun, SQLite + Drizzle, auth none, TanStack Start, effect-style on, todo). `create` calls `generate` + `writeTree`. `examples/golden` remains in the repo as a runnable sample.
+In-memory generator for `create-effect-t-stack`. These templates are the only product source of truth. The default stack is Rpc primary, HttpApi secondary, Bun, SQLite + Drizzle, auth none, TanStack Start, effect-style on, todo. `create` calls `generate` + `writeTree`.
 
 ```ts
 import { EMBEDDED_TEMPLATES, generate, projectConfig } from "@effect-t-stack/template-generator"

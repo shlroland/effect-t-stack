@@ -25,7 +25,7 @@ const asWriter = (loaded: unknown): WriterApi => loaded as WriterApi
 
 /**
  * Monorepo resolves the workspace package. A packed CLI falls back to the
- * prepack copy under `templates/template-generator` (no dependency on examples/golden).
+ * prepack copy under `templates/template-generator`.
  */
 export const loadGenerator = async (): Promise<GeneratorApi> => {
   try {

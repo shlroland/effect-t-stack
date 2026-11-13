@@ -1,6 +1,6 @@
-# Golden Sample package boundaries
+# Generated app package boundaries
 
-Paths below are under **`examples/golden/`** unless noted. Scaffold Product CLI lives at repo-root `apps/cli` and must not grow domain/SQL/HTTP business logic.
+Paths below are the layout `packages/template-generator` emits. The historical name of this file is `golden-boundaries.md`. Scaffold Product CLI lives at repo-root `apps/cli` and must not grow domain/SQL/HTTP business logic.
 
 ## Package set
 

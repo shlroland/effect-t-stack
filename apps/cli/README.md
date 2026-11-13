@@ -1,6 +1,6 @@
 # create-effect-t-stack
 
-Scaffold an Effect **v4** app by generating it from `packages/template-generator` (scope `@<name>/*`). `examples/golden` is not copied.
+Scaffold an Effect **v4** app by generating it from `packages/template-generator` (scope `@<name>/*`).
 
 ## Requirements
 
@@ -62,4 +62,4 @@ cd apps/cli && bun pm pack   # inspect tarball
 npm publish --access public  # requires npm auth; bumps version first
 ```
 
-`prepack` runs `pack:generator`: it prebuilds templates and copies `packages/template-generator` into `templates/template-generator` (gitignored). The packed CLI loads that copy when the workspace package is not installed. `pack:golden` is an alias of the same script.
+`prepack` runs `pack:generator`: it prebuilds templates and copies `packages/template-generator` into `templates/template-generator` (gitignored). The packed CLI loads that copy when the workspace package is not installed.

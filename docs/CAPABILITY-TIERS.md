@@ -201,7 +201,17 @@ See [ADR-0005](./adr/0005-l0-exit-and-fingerprint-hygiene.md).
 
 ## L3 — Effect Core Option Matrix
 
-Introduce `packages/template-generator` + `.hbs` when combinations explode (expected during this tier).
+> **L3 exit (this map) is met.** `packages/template-generator` is the only product source of truth. `examples/golden` is deleted. `create` uses `generate` + `writeTree`. `--yes` is proven by a generated-build (install, typecheck, lint) in CI, with no `repos/` required for lint. See [ADR-0007](./adr/0007-templates-are-the-source-of-truth.md).
+>
+> The checkboxes below are **backlog**, not exit blockers. Preference order after exit: API primary flip, then database/ORM, then runtime `node`, then auth (`better-auth`), then the rest. L0–L2 sections that mention a Golden Sample are historical records of the deleted sample.
+
+### Exit criteria
+
+- [x] Templates in `packages/template-generator` are the only product source of truth
+- [x] `examples/golden` deleted; no script, CI job, or test treats it as live code
+- [x] `create` / `create-json` call `generate` + `writeTree` (no whole-tree copy)
+- [x] `--yes` generated-build in CI: install, `check-types`, lint (and dprint on the generator test)
+- [x] Docs that said “edit golden first” point at the templates ([ADR-0007](./adr/0007-templates-are-the-source-of-truth.md))
 
 ### API
 
@@ -303,8 +313,8 @@ Introduce `packages/template-generator` + `.hbs` when combinations explode (expe
 
 - [ ] `packages/template-generator` (in-memory VFS; Handlebars helpers; post-processors: scope rename, turbo scripts, README, `reproducibleCommand`)
 - [ ] Handlebars templates + helpers (`eq` / `ne` / `and` / `or` / `includes`)
-- [ ] **Golden Sample → templates sync script** (edit golden first; regenerate templates; never hand-pin versions outside Dependency Catalog)
-- [x] Document ownership: which paths are golden-owned vs template-only overlays — preview in [fingerprint.md](./fingerprint.md) (L1); enforce with sync script when `.hbs` lands
+- [x] Templates are authored directly (supersedes “edit golden first, then sync”). Pins live only in `dependencyVersionMap`
+- [x] Document ownership: default templates vs template-only overlays — [fingerprint.md](./fingerprint.md)
 - [ ] `db:*` script matrix per database/ORM/deploy combo (BTS `DbScriptSupport` analogue)
 
 ---

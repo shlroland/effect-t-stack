@@ -254,4 +254,4 @@ Do not copy BTS product choices:
 - Some addons stay CLI post-steps after `writeTree` (BTS skills, mcp, fumadocs, starlight, tauri). effect-style’s dprint/oxlint/lefthook configs can be templates; `repos` and `language-service` need an explicit choice later (template files vs a post-step). They are not a reason to keep `examples/golden` as source of truth.
 - Alchemy, Vercel services, and native `appId` helpers are BTS-specific. Omit them until a deploy/native ticket exists.
 
-`examples/golden` is the current concrete monorepo that the CLI copies. Under this model it is extraction input for the first templates, then it goes away. After that, the default stack is authored the way BTS authors `DEFAULT_CONFIG` plus `templates/**`: edit the fragment or the processor, and let a generated-build prove `--yes`.
+`examples/golden` was the extraction input for the first templates and is deleted ([ADR-0007](../adr/0007-templates-are-the-source-of-truth.md)). The default stack is authored the way BTS authors `DEFAULT_CONFIG` plus `templates/**`: edit the fragment or the processor, and let a generated-build prove `--yes`.

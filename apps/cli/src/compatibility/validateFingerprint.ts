@@ -7,11 +7,6 @@ import { EFFECT_STYLE_CONFLICTS, ruleMessage } from "./catalog.ts"
 export const validateAddonSet = (
   addons: ReadonlyArray<string>
 ): Effect.Effect<void, CreateError> => {
-  if (addons.includes("effect-style") && !addons.includes("repos")) {
-    return Effect.fail(
-      new CreateError({ message: ruleMessage("add.addons.effect-style.requires-repos") })
-    )
-  }
   if (addons.includes("effect-style")) {
     const hit = EFFECT_STYLE_CONFLICTS.find((name) => addons.includes(name))
     if (hit !== undefined) {

@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 /**
  * Copy packages/template-generator into apps/cli/templates/template-generator
- * so a packed CLI can generate without examples/golden.
+ * so a packed CLI can generate from the embedded templates.
  */
 import { spawn } from "node:child_process"
 import { cp, mkdir, rm } from "node:fs/promises"

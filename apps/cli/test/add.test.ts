@@ -72,7 +72,7 @@ describe("add <addon>", () => {
     await Promise.all(temps.map((dir) => rm(dir, { recursive: true, force: true })))
   })
 
-  test("idempotent golden addon", async () => {
+  test("idempotent default addon", async () => {
     const cwd = await mkdtemp(join(tmpdir(), "ets-add-addon-"))
     temps.push(cwd)
     const created = await Effect.runPromise(
@@ -91,7 +91,7 @@ describe("add <addon>", () => {
     expect(result.alreadyPresent).toBe(true)
   })
 
-  test("rejects non-golden addon", async () => {
+  test("rejects an addon outside the default set", async () => {
     const cwd = await mkdtemp(join(tmpdir(), "ets-add-bad-"))
     temps.push(cwd)
     const created = await Effect.runPromise(

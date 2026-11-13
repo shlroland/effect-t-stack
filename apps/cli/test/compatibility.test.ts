@@ -6,7 +6,7 @@ import {
   resolveAddInput,
   validateAddonSet,
   validateCreateOptions,
-  validateGoldenAddon
+  validateDefaultAddon
 } from "../src/compatibility/index.ts"
 import type { CreateOptions } from "../src/create/CreateOptions.ts"
 
@@ -38,13 +38,13 @@ describe("compatibility catalog", () => {
     const ids = COMPATIBILITY_RULES.filter((rule) => rule.status === "active").map((rule) => rule.id)
     expect(ids).toContain("create.combinations.api.rpc-only")
     expect(ids).toContain("create.addons.effect-style.required")
-    expect(ids).toContain("add.addons.golden-only")
+    expect(ids).toContain("add.addons.default-only")
     expect(ids).toContain("add.mutex.package-or-addon")
   })
 })
 
 describe("validateCreateOptions", () => {
-  test("accepts golden defaults", async () => {
+  test("accepts default stack", async () => {
     const exit = await Effect.runPromise(validateCreateOptions(baseOptions()).pipe(Effect.exit))
     expect(Exit.isSuccess(exit)).toBe(true)
   })
@@ -101,19 +101,18 @@ describe("resolveAddInput", () => {
   })
 })
 
-describe("validateGoldenAddon / validateAddonSet", () => {
-  test("rejects non-golden addon", async () => {
-    const exit = await Effect.runPromise(validateGoldenAddon("biome").pipe(Effect.exit))
+describe("validateDefaultAddon / validateAddonSet", () => {
+  test("rejects an addon outside the default set", async () => {
+    const exit = await Effect.runPromise(validateDefaultAddon("biome").pipe(Effect.exit))
     expect(Exit.isFailure(exit)).toBe(true)
     expect(String(exit)).toContain("biome")
   })
 
-  test("effect-style requires repos", async () => {
+  test("effect-style does not require the repos checkout", async () => {
     const exit = await Effect.runPromise(
       validateAddonSet(["turborepo", "effect-style"]).pipe(Effect.exit)
     )
-    expect(Exit.isFailure(exit)).toBe(true)
-    expect(String(exit)).toContain("repos")
+    expect(Exit.isSuccess(exit)).toBe(true)
   })
 
   test("effect-style conflicts with biome", async () => {
@@ -124,7 +123,7 @@ describe("validateGoldenAddon / validateAddonSet", () => {
     expect(String(exit)).toContain("biome")
   })
 
-  test("golden addon set passes", async () => {
+  test("default addon set passes", async () => {
     const exit = await Effect.runPromise(
       validateAddonSet([
         "turborepo",
