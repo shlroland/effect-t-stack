@@ -1,0 +1,19 @@
+{
+  "name": "@{{projectName}}/server",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./http-api": "./src/http/createHttpApiWebHandler.ts",
+    "./rpc": "./src/rpc/createRpcWebHandler.ts"
+  },
+  "scripts": {
+    "dev": "bun --hot src/main.ts",
+    "start": "bun src/main.ts",
+    "check-types": "tsc --noEmit -p tsconfig.json",
+    "test": "bun test"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

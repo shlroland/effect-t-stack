@@ -2,12 +2,13 @@
 
 ## Layout
 
-| Path              | Role                                                                                                                |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------- |
-| `apps/cli`        | `create-effect-t-stack` (`effect/cli`) — domain folders + `test/`; see [`apps/cli/README.md`](./apps/cli/README.md) |
-| `examples/golden` | Golden Sample (SoT for `--yes`)                                                                                     |
-| `docs/`           | Capability Tiers, ADRs, fingerprint, compatibility                                                                  |
-| `repos/effect`    | Vendored Effect reference (read-only)                                                                               |
+| Path                          | Role                                                                                                                |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `apps/cli`                    | `create-effect-t-stack` (`effect/cli`) — domain folders + `test/`; see [`apps/cli/README.md`](./apps/cli/README.md) |
+| `packages/template-generator` | Handlebars + VFS generator. First template is the Golden default stack. CLI create still copies golden.             |
+| `examples/golden`             | Golden Sample (SoT for `--yes` until CLI create switches)                                                           |
+| `docs/`                       | Capability Tiers, ADRs, fingerprint, compatibility                                                                  |
+| `repos/effect`                | Vendored Effect reference (read-only)                                                                               |
 
 Edit the golden first for shared spine changes; L3 templates will sync from it later.
 
@@ -29,7 +30,7 @@ bun run check
 ## Test tiers (Scaffold)
 
 1. **Contract** — `bun run --filter=create-effect-t-stack test` (parse/rename/denylist; no golden file-text snapshots; tests only under `apps/cli/test/`)
-2. **Generated-build** — `ETS_GENERATED_BUILD=1 bun test apps/cli/test/generated-build.smoke.test.ts`
+2. **Generated-build** — `ETS_GENERATED_BUILD=1 bun test apps/cli/test/generated-build.smoke.test.ts` (CLI copy path) and `ETS_GENERATED_BUILD=1 bun test packages/template-generator/test/generated-build.test.ts` (template generator)
 3. **Live** — manual `bun run create -- <name> --yes` then `bun run check-types` in the target; CI: Actions workflow **live-smoke** (`workflow_dispatch` / weekly)
 
 ## Publishing the CLI
