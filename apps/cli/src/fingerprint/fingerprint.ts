@@ -3,20 +3,14 @@ import * as FileSystem from "effect/FileSystem"
 import * as Path from "effect/Path"
 import { CreateError } from "../shared/CreateError.ts"
 import { CLI_VERSION, ETS_SCHEMA_URL } from "./cliVersion.ts"
+import { decodeFingerprintJson, decodeFingerprintJsonSync, type Fingerprint } from "./FingerprintSchema.ts"
 
-export type Fingerprint = {
-  readonly version: number
-  readonly name?: string
-  readonly addons: ReadonlyArray<string>
-  readonly addonOptions?: Record<string, unknown>
-  readonly packageManager?: string
-  readonly createdAt?: string
-  readonly cliVersion?: string
-  readonly reproducibleCommand?: string
-  readonly dbSetupOptions?: { readonly mode?: string; readonly [key: string]: unknown }
-  readonly $schema?: string
-  readonly [key: string]: unknown
-}
+export type { Fingerprint } from "./FingerprintSchema.ts"
+export {
+  Fingerprint as FingerprintSchema,
+  FingerprintFromJsonString,
+  fingerprintJsonSchema
+} from "./FingerprintSchema.ts"
 
 /** Strip // line comments for JSONC parse. */
 export const stripJsoncComments = (raw: string): string =>
@@ -56,13 +50,8 @@ export const stripJsoncComments = (raw: string): string =>
     })
     .join("\n")
 
-export const parseFingerprint = (raw: string): Fingerprint => {
-  const parsed = JSON.parse(stripJsoncComments(raw)) as Fingerprint
-  if (typeof parsed.version !== "number" || !Array.isArray(parsed.addons)) {
-    throw new Error("Invalid fingerprint: expected version (number) and addons (array)")
-  }
-  return parsed
-}
+/** Sync parse for tests / pure stamp helpers. Throws SchemaError on invalid JSON/shape. */
+export const parseFingerprint = (raw: string): Fingerprint => decodeFingerprintJsonSync(stripJsoncComments(raw))
 
 export const loadFingerprint = Effect.fn("loadFingerprint")(function*(projectDir: string) {
   const fs = yield* FileSystem.FileSystem
@@ -75,13 +64,8 @@ export const loadFingerprint = Effect.fn("loadFingerprint")(function*(projectDir
     })
   }
   const raw = yield* fs.readFileString(etsPath)
-  try {
-    return { path: etsPath, fingerprint: parseFingerprint(raw), raw }
-  } catch (cause) {
-    return yield* new CreateError({
-      message: `Failed to parse ets.jsonc: ${cause instanceof Error ? cause.message : String(cause)}`
-    })
-  }
+  const fingerprint = yield* decodeFingerprintJson(stripJsoncComments(raw))
+  return { path: etsPath, fingerprint, raw }
 })
 
 export const writeFingerprint = Effect.fn("writeFingerprint")(function*(
@@ -102,7 +86,7 @@ export type CreateStampInput = {
   readonly manualDb?: boolean
 }
 
-/** Pure stamp applied when copying ets.jsonc during create. */
+/** Pure stamp applied when writing ets.jsonc during create. */
 export const stampCreateFingerprint = (raw: string, input: CreateStampInput): string => {
   const fp = parseFingerprint(raw)
   const next: Fingerprint = {

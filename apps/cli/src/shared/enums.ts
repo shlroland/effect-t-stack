@@ -1,0 +1,22 @@
+import * as Schema from "effect/Schema"
+
+/** Shared Option Matrix literals — single source for Schema, flags, and catalog. */
+export const PackageManagerSchema = Schema.Literals(["bun", "npm", "pnpm"])
+export type PackageManager = typeof PackageManagerSchema.Type
+export const CREATE_PACKAGE_MANAGERS = PackageManagerSchema.literals
+
+export const ApiPrimarySchema = Schema.Literals(["rpc", "httpapi"])
+export type ApiPrimary = typeof ApiPrimarySchema.Type
+export const CREATE_APIS = ApiPrimarySchema.literals
+
+export const DirectoryConflictSchema = Schema.Literals([
+  "error",
+  "overwrite",
+  "increment",
+  "merge"
+])
+export type DirectoryConflict = typeof DirectoryConflictSchema.Type
+export const CREATE_DIRECTORY_CONFLICTS = DirectoryConflictSchema.literals
+
+export const DbSetupModeSchema = Schema.Literals(["alchemy", "auto", "manual"])
+export type DbSetupMode = typeof DbSetupModeSchema.Type

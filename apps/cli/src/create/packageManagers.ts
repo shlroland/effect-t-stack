@@ -4,10 +4,24 @@ import * as FileSystem from "effect/FileSystem"
 import * as Path from "effect/Path"
 import { ChildProcess } from "effect/process"
 import { ChildProcessSpawner } from "effect/process/ChildProcessSpawner"
+import * as Schema from "effect/Schema"
 import * as Stream from "effect/Stream"
 import { CreateError } from "../shared/CreateError.ts"
+import type { PackageManager } from "../shared/enums.ts"
 
-export type PackageManager = "bun" | "npm" | "pnpm"
+export type { PackageManager } from "../shared/enums.ts"
+
+/** Minimal root package.json shape we stamp after generate. */
+export const RootPackageJson = Schema.StructWithRest(
+  Schema.Struct({
+    packageManager: Schema.optionalKey(Schema.String)
+  }),
+  [Schema.Record(Schema.String, Schema.Unknown)]
+)
+
+export type RootPackageJson = typeof RootPackageJson.Type
+
+const RootPackageJsonFromJsonString = Schema.fromJsonString(RootPackageJson)
 
 export const installCommand = (
   pm: PackageManager
@@ -79,14 +93,13 @@ export const emitPackageManagerArtifacts = Effect.fn("emitPackageManagerArtifact
     const path = yield* Path.Path
     const rootPkgPath = path.join(targetDir, "package.json")
     const raw = yield* fs.readFileString(rootPkgPath)
-    let pkg: Record<string, unknown>
-    try {
-      pkg = JSON.parse(raw) as Record<string, unknown>
-    } catch (cause) {
-      return yield* new CreateError({
-        message: `Invalid package.json after generate: ${cause instanceof Error ? cause.message : String(cause)}`
-      })
-    }
+    const pkg = yield* Schema.decodeUnknownEffect(RootPackageJsonFromJsonString)(raw).pipe(
+      Effect.mapError((error) =>
+        new CreateError({
+          message: `Invalid package.json after generate: ${error.message}`
+        })
+      )
+    )
 
     pkg["packageManager"] = yield* resolvePackageManagerPin(pm)
     yield* fs.writeFileString(rootPkgPath, `${JSON.stringify(pkg, null, 2)}\n`)

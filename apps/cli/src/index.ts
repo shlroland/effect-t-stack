@@ -39,6 +39,9 @@ export { resolveTargetDirectory } from "./create/targetDirectory.ts"
 export { CLI_VERSION, ETS_SCHEMA_URL, FINGERPRINT_SCHEMA_VERSION } from "./fingerprint/cliVersion.ts"
 export {
   DEFAULT_ADDONS,
+  FingerprintFromJsonString,
+  fingerprintJsonSchema,
+  FingerprintSchema,
   loadFingerprint,
   parseFingerprint,
   stampCreateFingerprint,
@@ -47,6 +50,14 @@ export {
 export type { Fingerprint } from "./fingerprint/fingerprint.ts"
 export { normalizeArgv } from "./normalizeArgv.ts"
 export { CreateError } from "./shared/CreateError.ts"
+export {
+  ApiPrimarySchema as SharedApiPrimarySchema,
+  CREATE_APIS,
+  CREATE_DIRECTORY_CONFLICTS,
+  CREATE_PACKAGE_MANAGERS,
+  DirectoryConflictSchema as SharedDirectoryConflictSchema,
+  PackageManagerSchema as SharedPackageManagerSchema
+} from "./shared/enums.ts"
 export { COPY_DENY_NAMES, isDeniedName } from "./template/denylist.ts"
 export { toPackageScope } from "./template/projectName.ts"
 export { applyRename, buildRenameMap, shouldRewriteFile } from "./template/rename.ts"

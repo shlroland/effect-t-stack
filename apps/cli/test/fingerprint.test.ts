@@ -1,6 +1,11 @@
 import { describe, expect, test } from "bun:test"
 import { ETS_SCHEMA_URL } from "../src/fingerprint/cliVersion.ts"
-import { parseFingerprint, stampCreateFingerprint, stripJsoncComments } from "../src/fingerprint/fingerprint.ts"
+import {
+  fingerprintJsonSchema,
+  parseFingerprint,
+  stampCreateFingerprint,
+  stripJsoncComments
+} from "../src/fingerprint/fingerprint.ts"
 
 describe("fingerprint", () => {
   test("stripJsoncComments keeps URLs and strips line comments", () => {
@@ -13,6 +18,10 @@ describe("fingerprint", () => {
     expect(cleaned).not.toContain("// note")
     expect(cleaned).toContain("https://example.com")
     expect(JSON.parse(cleaned)).toMatchObject({ version: 1 })
+  })
+
+  test("parseFingerprint rejects missing stack dims via Schema", () => {
+    expect(() => parseFingerprint(`{ "version": 1, "addons": [] }`)).toThrow()
   })
 
   test("stampCreateFingerprint adds meta + $schema", () => {
@@ -41,5 +50,22 @@ describe("fingerprint", () => {
     expect(fp.cliVersion).toBeDefined()
     expect(fp.reproducibleCommand).toContain("create acme")
     expect(fp.dbSetupOptions?.mode).toBe("manual")
+  })
+
+  test("fingerprintJsonSchema emits draft-2020-12 document", () => {
+    const schema = fingerprintJsonSchema()
+    expect(schema["$id"]).toBe(ETS_SCHEMA_URL)
+    expect(schema["$schema"]).toContain("2020-12")
+    expect(schema["required"]).toEqual([
+      "version",
+      "runtime",
+      "api",
+      "database",
+      "orm",
+      "auth",
+      "frontend",
+      "backend",
+      "addons"
+    ])
   })
 })

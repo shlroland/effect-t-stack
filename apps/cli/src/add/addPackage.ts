@@ -2,6 +2,7 @@ import * as Console from "effect/Console"
 import * as Effect from "effect/Effect"
 import * as FileSystem from "effect/FileSystem"
 import * as Path from "effect/Path"
+import { decodePackageName } from "../compatibility/validateAdd.ts"
 import { loadFingerprint, writeFingerprint } from "../fingerprint/fingerprint.ts"
 import { appendHistory } from "../fingerprint/history.ts"
 import { CreateError } from "../shared/CreateError.ts"
@@ -55,12 +56,7 @@ export const addPackage = Effect.fn("addPackage")(function*(options: AddPackageO
   const fs = yield* FileSystem.FileSystem
   const path = yield* Path.Path
   const projectDir = path.resolve(options.projectDir)
-  const name = options.packageName.trim()
-  if (!/^[a-z][a-z0-9-]*$/.test(name)) {
-    return yield* new CreateError({
-      message: `Invalid package name "${name}" (use lowercase kebab-case, e.g. billing)`
-    })
-  }
+  const name = yield* decodePackageName(options.packageName)
 
   const { path: etsPath, fingerprint } = yield* loadFingerprint(projectDir)
   const scope = toPackageScope(fingerprint.name ?? path.basename(projectDir))
@@ -92,20 +88,15 @@ export const addPackage = Effect.fn("addPackage")(function*(options: AddPackageO
   yield* fs.writeFileString(path.join(pkgDir, "tsconfig.json"), tsconfigFor())
   yield* fs.writeFileString(path.join(pkgDir, "src/index.ts"), indexTs(name))
 
-  const next = {
-    ...fingerprint,
-    cliVersion: fingerprint.cliVersion,
-    reproducibleCommand: `create-effect-t-stack add --package ${name}`
-  }
-  // record under addonOptions.packages for additive history without new root keys
-  const packages = Array.isArray((fingerprint.addonOptions as { packages?: unknown } | undefined)?.packages)
-    ? [...((fingerprint.addonOptions as { packages: Array<string> }).packages)]
+  const existingPackages = fingerprint.addonOptions?.["packages"]
+  const packages = Array.isArray(existingPackages)
+    ? existingPackages.filter((item): item is string => typeof item === "string")
     : []
   if (!packages.includes(name)) {
     packages.push(name)
   }
   const written = {
-    ...next,
+    ...fingerprint,
     addonOptions: {
       ...fingerprint.addonOptions,
       packages

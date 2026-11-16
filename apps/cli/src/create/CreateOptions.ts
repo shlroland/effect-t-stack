@@ -1,8 +1,6 @@
-import type { PackageManager } from "./packageManagers.ts"
+import type { ApiPrimary, DirectoryConflict, PackageManager } from "../shared/enums.ts"
 
-export type DirectoryConflict = "error" | "overwrite" | "increment" | "merge"
-
-export type ApiPrimary = "rpc" | "httpapi"
+export type { ApiPrimary, DirectoryConflict, PackageManager } from "../shared/enums.ts"
 
 export type CreateOptions = {
   readonly projectName: string

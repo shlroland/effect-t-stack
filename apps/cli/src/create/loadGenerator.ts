@@ -5,6 +5,8 @@ import type {
   Result,
   VirtualFileTree
 } from "@effect-t-stack/template-generator"
+import * as Effect from "effect/Effect"
+import { CreateError } from "../shared/CreateError.ts"
 
 export type GeneratorApi = {
   readonly generate: (options: GenerateOptions) => Result<VirtualFileTree, GeneratorError>
@@ -20,37 +22,46 @@ export type WriterApi = {
 }
 
 const asGenerator = (loaded: unknown): GeneratorApi => loaded as GeneratorApi
-
 const asWriter = (loaded: unknown): WriterApi => loaded as WriterApi
+
+const causeMessage = (cause: unknown): string => cause instanceof Error ? cause.message : String(cause)
 
 /**
  * Monorepo resolves the workspace package. A packed CLI falls back to the
  * prepack copy under `templates/template-generator`.
  */
-export const loadGenerator = async (): Promise<GeneratorApi> => {
-  try {
-    return asGenerator(await import("@effect-t-stack/template-generator"))
-  } catch (packageError) {
-    const vendored = new URL("../../templates/template-generator/src/index.ts", import.meta.url).href
-    try {
-      return asGenerator(await import(vendored))
-    } catch (vendoredError) {
-      const message = packageError instanceof Error ? packageError.message : String(packageError)
-      throw new Error(`template-generator unavailable (${message})`, { cause: vendoredError })
-    }
-  }
-}
+export const loadGenerator: Effect.Effect<GeneratorApi, CreateError> = Effect.firstSuccessOf([
+  Effect.tryPromise({
+    try: () => import("@effect-t-stack/template-generator"),
+    catch: (cause) => cause
+  }),
+  Effect.tryPromise({
+    try: () => import(new URL("../../templates/template-generator/src/index.ts", import.meta.url).href),
+    catch: (cause) => cause
+  })
+]).pipe(
+  Effect.map(asGenerator),
+  Effect.mapError((cause) =>
+    new CreateError({
+      message: `template-generator unavailable (${causeMessage(cause)})`
+    })
+  )
+)
 
-export const loadWriter = async (): Promise<WriterApi> => {
-  try {
-    return asWriter(await import("@effect-t-stack/template-generator/fs-writer"))
-  } catch (packageError) {
-    const vendored = new URL("../../templates/template-generator/src/fs-writer.ts", import.meta.url).href
-    try {
-      return asWriter(await import(vendored))
-    } catch (vendoredError) {
-      const message = packageError instanceof Error ? packageError.message : String(packageError)
-      throw new Error(`template-generator writer unavailable (${message})`, { cause: vendoredError })
-    }
-  }
-}
+export const loadWriter: Effect.Effect<WriterApi, CreateError> = Effect.firstSuccessOf([
+  Effect.tryPromise({
+    try: () => import("@effect-t-stack/template-generator/fs-writer"),
+    catch: (cause) => cause
+  }),
+  Effect.tryPromise({
+    try: () => import(new URL("../../templates/template-generator/src/fs-writer.ts", import.meta.url).href),
+    catch: (cause) => cause
+  })
+]).pipe(
+  Effect.map(asWriter),
+  Effect.mapError((cause) =>
+    new CreateError({
+      message: `template-generator writer unavailable (${causeMessage(cause)})`
+    })
+  )
+)

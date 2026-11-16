@@ -1,5 +1,6 @@
-import { Data } from "effect"
+import * as Schema from "effect/Schema"
 
-export class CreateError extends Data.TaggedError("CreateError")<{
-  readonly message: string
-}> {}
+/** CLI domain error — Schema.TaggedError so agents/tests can match `_tag` + decode. */
+export class CreateError extends Schema.TaggedError<CreateError>()("CreateError", {
+  message: Schema.String
+}) {}

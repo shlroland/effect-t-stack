@@ -5,6 +5,10 @@
  * agents do not invent them as active create/add behavior.
  */
 
+import { CREATE_APIS, CREATE_DIRECTORY_CONFLICTS, CREATE_PACKAGE_MANAGERS } from "../shared/enums.ts"
+
+export { CREATE_APIS, CREATE_DIRECTORY_CONFLICTS, CREATE_PACKAGE_MANAGERS } from "../shared/enums.ts"
+
 export type ValidationStage = "enums" | "combinations" | "authAddons" | "examples"
 
 export type RuleStatus = "active" | "deferred"
@@ -20,10 +24,6 @@ export type CompatibilityRule = {
 
 /** Addons that conflict with `effect-style`. */
 export const EFFECT_STYLE_CONFLICTS = ["biome", "ultracite", "oxlint-only", "husky"] as const
-
-export const CREATE_PACKAGE_MANAGERS = ["bun", "npm", "pnpm"] as const
-export const CREATE_APIS = ["rpc", "httpapi"] as const
-export const CREATE_DIRECTORY_CONFLICTS = ["error", "overwrite", "increment", "merge"] as const
 
 /** Ordered catalog — keep stages contiguous for agent docs. */
 export const COMPATIBILITY_RULES: ReadonlyArray<CompatibilityRule> = [

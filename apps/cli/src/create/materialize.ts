@@ -24,16 +24,18 @@ const withPhase = <S extends { readonly phases: ReadonlyArray<string> }>(
 ): S => ({ ...state, phases: [...state.phases, phase] })
 
 const write = (state: MaterializeInput) =>
-  Effect.tryPromise({
-    try: async () => {
-      const writer = await loadWriter()
-      await writer.writeTree(state.tree, state.targetDir)
-    },
-    catch: (cause) =>
-      new CreateError({
-        message: `Failed to write project: ${cause instanceof Error ? cause.message : String(cause)}`
+  loadWriter.pipe(
+    Effect.flatMap((writer) =>
+      Effect.tryPromise({
+        try: () => writer.writeTree(state.tree, state.targetDir),
+        catch: (cause) =>
+          new CreateError({
+            message: `Failed to write project: ${cause instanceof Error ? cause.message : String(cause)}`
+          })
       })
-  }).pipe(Effect.as(withPhase(state, "write")))
+    ),
+    Effect.as(withPhase(state, "write"))
+  )
 
 const maybeStampManualDb = (state: MaterializeInput) =>
   state.options.manualDb

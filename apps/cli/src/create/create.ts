@@ -5,13 +5,13 @@ import { CLI_VERSION } from "../fingerprint/cliVersion.ts"
 import { appendHistory } from "../fingerprint/history.ts"
 import { CreateError } from "../shared/CreateError.ts"
 import { confirmCreate } from "./confirmCreate.ts"
-import { resolveTargetDirectory } from "./targetDirectory.ts"
 import type { CreateOptions } from "./CreateOptions.ts"
 import { effectiveDirectoryConflict } from "./CreateOptions.ts"
 import { buildResult, emitResult, printPlanSummary, printTitle } from "./createReport.ts"
 import { loadGenerator } from "./loadGenerator.ts"
 import { materializeProject } from "./materialize.ts"
 import { resolveCreateContext } from "./resolveScope.ts"
+import { resolveTargetDirectory } from "./targetDirectory.ts"
 
 export type { CreateOptions, DirectoryConflict } from "./CreateOptions.ts"
 export type { CreateResult } from "./CreateResult.ts"
@@ -66,13 +66,7 @@ const planProject = (prepared: CreatePrepared) =>
       targetDir
     })),
     Effect.flatMap((state) =>
-      Effect.tryPromise({
-        try: () => loadGenerator(),
-        catch: (cause) =>
-          new CreateError({
-            message: cause instanceof Error ? cause.message : String(cause)
-          })
-      }).pipe(
+      loadGenerator.pipe(
         Effect.flatMap((generator) => {
           const generated = generator.generate({
             config: generator.projectConfig(state.scope, {

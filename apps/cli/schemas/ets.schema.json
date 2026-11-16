@@ -1,48 +1,76 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://raw.githubusercontent.com/shlroland/effect-t-stack/main/apps/cli/schemas/ets.schema.json",
-  "title": "effect-t-stack fingerprint (ets.jsonc)",
-  "description": "Stack fingerprint for create-effect-t-stack. version = schema version (not CLI release). See docs/fingerprint.md.",
   "type": "object",
-  "required": ["version", "runtime", "api", "database", "orm", "auth", "frontend", "backend", "addons"],
-  "additionalProperties": true,
   "properties": {
-    "$schema": {
-      "type": "string",
-      "description": "Optional JSON Schema URL for editor UX"
-    },
     "version": {
       "type": "integer",
       "minimum": 1,
+      "maximum": 9007199254740991,
       "description": "Fingerprint schema version (not CLI semver)"
     },
-    "name": { "type": "string" },
-    "effect": { "type": "string" },
-    "runtime": { "type": "string" },
-    "api": { "type": "string" },
-    "apiOptions": { "type": "object" },
-    "database": { "type": "string" },
-    "orm": { "type": "string" },
-    "ormOptions": { "type": "object" },
-    "auth": { "type": "string" },
-    "frontend": { "type": "string" },
-    "frontendOptions": { "type": "object" },
-    "backend": { "type": "string" },
-    "backendOptions": { "type": "object" },
-    "env": { "type": "object" },
+    "runtime": {
+      "type": "string"
+    },
+    "api": {
+      "type": "string"
+    },
+    "database": {
+      "type": "string"
+    },
+    "orm": {
+      "type": "string"
+    },
+    "auth": {
+      "type": "string"
+    },
+    "frontend": {
+      "type": "string"
+    },
+    "backend": {
+      "type": "string"
+    },
     "addons": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
-    "addonOptions": { "type": "object" },
+    "name": {
+      "type": "string"
+    },
+    "effect": {
+      "type": "string"
+    },
+    "apiOptions": {
+      "type": "object"
+    },
+    "ormOptions": {
+      "type": "object"
+    },
+    "frontendOptions": {
+      "type": "object"
+    },
+    "backendOptions": {
+      "type": "object"
+    },
+    "env": {
+      "type": "object"
+    },
+    "addonOptions": {
+      "type": "object"
+    },
     "examples": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
-    "packageManager": { "type": "string" },
+    "packageManager": {
+      "type": "string"
+    },
     "createdAt": {
       "type": "string",
-      "format": "date-time",
       "description": "Create-time stamp written by the generator"
     },
     "cliVersion": {
@@ -58,12 +86,48 @@
       "properties": {
         "mode": {
           "type": "string",
-          "enum": ["alchemy", "auto", "manual"]
+          "enum": [
+            "alchemy",
+            "auto",
+            "manual"
+          ]
         }
       },
-      "additionalProperties": true
+      "allOf": [
+        {
+          "type": "object",
+          "additionalProperties": {}
+        }
+      ]
     },
-    "webDeploy": { "type": "string" },
-    "serverDeploy": { "type": "string" }
-  }
+    "webDeploy": {
+      "type": "string"
+    },
+    "serverDeploy": {
+      "type": "string"
+    },
+    "$schema": {
+      "type": "string",
+      "description": "Optional JSON Schema URL for editor UX"
+    }
+  },
+  "required": [
+    "version",
+    "runtime",
+    "api",
+    "database",
+    "orm",
+    "auth",
+    "frontend",
+    "backend",
+    "addons"
+  ],
+  "allOf": [
+    {
+      "type": "object",
+      "additionalProperties": {}
+    }
+  ],
+  "title": "effect-t-stack fingerprint (ets.jsonc)",
+  "description": "Stack fingerprint for create-effect-t-stack. version = schema version (not CLI release). See docs/fingerprint.md."
 }

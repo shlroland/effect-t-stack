@@ -39,7 +39,8 @@
   "scripts": {
     "start": "bun run src/bin.ts",
     "pack:generator": "bun run scripts/pack-generator.ts",
-    "prepack": "bun run pack:generator",
+    "emit:ets-schema": "bun run scripts/emit-ets-schema.ts",
+    "prepack": "bun run emit:ets-schema && bun run pack:generator",
     "check-types": "tsc --noEmit -p tsconfig.json",
     "assert:test-layout": "bun run scripts/assert-no-src-tests.ts",
     "test": "bun test test",

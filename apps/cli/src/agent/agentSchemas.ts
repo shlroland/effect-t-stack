@@ -4,15 +4,9 @@ import * as Schema from "effect/Schema"
 import type { CreateOptions } from "../create/CreateOptions.ts"
 import { DEFAULT_ADDONS } from "../fingerprint/fingerprint.ts"
 import { CreateError } from "../shared/CreateError.ts"
+import { ApiPrimarySchema, DirectoryConflictSchema, PackageManagerSchema } from "../shared/enums.ts"
 
-export const PackageManagerSchema = Schema.Literals(["bun", "npm", "pnpm"])
-export const ApiPrimarySchema = Schema.Literals(["rpc", "httpapi"])
-export const DirectoryConflictSchema = Schema.Literals([
-  "error",
-  "overwrite",
-  "increment",
-  "merge"
-])
+export { ApiPrimarySchema, DirectoryConflictSchema, PackageManagerSchema } from "../shared/enums.ts"
 
 const boolWithDefault = (defaultValue: boolean) =>
   Schema.Boolean.pipe(Schema.withDecodingDefaultKey(Effect.succeed(defaultValue)))
