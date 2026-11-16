@@ -25,13 +25,10 @@ const withPhase = <S extends { readonly phases: ReadonlyArray<string> }>(
 
 const write = (state: MaterializeInput) =>
   loadWriter.pipe(
-    Effect.flatMap((writer) =>
-      Effect.tryPromise({
-        try: () => writer.writeTree(state.tree, state.targetDir),
-        catch: (cause) =>
-          new CreateError({
-            message: `Failed to write project: ${cause instanceof Error ? cause.message : String(cause)}`
-          })
+    Effect.flatMap((writer) => writer.writeTree(state.tree, state.targetDir)),
+    Effect.mapError((error) =>
+      new CreateError({
+        message: `Failed to write project: ${error.phase}: ${error.message}`
       })
     ),
     Effect.as(withPhase(state, "write"))

@@ -32,18 +32,22 @@ export const asStringRecord = (value: unknown): Record<string, string> => {
 
 const readPackage = (vfs: VirtualFileSystem, path: string): PackageJson => {
   if (!vfs.fileExists(path)) {
-    throw new GeneratorError("dependencies", `Missing ${path}`)
+    throw new GeneratorError({ phase: "dependencies", message: `Missing ${path}` })
   }
   try {
     const parsed: unknown = vfs.readJson(path)
     if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) {
-      throw new GeneratorError("dependencies", `${path} is not an object`)
+      throw new GeneratorError({ phase: "dependencies", message: `${path} is not an object` })
     }
     return parsed as PackageJson
   } catch (cause) {
     if (cause instanceof GeneratorError) throw cause
     const message = cause instanceof Error ? cause.message : String(cause)
-    throw new GeneratorError("dependencies", `Invalid JSON in ${path}: ${message}`, { cause })
+    throw new GeneratorError({
+      phase: "dependencies",
+      message: `Invalid JSON in ${path}: ${message}`,
+      cause
+    })
   }
 }
 

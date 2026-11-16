@@ -1,3 +1,5 @@
+import * as Schema from "effect/Schema"
+
 export type Runtime = "bun" | "node" | "workers" | "none"
 
 export type ApiPrimary = "rpc" | "httpapi"
@@ -40,28 +42,25 @@ export type ProjectConfig = {
   readonly examples: ReadonlyArray<string>
 }
 
-export type GeneratorPhase =
-  | "initialization"
-  | "templates"
-  | "package-configs"
-  | "dependencies"
-  | "env"
-  | "catalogs"
-  | "readme"
-  | "fingerprint"
+export const GeneratorPhase = Schema.Literals([
+  "initialization",
+  "templates",
+  "package-configs",
+  "dependencies",
+  "env",
+  "catalogs",
+  "readme",
+  "fingerprint",
+  "write"
+])
 
-export class GeneratorError extends Error {
-  readonly _tag = "GeneratorError"
+export type GeneratorPhase = typeof GeneratorPhase.Type
 
-  constructor(
-    readonly phase: GeneratorPhase,
-    message: string,
-    options?: { cause?: unknown }
-  ) {
-    super(message, options)
-    this.name = "GeneratorError"
-  }
-}
+export class GeneratorError extends Schema.TaggedError<GeneratorError>()("GeneratorError", {
+  phase: GeneratorPhase,
+  message: Schema.String,
+  cause: Schema.optionalKey(Schema.Unknown)
+}) {}
 
 export type VirtualFileNode = {
   readonly type: "file"

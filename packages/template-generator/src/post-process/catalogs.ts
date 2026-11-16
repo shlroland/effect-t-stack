@@ -24,7 +24,7 @@ const isDirectPin = (version: string): boolean =>
 const readPackage = (vfs: VirtualFileSystem, path: string): PackageJson => {
   const parsed: unknown = vfs.readJson(path)
   if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) {
-    throw new GeneratorError("catalogs", `${path} is not an object`)
+    throw new GeneratorError({ phase: "catalogs", message: `${path} is not an object` })
   }
   return parsed as PackageJson
 }

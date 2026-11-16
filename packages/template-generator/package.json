@@ -19,6 +19,7 @@
     "check": "bun run prebuild && bun run lint && bun run check-types && bun test ./test"
   },
   "dependencies": {
+    "effect": "catalog:",
     "handlebars": "^4.7.8",
     "memfs": "^4.49.0"
   },

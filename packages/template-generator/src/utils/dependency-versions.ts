@@ -38,7 +38,10 @@ export type DependencyName = keyof typeof dependencyVersionMap
 
 export const pinnedVersion = (name: string): string => {
   if (!Object.prototype.hasOwnProperty.call(dependencyVersionMap, name)) {
-    throw new GeneratorError("dependencies", `No dependencyVersionMap pin for ${name}`)
+    throw new GeneratorError({
+      phase: "dependencies",
+      message: `No dependencyVersionMap pin for ${name}`
+    })
   }
   return dependencyVersionMap[name as DependencyName]
 }

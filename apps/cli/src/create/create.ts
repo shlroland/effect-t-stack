@@ -67,29 +67,27 @@ const planProject = (prepared: CreatePrepared) =>
     })),
     Effect.flatMap((state) =>
       loadGenerator.pipe(
-        Effect.flatMap((generator) => {
-          const generated = generator.generate({
+        Effect.flatMap((generator) =>
+          generator.generate({
             config: generator.projectConfig(state.scope, {
               packageManager: state.options.packageManager
             }),
             templates: generator.EMBEDDED_TEMPLATES,
             version: CLI_VERSION
-          })
-          if (generated._tag === "Failure") {
-            return Effect.fail(
+          }).pipe(
+            Effect.mapError((error) =>
               new CreateError({
-                message: `${generated.error.phase}: ${generated.error.message}`
+                message: `${error.phase}: ${error.message}`
               })
-            )
-          }
-          const next: CreatePlanned = {
-            ...state,
-            phases: [...state.phases, "generate"],
-            tree: generated.value,
-            reproducibleCommand: reproducibleCommandFor(state.scope, state.options)
-          }
-          return Effect.succeed(next)
-        })
+            ),
+            Effect.map((tree): CreatePlanned => ({
+              ...state,
+              phases: [...state.phases, "generate"],
+              tree,
+              reproducibleCommand: reproducibleCommandFor(state.scope, state.options)
+            }))
+          )
+        )
       )
     ),
     Effect.tap((state) =>

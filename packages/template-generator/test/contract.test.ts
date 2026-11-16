@@ -1,4 +1,6 @@
 import { describe, expect, test } from "bun:test"
+import * as Effect from "effect/Effect"
+import * as Exit from "effect/Exit"
 import { readFileSync } from "node:fs"
 import { mkdtemp, readFile, rm } from "node:fs/promises"
 import { tmpdir } from "node:os"
@@ -21,26 +23,29 @@ const source = (relativePath: string): string => readFileSync(new URL(relativePa
 
 describe("template generator contract", () => {
   test("refuses an empty template map", () => {
-    const result = generate({ config: projectConfig("smoke"), templates: new Map() })
-    expect(result._tag).toBe("Failure")
-    if (result._tag === "Failure") expect(result.error.phase).toBe("initialization")
+    const error = Effect.runSync(
+      generate({ config: projectConfig("smoke"), templates: new Map() }).pipe(Effect.flip)
+    )
+    expect(error._tag).toBe("GeneratorError")
+    expect(error.phase).toBe("initialization")
   })
 
   test("refuses stacks other than the default cell", () => {
-    const result = generate({
-      config: projectConfig("smoke", { api: "httpapi" }),
-      templates: EMBEDDED_TEMPLATES
-    })
-    expect(result._tag).toBe("Failure")
-    if (result._tag === "Failure") {
-      expect(result.error.phase).toBe("initialization")
-      expect(result.error.message).toContain("api=httpapi")
-    }
+    const error = Effect.runSync(
+      generate({
+        config: projectConfig("smoke", { api: "httpapi" }),
+        templates: EMBEDDED_TEMPLATES
+      }).pipe(Effect.flip)
+    )
+    expect(error.phase).toBe("initialization")
+    expect(error.message).toContain("api=httpapi")
   })
 
   test("refuses a project name that is not an npm scope segment", () => {
-    const result = generate({ config: projectConfig("My App"), templates: EMBEDDED_TEMPLATES })
-    expect(result._tag).toBe("Failure")
+    const exit = Effect.runSyncExit(
+      generate({ config: projectConfig("My App"), templates: EMBEDDED_TEMPLATES })
+    )
+    expect(Exit.isFailure(exit)).toBe(true)
   })
 
   test("handlebars helpers see the project config", () => {
@@ -237,7 +242,7 @@ describe("template generator contract", () => {
     const tree = generateDefault("smoke", undefined, "0.1.0")
     const directory = await mkdtemp(join(tmpdir(), "ets-write-"))
     try {
-      await writeTree(tree, directory)
+      await Effect.runPromise(writeTree(tree, directory))
       const pkg = JSON.parse(await readFile(join(directory, "package.json"), "utf8")) as { name: string }
       expect(pkg.name).toBe("smoke")
       const todo = await readFile(join(directory, "packages/domain/src/Todo.ts"), "utf8")

@@ -2,14 +2,15 @@ import type {
   GenerateOptions,
   GeneratorError,
   ProjectConfig,
-  Result,
   VirtualFileTree
 } from "@effect-t-stack/template-generator"
 import * as Effect from "effect/Effect"
 import { CreateError } from "../shared/CreateError.ts"
 
 export type GeneratorApi = {
-  readonly generate: (options: GenerateOptions) => Result<VirtualFileTree, GeneratorError>
+  readonly generate: (
+    options: GenerateOptions
+  ) => Effect.Effect<VirtualFileTree, GeneratorError>
   readonly EMBEDDED_TEMPLATES: ReadonlyMap<string, string>
   readonly projectConfig: (
     projectName: string,
@@ -18,7 +19,10 @@ export type GeneratorApi = {
 }
 
 export type WriterApi = {
-  readonly writeTree: (tree: VirtualFileTree, projectDir: string) => Promise<void>
+  readonly writeTree: (
+    tree: VirtualFileTree,
+    projectDir: string
+  ) => Effect.Effect<void, GeneratorError>
 }
 
 const asGenerator = (loaded: unknown): GeneratorApi => loaded as GeneratorApi

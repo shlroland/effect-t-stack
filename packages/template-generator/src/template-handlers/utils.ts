@@ -31,7 +31,11 @@ export const processTemplatesFromPrefix = (
         content = compileTemplate(raw, config)
       } catch (cause) {
         const message = cause instanceof Error ? cause.message : String(cause)
-        throw new GeneratorError("templates", `Failed to render ${key}: ${message}`, { cause })
+        throw new GeneratorError({
+          phase: "templates",
+          message: `Failed to render ${key}: ${message}`,
+          cause
+        })
       }
     }
     vfs.writeFile(destination, content)

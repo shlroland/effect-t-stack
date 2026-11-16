@@ -24,13 +24,17 @@ const readPackage = (vfs: VirtualFileSystem, path: string): PackageJson | undefi
   try {
     const parsed: unknown = vfs.readJson(path)
     if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) {
-      throw new GeneratorError("package-configs", `${path} is not an object`)
+      throw new GeneratorError({ phase: "package-configs", message: `${path} is not an object` })
     }
     return parsed as PackageJson
   } catch (cause) {
     if (cause instanceof GeneratorError) throw cause
     const message = cause instanceof Error ? cause.message : String(cause)
-    throw new GeneratorError("package-configs", `Invalid JSON in ${path}: ${message}`, { cause })
+    throw new GeneratorError({
+      phase: "package-configs",
+      message: `Invalid JSON in ${path}: ${message}`,
+      cause
+    })
   }
 }
 
@@ -88,7 +92,10 @@ export const processPackageConfigs = (vfs: VirtualFileSystem, config: ProjectCon
   const rootPath = packageJsonPath("")
   const root = readPackage(vfs, rootPath)
   if (root === undefined) {
-    throw new GeneratorError("package-configs", "base template did not write package.json")
+    throw new GeneratorError({
+      phase: "package-configs",
+      message: "base template did not write package.json"
+    })
   }
   root["name"] = config.projectName
   root["scripts"] = rootScripts(vfs, config)

@@ -1,3 +1,4 @@
+import * as Effect from "effect/Effect"
 import { projectConfig } from "../src/default-config.ts"
 import { generate } from "../src/generator.ts"
 import { EMBEDDED_TEMPLATES } from "../src/templates.generated.ts"
@@ -7,17 +8,14 @@ export const generateDefault = (
   name: string,
   patch?: Partial<Omit<ProjectConfig, "projectName">>,
   version?: string
-): VirtualFileTree => {
-  const result = generate({
-    config: projectConfig(name, patch),
-    templates: EMBEDDED_TEMPLATES,
-    ...(version === undefined ? {} : { version })
-  })
-  if (result._tag === "Failure") {
-    throw new Error(`${result.error.phase}: ${result.error.message}`)
-  }
-  return result.value
-}
+): VirtualFileTree =>
+  Effect.runSync(
+    generate({
+      config: projectConfig(name, patch),
+      templates: EMBEDDED_TEMPLATES,
+      ...(version === undefined ? {} : { version })
+    })
+  )
 
 export const readTreeFile = (tree: VirtualFileTree, relativePath: string): string => {
   const parts = relativePath.split("/")

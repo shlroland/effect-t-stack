@@ -4,15 +4,15 @@
 
 ## Navigation
 
-| When                                          | Read                                                                                                   |
-| --------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| Edit CLI / tests / create·add gates           | [`apps/cli/README.md`](./apps/cli/README.md) (layout: `add/` · `create/` · `compatibility/` · `test/`) |
-| Tier status / what is open                    | [`docs/CAPABILITY-TIERS.md`](./docs/CAPABILITY-TIERS.md)                                               |
-| Illegal create·add combinations               | [`docs/compatibility.md`](./docs/compatibility.md)                                                     |
-| Fingerprint (`ets.jsonc`) fields              | [`docs/fingerprint.md`](./docs/fingerprint.md)                                                         |
-| Generated app packages / invariants           | [`docs/golden-boundaries.md`](./docs/golden-boundaries.md)                                             |
-| Dependency pins                               | [`docs/DEPENDENCY-CATALOG.md`](./docs/DEPENDENCY-CATALOG.md)                                           |
-| Review judgement (not mechanical lint)        | [`CODING_STANDARDS.md`](./CODING_STANDARDS.md)                                                         |
+| When                                   | Read                                                                                                   |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Edit CLI / tests / create·add gates    | [`apps/cli/README.md`](./apps/cli/README.md) (layout: `add/` · `create/` · `compatibility/` · `test/`) |
+| Tier status / what is open             | [`docs/CAPABILITY-TIERS.md`](./docs/CAPABILITY-TIERS.md)                                               |
+| Illegal create·add combinations        | [`docs/compatibility.md`](./docs/compatibility.md)                                                     |
+| Fingerprint (`ets.jsonc`) fields       | [`docs/fingerprint.md`](./docs/fingerprint.md)                                                         |
+| Generated app packages / invariants    | [`docs/golden-boundaries.md`](./docs/golden-boundaries.md)                                             |
+| Dependency pins                        | [`docs/DEPENDENCY-CATALOG.md`](./docs/DEPENDENCY-CATALOG.md)                                           |
+| Review judgement (not mechanical lint) | [`CODING_STANDARDS.md`](./CODING_STANDARDS.md)                                                         |
 
 ## Learning more about Effect
 
@@ -56,13 +56,13 @@ git subtree pull --prefix=repos/effect https://github.com/Effect-TS/effect.git m
 
 ## Scaffold Product vs templates
 
-| Area        | Path                                              | Role                                                                                                                                             |
-| ----------- | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| CLI         | `apps/cli`                                        | `create-effect-t-stack` via **`effect/cli`** + BunServices — generates from `packages/template-generator`; **no** domain/SQL/HTTP business logic |
-| Templates   | `packages/template-generator`                     | Only product source of truth for generated apps                                                                                                  |
-| Lint plugin | `packages/effect-oxc`                             | Owned copy of unpublished `@effect/oxc`; the template copies it into generated apps                                                             |
-| Docs / ADRs | `docs/`                                           | Capability Tiers, fingerprint, compatibility, decisions                                                                                          |
-| Pins        | `dependencyVersionMap` in the template generator  | The only dependency pin table                                                                                                                    |
+| Area        | Path                                             | Role                                                                                                                                             |
+| ----------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| CLI         | `apps/cli`                                       | `create-effect-t-stack` via **`effect/cli`** + BunServices — generates from `packages/template-generator`; **no** domain/SQL/HTTP business logic |
+| Templates   | `packages/template-generator`                    | Only product source of truth for generated apps; **Effect** style (`generate` / `writeTree` return `Effect`, `Schema.TaggedError`)               |
+| Lint plugin | `packages/effect-oxc`                            | Owned copy of unpublished `@effect/oxc`; the template copies it into generated apps                                                              |
+| Docs / ADRs | `docs/`                                          | Capability Tiers, fingerprint, compatibility, decisions                                                                                          |
+| Pins        | `dependencyVersionMap` in the template generator | The only dependency pin table                                                                                                                    |
 
 **Ownership:** edit the Handlebars fragment or the post-processor, then prove it with a generated-build. Do not recreate a second default monorepo.
 
