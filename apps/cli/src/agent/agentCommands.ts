@@ -6,60 +6,27 @@ import { addAddon } from "../add/addAddon.ts"
 import { addPackage } from "../add/addPackage.ts"
 import { resolveAddInput } from "../compatibility/index.ts"
 import { createProject } from "../create/create.ts"
-import type { CreateOptions } from "../create/CreateOptions.ts"
 import { clearHistory, readHistory, resolveHistoryPath } from "../fingerprint/history.ts"
 import { CreateError } from "../shared/CreateError.ts"
+import { decodeAddJsonInput, decodeCreateJsonInput, toCreateOptions } from "./agentSchemas.ts"
 import { emitSchema, type SchemaName } from "./schemaCommand.ts"
 
-const readStdinJson = Effect.fn("readStdinJson")(function*() {
-  const raw = yield* Effect.tryPromise({
+const readStdinText = Effect.fn("readStdinText")(function*() {
+  return yield* Effect.tryPromise({
     try: () => Bun.stdin.text().then((text) => text.trim()),
     catch: (cause) =>
       new CreateError({
         message: `Failed to read stdin: ${cause instanceof Error ? cause.message : String(cause)}`
       })
   })
-  if (raw.length === 0) {
-    return yield* new CreateError({ message: "Expected JSON on stdin" })
-  }
-  try {
-    return JSON.parse(raw) as Record<string, unknown>
-  } catch (cause) {
-    return yield* new CreateError({
-      message: `Invalid JSON on stdin: ${cause instanceof Error ? cause.message : String(cause)}`
-    })
-  }
 })
-
-const toCreateOptions = (input: Record<string, unknown>): Effect.Effect<CreateOptions, CreateError> => {
-  const projectName = input["projectName"]
-  if (typeof projectName !== "string" || projectName.length === 0) {
-    return Effect.fail(new CreateError({ message: "create-json requires projectName: string" }))
-  }
-  return Effect.succeed({
-    projectName,
-    yes: input["yes"] !== false,
-    yolo: Boolean(input["yolo"]),
-    dryRun: Boolean(input["dryRun"]),
-    verbose: true,
-    install: input["install"] !== false,
-    git: input["git"] !== false,
-    renderTitle: false,
-    open: typeof input["open"] === "string" ? input["open"] : undefined,
-    manualDb: Boolean(input["manualDb"]),
-    directoryConflict: (input["directoryConflict"] as CreateOptions["directoryConflict"]) ?? "error",
-    packageManager: (input["packageManager"] as CreateOptions["packageManager"]) ?? "bun",
-    api: (input["api"] as CreateOptions["api"]) ?? "rpc",
-    effectStyle: input["effectStyle"] !== false,
-    cwd: typeof input["cwd"] === "string" ? input["cwd"] : undefined
-  })
-}
 
 export const createJsonCommand = Command.make("create-json").pipe(
   Command.withDescription("Agent contract: create from JSON stdin; always prints CreateResult JSON"),
   Command.withHandler(() =>
-    readStdinJson().pipe(
-      Effect.flatMap(toCreateOptions),
+    readStdinText().pipe(
+      Effect.flatMap(decodeCreateJsonInput),
+      Effect.map(toCreateOptions),
       Effect.flatMap(createProject),
       Effect.asVoid
     )
@@ -72,27 +39,25 @@ export const addJsonCommand = Command.make("add-json").pipe(
   ),
   Command.withHandler(() =>
     Effect.gen(function*() {
-      const input = yield* readStdinJson()
-      const projectDir = typeof input["projectDir"] === "string" ? input["projectDir"] : "."
-      const dryRun = Boolean(input["dryRun"])
+      const input = yield* readStdinText().pipe(Effect.flatMap(decodeAddJsonInput))
       const resolved = yield* resolveAddInput({
-        packageName: typeof input["packageName"] === "string" ? input["packageName"] : undefined,
-        addon: typeof input["addon"] === "string" ? input["addon"] : undefined
+        packageName: input.packageName,
+        addon: input.addon
       })
 
       if (resolved.kind === "package") {
         yield* addPackage({
           packageName: resolved.packageName,
-          projectDir,
-          dryRun,
+          projectDir: input.projectDir,
+          dryRun: input.dryRun,
           verbose: true
         })
         return
       }
       yield* addAddon({
         addon: resolved.addon,
-        projectDir,
-        dryRun,
+        projectDir: input.projectDir,
+        dryRun: input.dryRun,
         verbose: true
       })
     })

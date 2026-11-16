@@ -1,3 +1,24 @@
+export {
+  AddJsonInput,
+  AddJsonInputFromJsonString,
+  AddonOptions,
+  addonOptionsJsonSchema,
+  ApiPrimarySchema,
+  createInputJsonSchema,
+  CreateJsonInput,
+  CreateJsonInputFromJsonString,
+  decodeAddJsonInput,
+  decodeCreateJsonInput,
+  DirectoryConflictSchema,
+  PackageManagerSchema,
+  toAgentJsonSchema,
+  toCreateOptions
+} from "./agent/agentSchemas.ts"
+export type {
+  AddJsonInput as AddJsonInputDecoded,
+  AddonOptions as AddonOptionsDecoded,
+  CreateJsonInput as CreateJsonInputDecoded
+} from "./agent/agentSchemas.ts"
 export { createEffectTStack } from "./Cli.ts"
 export {
   activeRules,
@@ -8,17 +29,13 @@ export {
   validateDefaultAddon
 } from "./compatibility/index.ts"
 export type { CompatibilityRule, ResolvedAddInput, ValidationStage } from "./compatibility/index.ts"
-export { resolveTargetDirectory } from "./create/targetDirectory.ts"
 export { createProject } from "./create/create.ts"
 export type { ApiPrimary, CreateOptions, DirectoryConflict } from "./create/CreateOptions.ts"
 export type { CreateResult } from "./create/CreateResult.ts"
 export { formatVerbose, makeCreateResult } from "./create/CreateResult.ts"
-export {
-  emitPackageManagerArtifacts,
-  installCommand,
-  resolvePackageManagerPin
-} from "./create/packageManagers.ts"
+export { emitPackageManagerArtifacts, installCommand, resolvePackageManagerPin } from "./create/packageManagers.ts"
 export type { PackageManager } from "./create/packageManagers.ts"
+export { resolveTargetDirectory } from "./create/targetDirectory.ts"
 export { CLI_VERSION, ETS_SCHEMA_URL, FINGERPRINT_SCHEMA_VERSION } from "./fingerprint/cliVersion.ts"
 export {
   DEFAULT_ADDONS,
