@@ -58,6 +58,15 @@ const requireEq = <K extends keyof ProjectConfig>(
 ): StackCheck =>
 (config) => config[key] === expected ? Option.none() : Option.some(`${String(key)}=${String(config[key])}`)
 
+const requireOneOf = <K extends keyof ProjectConfig>(
+  key: K,
+  allowed: ReadonlyArray<ProjectConfig[K]>
+): StackCheck =>
+(config) =>
+  allowed.includes(config[key])
+    ? Option.none()
+    : Option.some(`${String(key)}=${String(config[key])}`)
+
 const requireMembers = (
   key: "frontend" | "addons" | "examples",
   expected: ReadonlyArray<string>
@@ -82,7 +91,7 @@ const requireKnownPackageManager: StackCheck = (config) =>
 const STACK_CHECKS: ReadonlyArray<StackCheck> = [
   requireProjectName,
   requireEq("runtime", "bun"),
-  requireEq("api", "rpc"),
+  requireOneOf("api", ["rpc", "httpapi"]),
   requireEq("database", "sqlite"),
   requireEq("orm", "drizzle"),
   requireEq("auth", "none"),
@@ -96,12 +105,12 @@ const STACK_CHECKS: ReadonlyArray<StackCheck> = [
   requireMembers("examples", ["todo"])
 ]
 
-const unsupportedPreamble = "This generator currently emits the Golden default stack only " +
-  "(Rpc primary, HttpApi secondary, Bun, SQLite, Drizzle, auth none, TanStack Start, " +
+const unsupportedPreamble = "This generator currently emits the Golden default cell family only " +
+  "(api ∈ {rpc, httpapi}, Bun, SQLite, Drizzle, auth none, TanStack Start, " +
   "effect-style on, todo). Unsupported: "
 
 /**
- * The first template is the Golden default cell only. Other Option Matrix cells
+ * Default cell family: rpc or httpapi primary. Other Option Matrix cells
  * are refused instead of emitting a partial tree.
  */
 export const unsupportedStackMessage = (config: ProjectConfig): Option.Option<string> =>

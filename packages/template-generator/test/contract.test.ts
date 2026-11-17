@@ -30,15 +30,42 @@ describe("template generator contract", () => {
     expect(error.phase).toBe("initialization")
   })
 
-  test("refuses stacks other than the default cell", () => {
+  test("refuses stacks outside the default cell family", () => {
     const error = Effect.runSync(
       generate({
-        config: projectConfig("smoke", { api: "httpapi" }),
+        config: projectConfig("smoke", { database: "postgres" }),
         templates: EMBEDDED_TEMPLATES
       }).pipe(Effect.flip)
     )
     expect(error.phase).toBe("initialization")
-    expect(error.message).toContain("api=httpapi")
+    expect(error.message).toContain("database=postgres")
+  })
+
+  test("generates api=httpapi primary with AtomHttpApi Todo UI", () => {
+    const tree = generateDefault("smoke", { api: "httpapi" }, "0.1.0")
+    const todos = readTreeFile(tree, "apps/web/src/atoms/todos.ts")
+    expect(todos).toContain("HttpApiAtoms")
+    expect(todos.includes("RpcAtoms.query")).toBe(false)
+    const httpAtoms = readTreeFile(tree, "apps/web/src/atoms/http-api.ts")
+    expect(httpAtoms).toContain("AtomHttpApi.Service")
+    const index = readTreeFile(tree, "apps/web/src/routes/index.tsx")
+    expect(index).toContain("AtomHttpApi")
+    const api = readTreeFile(tree, "packages/protocol/src/http-api/Api.ts")
+    expect(api).toContain("HttpApi primary")
+    const fingerprint = parseJsonc(readTreeFile(tree, "ets.jsonc"))
+    expect(fingerprint["api"]).toBe("httpapi")
+    const apiOptions = fingerprint["apiOptions"] as {
+      import: string
+      secondary: { api: string; import: string }
+    }
+    expect(apiOptions.import).toBe("@smoke/protocol/http-api")
+    expect(apiOptions.secondary.api).toBe("rpc")
+    expect(apiOptions.secondary.import).toBe("@smoke/protocol/rpc")
+    const atom = (fingerprint["frontendOptions"] as { atom: { client: string } }).atom
+    expect(atom.client).toBe("httpapi")
+    expect(fingerprint["reproducibleCommand"]).toBe(
+      "bunx create-effect-t-stack@0.1.0 smoke --yes --api httpapi"
+    )
   })
 
   test("refuses a project name that is not an npm scope segment", () => {

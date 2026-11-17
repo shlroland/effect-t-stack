@@ -12,6 +12,10 @@ const runner = (config: ProjectConfig, version: string): string => {
   }
 }
 
-/** `--yes` reproduces the default stack. Non-default flags land with later Option Matrix cells. */
-export const reproducibleCommand = (config: ProjectConfig, version: string): string =>
-  `${runner(config, version)} ${config.projectName} --yes`
+/** `--yes` plus non-default Option Matrix flags that were selected. */
+export const reproducibleCommand = (config: ProjectConfig, version: string): string => {
+  const parts = [`${runner(config, version)} ${config.projectName}`, "--yes"]
+  if (config.api !== "rpc") parts.push(`--api ${config.api}`)
+  if (config.packageManager !== "bun") parts.push(`--package-manager ${config.packageManager}`)
+  return parts.join(" ")
+}

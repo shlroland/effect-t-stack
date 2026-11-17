@@ -49,14 +49,6 @@ export const COMPATIBILITY_RULES: ReadonlyArray<CompatibilityRule> = [
     message: `Invalid directoryConflict. Allowed: ${CREATE_DIRECTORY_CONFLICTS.join(", ")}.`
   },
   {
-    id: "create.combinations.api.rpc-only",
-    stage: "combinations",
-    status: "active",
-    summary: "create api must be rpc until L3 primary flip",
-    message:
-      "api=httpapi primary flip is not implemented yet (the default stack is rpc-primary). Flag accepted for plumbing; matrix completeness is later."
-  },
-  {
     id: "create.combinations.database.none+drizzle",
     stage: "combinations",
     status: "deferred",

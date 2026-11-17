@@ -1,6 +1,16 @@
 import { Todo, TodoId, TodoTitle } from "@{{projectName}}/domain"
 import { Effect } from "effect"
 import { AsyncResult, Atom } from "effect/reactivity"
+{{#if (eq api "httpapi")}}
+import { HttpApiAtoms, todosReactivityKeys } from "./http-api.ts"
+
+/** Serializable query atom — dehydrated on the server, hydrated into the client registry. */
+export const todosQueryAtom = HttpApiAtoms.query("todos", "list", {
+  reactivityKeys: todosReactivityKeys,
+  timeToLive: "30 seconds",
+  serializationKey: "list"
+})
+{{else}}
 import { RpcAtoms, todosReactivityKeys } from "./rpc.ts"
 
 /** Serializable query atom — dehydrated on the server, hydrated into the client registry. */
@@ -9,6 +19,7 @@ export const todosQueryAtom = RpcAtoms.query("ListTodos", void 0, {
   timeToLive: "30 seconds",
   serializationKey: "list"
 })
+{{/if}}
 
 export const todosListAtom = Atom.optimistic(todosQueryAtom)
 
@@ -34,6 +45,15 @@ export const createTodoAtom = todosListAtom.pipe(
           createdAt: new Date()
         })
       ]),
+{{#if (eq api "httpapi")}}
+    fn: HttpApiAtoms.runtime.fn(
+      Effect.fnUntraced(function*(title: CreateTodoInput) {
+        const client = yield* HttpApiAtoms
+        return yield* client.todos.create({ payload: { title: TodoTitle.make(title) } })
+      }),
+      { reactivityKeys: todosReactivityKeys }
+    )
+{{else}}
     fn: RpcAtoms.runtime.fn(
       Effect.fnUntraced(function*(title: CreateTodoInput) {
         const client = yield* RpcAtoms
@@ -41,6 +61,7 @@ export const createTodoAtom = todosListAtom.pipe(
       }),
       { reactivityKeys: todosReactivityKeys }
     )
+{{/if}}
   })
 )
 
@@ -64,6 +85,21 @@ export const updateTodoAtom = todosListAtom.pipe(
             })
             : todo
         )),
+{{#if (eq api "httpapi")}}
+    fn: HttpApiAtoms.runtime.fn(
+      Effect.fnUntraced(function*(patch: UpdateTodoInput) {
+        const client = yield* HttpApiAtoms
+        return yield* client.todos.update({
+          params: { id: patch.id },
+          payload: {
+            ...(patch.title !== undefined ? { title: TodoTitle.make(patch.title) } : {}),
+            ...(patch.completed !== undefined ? { completed: patch.completed } : {})
+          }
+        })
+      }),
+      { reactivityKeys: todosReactivityKeys }
+    )
+{{else}}
     fn: RpcAtoms.runtime.fn(
       Effect.fnUntraced(function*(patch: UpdateTodoInput) {
         const client = yield* RpcAtoms
@@ -75,6 +111,7 @@ export const updateTodoAtom = todosListAtom.pipe(
       }),
       { reactivityKeys: todosReactivityKeys }
     )
+{{/if}}
   })
 )
 
@@ -83,6 +120,15 @@ export type RemoveTodoInput = TodoId
 export const removeTodoAtom = todosListAtom.pipe(
   Atom.optimisticFn({
     reducer: (current, id: RemoveTodoInput) => mapSuccess(current, (todos) => todos.filter((todo) => todo.id !== id)),
+{{#if (eq api "httpapi")}}
+    fn: HttpApiAtoms.runtime.fn(
+      Effect.fnUntraced(function*(id: RemoveTodoInput) {
+        const client = yield* HttpApiAtoms
+        return yield* client.todos.remove({ params: { id } })
+      }),
+      { reactivityKeys: todosReactivityKeys }
+    )
+{{else}}
     fn: RpcAtoms.runtime.fn(
       Effect.fnUntraced(function*(id: RemoveTodoInput) {
         const client = yield* RpcAtoms
@@ -90,12 +136,27 @@ export const removeTodoAtom = todosListAtom.pipe(
       }),
       { reactivityKeys: todosReactivityKeys }
     )
+{{/if}}
   })
 )
 
 export const clearCompletedAtom = todosListAtom.pipe(
   Atom.optimisticFn({
     reducer: (current) => mapSuccess(current, (todos) => todos.filter((todo) => !todo.completed)),
+{{#if (eq api "httpapi")}}
+    fn: HttpApiAtoms.runtime.fn(
+      Effect.fnUntraced(function*() {
+        const client = yield* HttpApiAtoms
+        const todos = yield* client.todos.list({})
+        yield* Effect.forEach(
+          todos.filter((todo) => todo.completed),
+          (todo) => client.todos.remove({ params: { id: todo.id } }),
+          { concurrency: "unbounded" }
+        )
+      }),
+      { reactivityKeys: todosReactivityKeys }
+    )
+{{else}}
     fn: RpcAtoms.runtime.fn(
       Effect.fnUntraced(function*() {
         const client = yield* RpcAtoms
@@ -108,6 +169,7 @@ export const clearCompletedAtom = todosListAtom.pipe(
       }),
       { reactivityKeys: todosReactivityKeys }
     )
+{{/if}}
   })
 )
 

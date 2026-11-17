@@ -70,7 +70,8 @@ const planProject = (prepared: CreatePrepared) =>
         Effect.flatMap((generator) =>
           generator.generate({
             config: generator.projectConfig(state.scope, {
-              packageManager: state.options.packageManager
+              packageManager: state.options.packageManager,
+              api: state.options.api
             }),
             templates: generator.EMBEDDED_TEMPLATES,
             version: CLI_VERSION

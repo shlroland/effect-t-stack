@@ -26,8 +26,13 @@ function TodosPage() {
     <>
       <h1 className="brand">effect-t-stack</h1>
       <p className="lede">
-        Effect v4 金样：默认 API primary 为 Rpc（`/rpc`），HttpApi（`/api`，OpenAPI）为 secondary。Todo UI 用
+{{#if (eq api "httpapi")}}
+        Effect v4：API primary 为 HttpApi（`/api`，OpenAPI），Rpc（`/rpc`）为 secondary。Todo UI 用
+        AtomHttpApi；Start loader 预热 Atom 再注水，React 只订阅与分发。
+{{else}}
+        Effect v4：API primary 为 Rpc（`/rpc`），HttpApi（`/api`，OpenAPI）为 secondary。Todo UI 用
         AtomRpc；Start loader 预热 Atom 再注水，React 只订阅与分发。
+{{/if}}
       </p>
 
       <section className="panel">

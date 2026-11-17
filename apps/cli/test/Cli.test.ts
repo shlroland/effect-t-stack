@@ -35,10 +35,15 @@ describe("create-effect-t-stack (effect/cli)", () => {
     expect(Exit.isFailure(exit)).toBe(true)
   })
 
-  test("api httpapi fails in handler", async () => {
-    const exit = await runCli(["demo", "--yes", "--api", "httpapi", "--no-render-title"])
-    expect(Exit.isFailure(exit)).toBe(true)
-    expect(String(exit)).toContain("CreateError")
+  test("api httpapi dry-run succeeds", async () => {
+    const exit = await runCli([
+      "demo-httpapi",
+      "--dry-run",
+      "--api",
+      "httpapi",
+      "--no-render-title"
+    ])
+    expect(Exit.isSuccess(exit)).toBe(true)
   })
 })
 

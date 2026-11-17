@@ -1,0 +1,22 @@
+import { Api, ApiPrefix } from "@{{projectName}}/protocol/http-api"
+import { FetchHttpClient } from "effect/http"
+import { AtomHttpApi } from "effect/reactivity"
+
+/** Same-origin by default (Start embeds `/api`). Override for standalone `apps/server`. */
+const baseUrl = import.meta.env.VITE_API_URL ??
+  (typeof window !== "undefined" ? window.location.origin : "http://localhost:5173")
+
+/**
+ * Atom-backed Effect HttpApi client used by the todos UI when `api=httpapi` is primary.
+ * OpenAPI under `${origin}/api`. Rpc remains mounted at `/rpc` as secondary.
+ */
+export const HttpApiAtoms = AtomHttpApi.Service()("HttpApiAtoms", {
+  api: Api,
+  baseUrl: `${baseUrl.replace(/\/$/, "")}`,
+  httpClient: FetchHttpClient.layer
+})
+
+export const todosReactivityKeys = ["todos"] as const
+
+/** Documented for agents — primary HttpApi mount vs Rpc secondary. */
+export const httpApiPrimaryPrefix = ApiPrefix

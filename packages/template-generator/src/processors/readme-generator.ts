@@ -9,7 +9,9 @@ export const processReadme = (vfs: VirtualFsService, config: ProjectConfig): voi
     "Effect v4 app created by create-effect-t-stack.",
     "",
     `- Runtime: ${config.runtime}`,
-    `- API: ${config.api} primary, HttpApi secondary (\`/api\`)`,
+    config.api === "httpapi"
+      ? "- API: httpapi primary (`/api`), Rpc secondary (`/rpc`)"
+      : "- API: rpc primary (`/rpc`), HttpApi secondary (`/api`)",
     `- Database: ${config.database}`,
     `- ORM: ${config.orm}`,
     `- Auth: ${config.auth}`,

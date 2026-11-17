@@ -20,13 +20,8 @@ const validateCreateEnums = (options: CreateOptions): Effect.Effect<void, Create
   return Effect.void
 }
 
-/** Stage: combinations — only the default stack cell is implemented. */
-const validateCreateCombinations = (options: CreateOptions): Effect.Effect<void, CreateError> => {
-  if (options.api !== "rpc") {
-    return Effect.fail(new CreateError({ message: ruleMessage("create.combinations.api.rpc-only") }))
-  }
-  return Effect.void
-}
+/** Stage: combinations — api ∈ {rpc, httpapi}; other matrix dims wait for later L3 cells. */
+const validateCreateCombinations = (_options: CreateOptions): Effect.Effect<void, CreateError> => Effect.void
 
 /** Stage: auth/addons — effect-style omit path waits for L3. */
 const validateCreateAuthAddons = (options: CreateOptions): Effect.Effect<void, CreateError> => {

@@ -101,7 +101,10 @@ export const emitPackageManagerArtifacts = Effect.fn("emitPackageManagerArtifact
       )
     )
 
-    pkg["packageManager"] = yield* resolvePackageManagerPin(pm)
-    yield* fs.writeFileString(rootPkgPath, `${JSON.stringify(pkg, null, 2)}\n`)
+    const next = {
+      ...pkg,
+      packageManager: yield* resolvePackageManagerPin(pm)
+    }
+    yield* fs.writeFileString(rootPkgPath, `${JSON.stringify(next, null, 2)}\n`)
   }
 )

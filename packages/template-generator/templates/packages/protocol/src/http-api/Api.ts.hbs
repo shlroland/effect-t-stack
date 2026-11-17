@@ -11,6 +11,10 @@ export class Api extends HttpApi.make("effect-t-stack")
   .prefix(ApiPrefix)
   .annotateMerge(OpenApi.annotations({
     title: "effect-t-stack API",
+{{#if (eq api "httpapi")}}
+    description: "Effect v4 HttpApi primary surface — Todo CRUD + health (Rpc remains secondary at /rpc)"
+{{else}}
     description: "Effect v4 HttpApi secondary surface — Todo CRUD + health (primary API is Rpc)"
+{{/if}}
   }))
 {}

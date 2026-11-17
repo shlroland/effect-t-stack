@@ -6,7 +6,7 @@ Frozen at L0 closeout (**signed off 2026-11-11**). Empty Active means no blocker
 
 **Owned by later Capability Tiers** (see [CAPABILITY-TIERS.md](./CAPABILITY-TIERS.md)):
 
-- **CLI `--api` / primary flip** (`rpc` ↔ `httpapi`) — flag/prompt plumbing landed; L3 Option Matrix completeness — [ADR-0006](./adr/0006-api-primary-rpc-with-httpapi-secondary.md); gated in [compatibility.md](./compatibility.md)
+- **CLI `--api` / primary flip** (`rpc` ↔ `httpapi`) — landed in L3 (Todo UI AtomRpc ↔ AtomHttpApi; secondary mount retained) — [ADR-0006](./adr/0006-api-primary-rpc-with-httpapi-secondary.md)
 - **Optional `effect-style`** at `create` / `add` (omit path; `--yes` stays on) — flag wiring landed; L3 Addons matrix
 - Human “how to read `ets.jsonc`” UX polish beyond [fingerprint.md](./fingerprint.md) — L5 docs
 - Scaffold `migrate` / codemods for old generated apps — explicit non-goal ([ADR-0004](./adr/0004-scaffold-defaults-and-invariants.md))

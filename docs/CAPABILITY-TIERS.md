@@ -215,10 +215,10 @@ See [ADR-0005](./adr/0005-l0-exit-and-fingerprint-hygiene.md).
 
 ### API
 
-- [ ] `api=rpc` (Golden / `--yes` default; Todo UI = AtomRpc) — [ADR-0006](./adr/0006-api-primary-rpc-with-httpapi-secondary.md)
-- [ ] `api=httpapi` (primary flip; Todo UI = AtomHttpApi; Rpc may remain secondary)
-- [ ] Primary binding: root `api` + default client + default UI; unselected Effect API may stay secondary (not mutual exclusion)
-- [ ] CLI `create` / `--api` prompt (L1 wiring; matrix completeness here)
+- [x] `api=rpc` (Golden / `--yes` default; Todo UI = AtomRpc) — [ADR-0006](./adr/0006-api-primary-rpc-with-httpapi-secondary.md)
+- [x] `api=httpapi` (primary flip; Todo UI = AtomHttpApi; Rpc remains secondary)
+- [x] Primary binding: root `api` + default client + default UI; unselected Effect API stays secondary (not mutual exclusion)
+- [x] CLI `create` / `--api` (`rpc` \| `httpapi`; default `rpc`)
 - Non-goal remains: tRPC/oRPC as first-class (L6c)
 
 ### Runtime (`--runtime`)

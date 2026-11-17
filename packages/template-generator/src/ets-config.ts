@@ -14,6 +14,75 @@ const pkg = (config: ProjectConfig, name: string): string => `@${config.projectN
  * Written only when `generate` is given a CLI `version`. Stack fields mirror the Golden Sample;
  * create-time meta (`$schema`, `createdAt`, `cliVersion`, `reproducibleCommand`) is stamped here.
  */
+const rpcApiOptions = (config: ProjectConfig) => ({
+  prefix: "/rpc",
+  import: `${pkg(config, "protocol")}/rpc`,
+  client: `${pkg(config, "client")}/rpc`,
+  group: "AppRpcs",
+  modules: ["Rpc", "RpcGroup", "RpcServer", "RpcClient", "RpcSerialization"],
+  serialization: "ndjson",
+  protocol: "http"
+})
+
+const httpApiOptions = (config: ProjectConfig) => ({
+  prefix: "/api",
+  import: `${pkg(config, "protocol")}/http-api`,
+  client: `${pkg(config, "client")}/http-api`,
+  modules: ["HttpApi", "HttpApiBuilder", "HttpApiClient"],
+  note: "Same Services; OpenAPI/docs; separate protocol/client/server folders from Rpc."
+})
+
+const apiOptionsFor = (config: ProjectConfig) =>
+  config.api === "httpapi"
+    ? {
+      ...httpApiOptions(config),
+      secondary: {
+        api: "rpc" as const,
+        ...rpcApiOptions(config),
+        note: "Rpc remains mounted at /rpc; Todo UI uses AtomHttpApi primary."
+      }
+    }
+    : {
+      ...rpcApiOptions(config),
+      secondary: {
+        api: "httpapi" as const,
+        ...httpApiOptions(config)
+      }
+    }
+
+const atomOptionsFor = (config: ProjectConfig) =>
+  config.api === "httpapi"
+    ? {
+      package: "@effect/atom-react",
+      version: "catalog:",
+      client: "httpapi" as const,
+      modules: ["Atom", "AtomHttpApi", "AsyncResult", "RegistryProvider", "HydrationBoundary"],
+      reactivity: "effect/reactivity",
+      ssr: {
+        loader: "apps/web/src/routes/index.tsx",
+        dehydrate: "apps/web/src/atoms/dehydrateTodos.ts",
+        hydrate: "HydrationBoundary",
+        serializationKey: "todos list query"
+      },
+      note:
+        "Server remains SoT; Start loader dehydrates AtomHttpApi todos.list query; client HydrationBoundary + optimistic mutations; Rpc stays secondary at /rpc."
+    }
+    : {
+      package: "@effect/atom-react",
+      version: "catalog:",
+      client: "rpc" as const,
+      modules: ["Atom", "AtomRpc", "AsyncResult", "RegistryProvider", "HydrationBoundary"],
+      reactivity: "effect/reactivity",
+      ssr: {
+        loader: "apps/web/src/routes/index.tsx",
+        dehydrate: "apps/web/src/atoms/dehydrateTodos.ts",
+        hydrate: "HydrationBoundary",
+        serializationKey: "todos list query"
+      },
+      note:
+        "Server remains SoT; Start loader dehydrates AtomRpc ListTodos query; client HydrationBoundary + optimistic mutations; HttpApi stays secondary at /api."
+    }
+
 export const writeEtsConfig = (vfs: VirtualFsService, config: ProjectConfig, version: string): void => {
   const frontend = config.frontend[0] ?? "tanstack-start"
   const body = {
@@ -22,23 +91,7 @@ export const writeEtsConfig = (vfs: VirtualFsService, config: ProjectConfig, ver
     effect: "v4",
     runtime: config.runtime,
     api: config.api,
-    apiOptions: {
-      prefix: "/rpc",
-      import: `${pkg(config, "protocol")}/rpc`,
-      client: `${pkg(config, "client")}/rpc`,
-      group: "AppRpcs",
-      modules: ["Rpc", "RpcGroup", "RpcServer", "RpcClient", "RpcSerialization"],
-      serialization: "ndjson",
-      protocol: "http",
-      secondary: {
-        api: "httpapi",
-        prefix: "/api",
-        import: `${pkg(config, "protocol")}/http-api`,
-        client: `${pkg(config, "client")}/http-api`,
-        modules: ["HttpApi", "HttpApiBuilder", "HttpApiClient"],
-        note: "Same Services; OpenAPI/docs; separate protocol/client/server folders from Rpc."
-      }
-    },
+    apiOptions: apiOptionsFor(config),
     database: config.database,
     orm: config.orm,
     ormOptions: {
@@ -60,21 +113,7 @@ export const writeEtsConfig = (vfs: VirtualFsService, config: ProjectConfig, ver
     auth: config.auth,
     frontend,
     frontendOptions: {
-      atom: {
-        package: "@effect/atom-react",
-        version: "catalog:",
-        client: "rpc",
-        modules: ["Atom", "AtomRpc", "AsyncResult", "RegistryProvider", "HydrationBoundary"],
-        reactivity: "effect/reactivity",
-        ssr: {
-          loader: "apps/web/src/routes/index.tsx",
-          dehydrate: "apps/web/src/atoms/dehydrateTodos.ts",
-          hydrate: "HydrationBoundary",
-          serializationKey: "todos list query"
-        },
-        note:
-          "Server remains SoT; Start loader dehydrates AtomRpc ListTodos query; client HydrationBoundary + optimistic mutations; UI filter/draft/edit in local atoms. Future CLI may set atom.client to httpapi when api primary flips."
-      },
+      atom: atomOptionsFor(config),
       peer: { scheduler: "catalog:" },
       catalog: "docs/DEPENDENCY-CATALOG.md"
     },

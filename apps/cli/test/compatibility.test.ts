@@ -36,7 +36,7 @@ describe("compatibility catalog", () => {
 
   test("active rules include create + add gates", () => {
     const ids = COMPATIBILITY_RULES.filter((rule) => rule.status === "active").map((rule) => rule.id)
-    expect(ids).toContain("create.combinations.api.rpc-only")
+    expect(ids).not.toContain("create.combinations.api.rpc-only")
     expect(ids).toContain("create.addons.effect-style.required")
     expect(ids).toContain("add.addons.default-only")
     expect(ids).toContain("add.mutex.package-or-addon")
@@ -59,12 +59,11 @@ describe("validateCreateOptions", () => {
     expect(String(exit)).toContain("packageManager")
   })
 
-  test("rejects api=httpapi until L3", async () => {
+  test("accepts api=httpapi primary flip", async () => {
     const exit = await Effect.runPromise(
       validateCreateOptions(baseOptions({ api: "httpapi" })).pipe(Effect.exit)
     )
-    expect(Exit.isFailure(exit)).toBe(true)
-    expect(String(exit)).toContain("httpapi")
+    expect(Exit.isSuccess(exit)).toBe(true)
   })
 
   test("rejects --no-effect-style until L3", async () => {

@@ -28,7 +28,9 @@ const write = (state: MaterializeInput) =>
     Effect.flatMap((writer) => writer.writeTree(state.tree, state.targetDir)),
     Effect.mapError((error) =>
       new CreateError({
-        message: `Failed to write project: ${error.phase}: ${error.message}`
+        message: error._tag === "GeneratorError"
+          ? `Failed to write project: ${error.phase}: ${error.message}`
+          : `Failed to write project: ${error.message}`
       })
     ),
     Effect.as(withPhase(state, "write"))

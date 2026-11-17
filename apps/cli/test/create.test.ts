@@ -5,9 +5,9 @@ import * as Exit from "effect/Exit"
 import { mkdir, mkdtemp, readFile, rm, stat } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
-import { resolveTargetDirectory } from "../src/create/targetDirectory.ts"
 import { createProject } from "../src/create/create.ts"
 import type { CreateOptions } from "../src/create/CreateOptions.ts"
+import { resolveTargetDirectory } from "../src/create/targetDirectory.ts"
 import { CreateError } from "../src/shared/CreateError.ts"
 
 const provideBun = <A, E, R>(effect: Effect.Effect<A, E, R>) =>
@@ -136,14 +136,15 @@ describe("createProject (Effect)", () => {
     expect(Array.isArray(pkg.workspaces)).toBe(true)
   })
 
-  test("api=httpapi fails clearly until L3", async () => {
-    const exit = await Effect.runPromise(
-      provideBun(createProject(base({ projectName: "x", cwd: tmpdir(), api: "httpapi" }))).pipe(
-        Effect.exit
-      )
+  test("api=httpapi dry-run plans AtomHttpApi primary", async () => {
+    const cwd = await mkdtemp(join(tmpdir(), "ets-cli-httpapi-"))
+    temps.push(cwd)
+    const result = await Effect.runPromise(
+      provideBun(createProject(base({ projectName: "http", cwd, dryRun: true, api: "httpapi" })))
     )
-    expect(Exit.isFailure(exit)).toBe(true)
-    expect(String(exit)).toContain("httpapi")
+    expect(result.dryRun).toBe(true)
+    expect(result.fileCount).toBeGreaterThan(10)
+    expect(result.api).toBe("httpapi")
   })
 
   test("effectStyle=false fails clearly until L3", async () => {
