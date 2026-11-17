@@ -29,7 +29,7 @@ npx create-effect-t-stack@latest my-app --yes
 
 This generates `./my-app` from `packages/template-generator` (scope `@my-app/*`) and writes `ets.jsonc`. Notable flags: `--dry-run`, `--package-manager bun|npm|pnpm`, `--directory-conflict`, `--open <bin>`, `--manual-db`, `--api rpc|httpapi` (default `rpc`). `--no-effect-style` still errors until that L3 cell lands.
 
-**Published CLI:** Node ≥ 22.19 (`npx` / `pnpm dlx`). **Scaffold Product checkout:** Bun ≥ 1.4.4. See [`CONTRIBUTING.md`](./CONTRIBUTING.md) and [`SECURITY.md`](./SECURITY.md).
+**Published CLI:** Node ≥ 24 LTS (`npx` / `pnpm dlx`). **Scaffold Product checkout:** Bun ≥ 1.4.4. Optional Nix: `nix develop` (root `flake.nix`; generated apps get `flake` by default). See [`CONTRIBUTING.md`](./CONTRIBUTING.md) and [`SECURITY.md`](./SECURITY.md).
 
 Smoke tiers:
 

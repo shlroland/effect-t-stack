@@ -140,7 +140,8 @@ export const DEFAULT_ADDONS = [
   "repos",
   "language-service",
   "mcp",
-  "effect-style"
+  "effect-style",
+  "flake"
 ] as const
 
 export type DefaultAddon = (typeof DEFAULT_ADDONS)[number]

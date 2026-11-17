@@ -15,7 +15,23 @@ Edit a template fragment or a post-processor, then prove it with a generated-bui
 ## Prerequisites
 
 - **Bun ≥ 1.4.4** for Scaffold Product development / `bun run check` (see root `packageManager`)
-- **Node ≥ 22.19** for the published CLI (`npx` / `pnpm dlx`). Generated default apps still target Bun runtime until a later runtime matrix lands
+- **Node ≥ 24** (Active LTS) for the published CLI (`npx` / `pnpm dlx`). Generated default apps still target Bun runtime until a later runtime matrix lands
+
+### Optional: Nix flake
+
+Root [`flake.nix`](./flake.nix) (Effect-style) pins a reproducible shell: Bun, Node LTS (`nodejs_24`), pnpm, yarn, git. Not required if those tools are already on PATH. Generated apps include the same `flake` addon by default.
+
+```sh
+# flakes already enabled in ~/.config/nix/nix.conf when set up for this machine
+# fish: ~/.config/fish/conf.d/nix.fish sources the multi-user Nix profile
+nix develop                 # enter the shell (first run downloads nixpkgs + writes flake.lock)
+nix develop -c $SHELL       # keep fish/zsh
+
+bun install
+bun run check
+```
+
+Optional direnv: add a local `.envrc` with `use flake` (and `direnv allow`). Do not commit `.direnv/`.
 
 ## Setup
 

@@ -22,3 +22,8 @@ apps/cli/templates/
 packages/template-generator/src/templates.generated.ts
 packages/template-generator/templates-binary/
 *.tgz
+
+# Nix / direnv
+.direnv/
+result
+result-*
