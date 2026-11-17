@@ -6,7 +6,7 @@ import { mkdtemp, readFile, rm } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join, resolve } from "node:path"
 
-import { compileTemplate } from "../src/core/template-processor.ts"
+import { makeTemplateEngine } from "../src/core/template-engine.ts"
 import { loadTemplates } from "../src/core/template-reader.ts"
 import { seedTextFiles } from "../src/core/virtual-fs.ts"
 import { projectConfig } from "../src/default-config.ts"
@@ -49,17 +49,18 @@ describe("template generator contract", () => {
   })
 
   test("handlebars helpers see the project config", () => {
+    const engine = makeTemplateEngine()
     const config = projectConfig("smoke")
-    expect(compileTemplate("{{#if (eq api \"rpc\")}}yes{{else}}no{{/if}}", config)).toBe("yes")
-    expect(compileTemplate("{{#if (ne auth \"none\")}}yes{{else}}no{{/if}}", config)).toBe("no")
+    expect(engine.compile("{{#if (eq api \"rpc\")}}yes{{else}}no{{/if}}", config)).toBe("yes")
+    expect(engine.compile("{{#if (ne auth \"none\")}}yes{{else}}no{{/if}}", config)).toBe("no")
     expect(
-      compileTemplate(
+      engine.compile(
         "{{#if (and (eq orm \"drizzle\") (includes frontend \"tanstack-start\"))}}yes{{else}}no{{/if}}",
         config
       )
     ).toBe("yes")
-    expect(compileTemplate("{{#if (or (eq runtime \"node\") (eq runtime \"bun\"))}}yes{{/if}}", config)).toBe("yes")
-    expect(compileTemplate("{{#if (not (eq database \"none\"))}}yes{{else}}no{{/if}}", config)).toBe("yes")
+    expect(engine.compile("{{#if (or (eq runtime \"node\") (eq runtime \"bun\"))}}yes{{/if}}", config)).toBe("yes")
+    expect(engine.compile("{{#if (not (eq database \"none\"))}}yes{{else}}no{{/if}}", config)).toBe("yes")
   })
 
   test("generate does not import node:fs; writeTree does", () => {

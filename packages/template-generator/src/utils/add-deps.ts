@@ -1,9 +1,9 @@
-import type { VirtualFileSystem } from "../core/virtual-fs.ts"
+import type { VirtualFsService } from "../core/virtual-fs.ts"
 import { GeneratorError } from "../types.ts"
 import { pinnedVersion } from "./dependency-versions.ts"
 
 export type AddPackageDependencyInput = {
-  readonly vfs: VirtualFileSystem
+  readonly vfs: VirtualFsService
   /** Package directory. `""` is the repo root. */
   readonly packagePath: string
   readonly dependencies?: ReadonlyArray<string>
@@ -30,7 +30,7 @@ export const asStringRecord = (value: unknown): Record<string, string> => {
   return record
 }
 
-const readPackage = (vfs: VirtualFileSystem, path: string): PackageJson => {
+const readPackage = (vfs: VirtualFsService, path: string): PackageJson => {
   if (!vfs.fileExists(path)) {
     throw new GeneratorError({ phase: "dependencies", message: `Missing ${path}` })
   }

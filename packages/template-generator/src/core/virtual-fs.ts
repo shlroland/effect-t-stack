@@ -1,3 +1,5 @@
+import * as Context from "effect/Context"
+import * as Layer from "effect/Layer"
 import { Volume } from "memfs"
 
 import type { VirtualDirNode, VirtualFileNode, VirtualNode } from "../types.ts"
@@ -20,77 +22,105 @@ type MutableDir = {
 }
 
 /**
- * In-memory project tree. `generate` is browser-safe: this module does not read or write the disk.
+ * In-memory project tree for `generate`. Browser-safe: no disk I/O.
  * Paths are absolute inside memfs and relative everywhere callers see them.
+ *
+ * Methods are sync because memfs is sync; the Layer is the Effect boundary.
  */
-export class VirtualFileSystem {
-  private readonly volume: MemVolume
-  private readonly sourcePaths = new Map<string, string>()
+export class VirtualFs extends Context.Service<VirtualFs, {
+  readonly writeFile: (path: string, content: string, sourcePath?: string) => void
+  readonly readFile: (path: string) => string
+  readonly exists: (path: string) => boolean
+  readonly fileExists: (path: string) => boolean
+  readonly directoryExists: (path: string) => boolean
+  readonly readJson: <T = unknown>(path: string) => T
+  readonly writeJson: (path: string, value: unknown) => void
+  readonly deleteFile: (path: string) => void
+  readonly getAllFiles: () => ReadonlyArray<string>
+  readonly getFileCount: () => number
+  readonly toTree: (rootName: string) => VirtualDirNode
+}>()("@effect-t-stack/template-generator/core/VirtualFs") {
+  /** Fresh memfs volume per build. */
+  static readonly layer: Layer.Layer<VirtualFs> = Layer.sync(VirtualFs)(() => makeMemVirtualFs())
+}
 
-  constructor() {
-    this.volume = new Volume() as unknown as MemVolume
-  }
+export type VirtualFsService = VirtualFs["Service"]
 
-  writeFile(path: string, content: string, sourcePath?: string): void {
+/** @deprecated Prefer `VirtualFs.layer` + `yield* VirtualFs`, or `makeMemVirtualFs` in tests. */
+export const createVirtualFileSystem = (): VirtualFsService => makeMemVirtualFs()
+
+export const makeMemVirtualFs = (): VirtualFsService => {
+  const volume = new Volume() as unknown as MemVolume
+  const sourcePaths = new Map<string, string>()
+
+  const writeFile = (path: string, content: string, sourcePath?: string): void => {
     const absolute = toAbsolute(path)
     const relative = toRelative(absolute)
     if (relative.length === 0) {
       throw new Error("Cannot write the VFS root")
     }
-    this.volume.mkdirSync(dirnamePosix(absolute), { recursive: true })
-    this.volume.writeFileSync(absolute, content)
-    if (sourcePath !== undefined) this.sourcePaths.set(relative, sourcePath)
-    else this.sourcePaths.delete(relative)
+    volume.mkdirSync(dirnamePosix(absolute), { recursive: true })
+    volume.writeFileSync(absolute, content)
+    if (sourcePath !== undefined) sourcePaths.set(relative, sourcePath)
+    else sourcePaths.delete(relative)
   }
 
-  readFile(path: string): string {
-    return this.volume.readFileSync(toAbsolute(path), "utf8")
-  }
+  const readFile = (path: string): string => volume.readFileSync(toAbsolute(path), "utf8")
 
-  exists(path: string): boolean {
-    return this.volume.existsSync(toAbsolute(path))
-  }
+  const exists = (path: string): boolean => volume.existsSync(toAbsolute(path))
 
-  fileExists(path: string): boolean {
+  const fileExists = (path: string): boolean => {
     const absolute = toAbsolute(path)
-    if (!this.volume.existsSync(absolute)) return false
-    return this.volume.statSync(absolute).isFile()
+    if (!volume.existsSync(absolute)) return false
+    return volume.statSync(absolute).isFile()
   }
 
-  directoryExists(path: string): boolean {
+  const directoryExists = (path: string): boolean => {
     const absolute = toAbsolute(path)
-    if (!this.volume.existsSync(absolute)) return false
-    return this.volume.statSync(absolute).isDirectory()
+    if (!volume.existsSync(absolute)) return false
+    return volume.statSync(absolute).isDirectory()
   }
 
-  readJson<T = unknown>(path: string): T {
-    return JSON.parse(this.readFile(path)) as T
+  const readJson = <T = unknown>(path: string): T => JSON.parse(readFile(path)) as T
+
+  const writeJson = (path: string, value: unknown): void => {
+    writeFile(path, `${JSON.stringify(value, null, 2)}\n`)
   }
 
-  writeJson(path: string, value: unknown): void {
-    this.writeFile(path, `${JSON.stringify(value, null, 2)}\n`)
-  }
-
-  deleteFile(path: string): void {
+  const deleteFile = (path: string): void => {
     const absolute = toAbsolute(path)
-    if (this.volume.existsSync(absolute)) this.volume.unlinkSync(absolute)
-    this.sourcePaths.delete(toRelative(absolute))
+    if (volume.existsSync(absolute)) volume.unlinkSync(absolute)
+    sourcePaths.delete(toRelative(absolute))
   }
 
-  getAllFiles(): ReadonlyArray<string> {
+  const walk = (absolute: string, files: Array<string>): void => {
+    if (!volume.existsSync(absolute)) return
+    const stat = volume.statSync(absolute)
+    if (stat.isFile()) {
+      const relative = toRelative(absolute)
+      if (relative.length > 0) files.push(relative)
+      return
+    }
+    if (!stat.isDirectory()) return
+    for (const entry of volume.readdirSync(absolute)) {
+      const name = typeof entry === "string" ? entry : new TextDecoder().decode(entry)
+      const next = absolute === "/" ? `/${name}` : `${absolute}/${name}`
+      walk(next, files)
+    }
+  }
+
+  const getAllFiles = (): ReadonlyArray<string> => {
     const files: Array<string> = []
-    this.walk("/", files)
+    walk("/", files)
     files.sort((a, b) => a.localeCompare(b))
     return files
   }
 
-  getFileCount(): number {
-    return this.getAllFiles().length
-  }
+  const getFileCount = (): number => getAllFiles().length
 
-  toTree(rootName: string): VirtualDirNode {
+  const toTree = (rootName: string): VirtualDirNode => {
     const root: MutableDir = { type: "directory", name: rootName, children: [] }
-    for (const relative of this.getAllFiles()) {
+    for (const relative of getAllFiles()) {
       const parts = relative.split("/")
       let directory = root
       for (let index = 0; index < parts.length - 1; index++) {
@@ -107,31 +137,29 @@ export class VirtualFileSystem {
       }
       const name = parts[parts.length - 1]
       if (name === undefined) continue
-      const sourcePath = this.sourcePaths.get(relative)
+      const sourcePath = sourcePaths.get(relative)
       const file: VirtualFileNode = sourcePath === undefined
-        ? { type: "file", name, content: this.readFile(relative) }
-        : { type: "file", name, content: this.readFile(relative), sourcePath }
+        ? { type: "file", name, content: readFile(relative) }
+        : { type: "file", name, content: readFile(relative), sourcePath }
       directory.children.push(file)
     }
     sortDirectory(root)
     return root
   }
 
-  private walk(absolute: string, files: Array<string>): void {
-    if (!this.volume.existsSync(absolute)) return
-    const stat = this.volume.statSync(absolute)
-    if (stat.isFile()) {
-      const relative = toRelative(absolute)
-      if (relative.length > 0) files.push(relative)
-      return
-    }
-    if (!stat.isDirectory()) return
-    for (const entry of this.volume.readdirSync(absolute)) {
-      const name = typeof entry === "string" ? entry : new TextDecoder().decode(entry)
-      const next = absolute === "/" ? `/${name}` : `${absolute}/${name}`
-      this.walk(next, files)
-    }
-  }
+  return VirtualFs.of({
+    writeFile,
+    readFile,
+    exists,
+    fileExists,
+    directoryExists,
+    readJson,
+    writeJson,
+    deleteFile,
+    getAllFiles,
+    getFileCount,
+    toTree
+  })
 }
 
 const sortDirectory = (directory: MutableDir): void => {
@@ -141,13 +169,11 @@ const sortDirectory = (directory: MutableDir): void => {
   }
 }
 
-export const createVirtualFileSystem = (): VirtualFileSystem => new VirtualFileSystem()
-
 /** Seed text files into a VFS. `add` will reuse this; create does not. */
 export const seedTextFiles = (
   files: ReadonlyArray<{ readonly path: string; readonly content: string }>
-): VirtualFileSystem => {
-  const vfs = createVirtualFileSystem()
+): VirtualFsService => {
+  const vfs = makeMemVirtualFs()
   for (const file of files) vfs.writeFile(file.path, file.content)
   return vfs
 }

@@ -1,4 +1,4 @@
-import type { VirtualFileSystem } from "../core/virtual-fs.ts"
+import type { VirtualFsService } from "../core/virtual-fs.ts"
 import { GeneratorError, type ProjectConfig } from "../types.ts"
 import { asStringRecord, sortStringRecord } from "../utils/add-deps.ts"
 
@@ -21,7 +21,7 @@ const SECTIONS = ["dependencies", "devDependencies"] as const
 const isDirectPin = (version: string): boolean =>
   version !== "catalog:" && version !== "*" && !version.startsWith("workspace:")
 
-const readPackage = (vfs: VirtualFileSystem, path: string): PackageJson => {
+const readPackage = (vfs: VirtualFsService, path: string): PackageJson => {
   const parsed: unknown = vfs.readJson(path)
   if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) {
     throw new GeneratorError({ phase: "catalogs", message: `${path} is not an object` })
@@ -29,7 +29,7 @@ const readPackage = (vfs: VirtualFileSystem, path: string): PackageJson => {
   return parsed as PackageJson
 }
 
-const presentPackages = (vfs: VirtualFileSystem): Array<{ readonly path: string; readonly pkg: PackageJson }> =>
+const presentPackages = (vfs: VirtualFsService): Array<{ readonly path: string; readonly pkg: PackageJson }> =>
   PACKAGE_JSONS.filter((path) => vfs.fileExists(path)).map((path) => ({ path, pkg: readPackage(vfs, path) }))
 
 const workspacePackages = (pkg: PackageJson): Array<string> => {
@@ -47,7 +47,7 @@ const workspacePackages = (pkg: PackageJson): Array<string> => {
  * Bun writes `workspaces.catalog` and rewrites ranges to `catalog:`. npm skips the catalog.
  * pnpm writes `pnpm-workspace.yaml`.
  */
-export const processCatalogs = (vfs: VirtualFileSystem, config: ProjectConfig): void => {
+export const processCatalogs = (vfs: VirtualFsService, config: ProjectConfig): void => {
   const packages = presentPackages(vfs)
   const root = packages.find((entry) => entry.path === "package.json")
   if (root === undefined) return

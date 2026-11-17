@@ -1,8 +1,8 @@
-import type { VirtualFileSystem } from "../core/virtual-fs.ts"
+import type { VirtualFsService } from "../core/virtual-fs.ts"
 import type { ProjectConfig } from "../types.ts"
 
 /** Computed env files. `.env.example` stays a template; these are the files the app reads. */
-export const processEnvVariables = (vfs: VirtualFileSystem, config: ProjectConfig): void => {
+export const processEnvVariables = (vfs: VirtualFsService, config: ProjectConfig): void => {
   if (config.database === "none") return
   const databaseUrl = config.database === "sqlite" ? "./data.db" : ""
   if (vfs.fileExists("apps/web/package.json")) {

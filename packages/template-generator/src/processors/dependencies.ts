@@ -1,4 +1,4 @@
-import type { VirtualFileSystem } from "../core/virtual-fs.ts"
+import type { VirtualFsService } from "../core/virtual-fs.ts"
 import { hasAddon, hasFrontend } from "../default-config.ts"
 import type { ProjectConfig } from "../types.ts"
 import { addPackageDependency, asStringRecord, packageJsonPath, sortStringRecord } from "../utils/add-deps.ts"
@@ -8,7 +8,7 @@ type PackageJson = Record<string, unknown>
 
 const workspaceProtocol = (config: ProjectConfig): string => config.packageManager === "npm" ? "*" : "workspace:*"
 
-const linkWorkspacePackages = (vfs: VirtualFileSystem, config: ProjectConfig): void => {
+const linkWorkspacePackages = (vfs: VirtualFsService, config: ProjectConfig): void => {
   const protocol = workspaceProtocol(config)
   const scope = config.projectName
   const links: Readonly<Record<string, ReadonlyArray<string>>> = {
@@ -50,7 +50,7 @@ const rootDevDependencies = (config: ProjectConfig): Array<string> => {
  * Workspace links, then per-package dependencies from `dependencyVersionMap`, then `turbo.json`.
  * Versions are not written in templates.
  */
-export const processDependencies = (vfs: VirtualFileSystem, config: ProjectConfig): void => {
+export const processDependencies = (vfs: VirtualFsService, config: ProjectConfig): void => {
   linkWorkspacePackages(vfs, config)
 
   addPackageDependency({

@@ -1,4 +1,5 @@
-import type { VirtualFileSystem } from "../core/virtual-fs.ts"
+import * as Effect from "effect/Effect"
+
 import { hasAddon } from "../default-config.ts"
 import type { ProjectConfig } from "../types.ts"
 import { processTemplatesFromPrefix } from "./utils.ts"
@@ -8,15 +9,14 @@ import { processTemplatesFromPrefix } from "./utils.ts"
  * `repos`, `language-service`, and `mcp` are fingerprint + dependency concerns for this cell
  * (the vendored `repos/` tree is not copied; same denylist as the CLI copy path).
  */
-export const processAddonTemplates = (
-  vfs: VirtualFileSystem,
+export const processAddonTemplates = Effect.fnUntraced(function*(
   templates: ReadonlyMap<string, string>,
   config: ProjectConfig
-): void => {
+) {
   if (hasAddon(config, "effect-style")) {
-    processTemplatesFromPrefix(vfs, templates, config, "addons/effect-style", "")
+    yield* processTemplatesFromPrefix(templates, config, "addons/effect-style", "")
   }
   if (hasAddon(config, "skills")) {
-    processTemplatesFromPrefix(vfs, templates, config, "addons/skills", "")
+    yield* processTemplatesFromPrefix(templates, config, "addons/skills", "")
   }
-}
+})

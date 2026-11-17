@@ -1,6 +1,8 @@
 import * as Effect from "effect/Effect"
 import * as Option from "effect/Option"
-import { countTree, createVirtualFileSystem } from "./core/virtual-fs.ts"
+
+import { GenerateLayers } from "./core/layers.ts"
+import { countTree, VirtualFs } from "./core/virtual-fs.ts"
 import { unsupportedStackMessage } from "./default-config.ts"
 import { writeEtsConfig } from "./ets-config.ts"
 import { processCatalogs } from "./post-process/catalogs.ts"
@@ -41,25 +43,27 @@ export const generate = Effect.fn("generate")(function*(options: GenerateOptions
     return yield* new GeneratorError({ phase: "initialization", message: unsupported.value })
   }
 
-  return yield* Effect.try({
-    try: (): VirtualFileTree => {
-      const vfs = createVirtualFileSystem()
-      applyTemplateHandlers(vfs, options.templates, options.config)
-      processPackageConfigs(vfs, options.config)
-      processDependencies(vfs, options.config)
-      processEnvVariables(vfs, options.config)
-      processCatalogs(vfs, options.config)
-      processReadme(vfs, options.config)
-      if (options.version !== undefined) writeEtsConfig(vfs, options.config, options.version)
-      const root = vfs.toTree(options.config.projectName)
-      const counts = countTree(root)
-      return {
-        root,
-        fileCount: counts.fileCount,
-        directoryCount: counts.directoryCount,
-        config: options.config
-      }
-    },
-    catch: mapCause
-  })
+  return yield* Effect.gen(function*() {
+    const vfs = yield* VirtualFs
+    yield* applyTemplateHandlers(options.templates, options.config)
+    yield* Effect.try({
+      try: () => {
+        processPackageConfigs(vfs, options.config)
+        processDependencies(vfs, options.config)
+        processEnvVariables(vfs, options.config)
+        processCatalogs(vfs, options.config)
+        processReadme(vfs, options.config)
+        if (options.version !== undefined) writeEtsConfig(vfs, options.config, options.version)
+      },
+      catch: mapCause
+    })
+    const root = vfs.toTree(options.config.projectName)
+    const counts = countTree(root)
+    return {
+      root,
+      fileCount: counts.fileCount,
+      directoryCount: counts.directoryCount,
+      config: options.config
+    } satisfies VirtualFileTree
+  }).pipe(Effect.provide(GenerateLayers))
 })

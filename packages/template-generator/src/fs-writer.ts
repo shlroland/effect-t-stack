@@ -3,7 +3,7 @@ import { copyFile, mkdir, writeFile } from "node:fs/promises"
 import path from "node:path"
 import { fileURLToPath } from "node:url"
 
-import { BINARY_MARKER } from "./core/binary.ts"
+import { BINARY_MARKER } from "./core/template-engine.ts"
 import { GeneratorError, type VirtualFileTree, type VirtualNode } from "./types.ts"
 
 const defaultBinaryRoot = fileURLToPath(new URL("../templates-binary/", import.meta.url))

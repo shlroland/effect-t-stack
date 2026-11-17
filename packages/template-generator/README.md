@@ -20,7 +20,7 @@ await Effect.runPromise(program)
 ```
 
 - Templates are Handlebars fragments under `templates/`. Scope is `@{{projectName}}/…`.
-- `generate` is an `Effect` that renders into a memfs VFS, then runs post-processors. It does not touch the disk.
+- `generate` is an `Effect` that provides `GenerateLayers` (`VirtualFs` + `TemplateEngine`), then runs post-processors. It does not touch the disk.
 - `writeTree` (Node-only entry `./fs-writer`) is an `Effect` that materializes the tree. Binary files use the `[Binary file]` marker plus `templates-binary/`.
 - Failures are `GeneratorError` (`Schema.TaggedError`) with a `phase`.
 - `bun run prebuild` embeds `templates/` as `EMBEDDED_TEMPLATES`. Create does not read the template directory at runtime.

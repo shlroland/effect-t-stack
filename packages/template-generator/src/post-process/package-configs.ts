@@ -1,4 +1,4 @@
-import type { VirtualFileSystem } from "../core/virtual-fs.ts"
+import type { VirtualFsService } from "../core/virtual-fs.ts"
 import { hasAddon } from "../default-config.ts"
 import { GeneratorError, type ProjectConfig } from "../types.ts"
 import { packageJsonPath } from "../utils/add-deps.ts"
@@ -19,7 +19,7 @@ const WORKSPACE_PACKAGES = [
 /** Golden Sample pin. The CLI stamps the detected package-manager version after `writeTree`. */
 const BUN_PACKAGE_MANAGER_PIN = "bun@1.4.4"
 
-const readPackage = (vfs: VirtualFileSystem, path: string): PackageJson | undefined => {
+const readPackage = (vfs: VirtualFsService, path: string): PackageJson | undefined => {
   if (!vfs.fileExists(path)) return undefined
   try {
     const parsed: unknown = vfs.readJson(path)
@@ -44,7 +44,7 @@ const turboRun = (config: ProjectConfig, script: string, pkg: string): string =>
   return `bun run --filter=${filter} ${script}`
 }
 
-const rootScripts = (vfs: VirtualFileSystem, config: ProjectConfig): Record<string, string> => {
+const rootScripts = (vfs: VirtualFsService, config: ProjectConfig): Record<string, string> => {
   const scripts: Record<string, string> = {}
   if (vfs.fileExists("apps/web/package.json")) {
     scripts["dev"] = turboRun(config, "dev", "web")
@@ -88,7 +88,7 @@ const rootScripts = (vfs: VirtualFileSystem, config: ProjectConfig): Record<stri
 }
 
 /** Root `name` becomes `projectName`. Workspace packages are `@<projectName>/<spine>`. */
-export const processPackageConfigs = (vfs: VirtualFileSystem, config: ProjectConfig): void => {
+export const processPackageConfigs = (vfs: VirtualFsService, config: ProjectConfig): void => {
   const rootPath = packageJsonPath("")
   const root = readPackage(vfs, rootPath)
   if (root === undefined) {

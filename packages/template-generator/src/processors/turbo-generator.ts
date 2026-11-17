@@ -1,9 +1,9 @@
-import type { VirtualFileSystem } from "../core/virtual-fs.ts"
+import type { VirtualFsService } from "../core/virtual-fs.ts"
 import { hasAddon } from "../default-config.ts"
 import type { ProjectConfig } from "../types.ts"
 
 /** Task-runner JSON is generated, not templated. Shape matches the Golden Sample for the default cell. */
-export const processTurboConfig = (vfs: VirtualFileSystem, config: ProjectConfig): void => {
+export const processTurboConfig = (vfs: VirtualFsService, config: ProjectConfig): void => {
   if (!hasAddon(config, "turborepo")) return
   const tasks: Record<string, unknown> = {
     build: {

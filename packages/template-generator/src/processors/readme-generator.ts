@@ -1,8 +1,8 @@
-import type { VirtualFileSystem } from "../core/virtual-fs.ts"
+import type { VirtualFsService } from "../core/virtual-fs.ts"
 import type { ProjectConfig } from "../types.ts"
 
 /** README is generated from config. There is no `README.md.hbs` on the default path. */
-export const processReadme = (vfs: VirtualFileSystem, config: ProjectConfig): void => {
+export const processReadme = (vfs: VirtualFsService, config: ProjectConfig): void => {
   const lines = [
     `# ${config.projectName}`,
     "",

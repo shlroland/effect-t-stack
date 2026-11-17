@@ -1,4 +1,4 @@
-import type { VirtualFileSystem } from "./core/virtual-fs.ts"
+import type { VirtualFsService } from "./core/virtual-fs.ts"
 import type { ProjectConfig } from "./types.ts"
 import { reproducibleCommand } from "./utils/reproducible-command.ts"
 
@@ -14,7 +14,7 @@ const pkg = (config: ProjectConfig, name: string): string => `@${config.projectN
  * Written only when `generate` is given a CLI `version`. Stack fields mirror the Golden Sample;
  * create-time meta (`$schema`, `createdAt`, `cliVersion`, `reproducibleCommand`) is stamped here.
  */
-export const writeEtsConfig = (vfs: VirtualFileSystem, config: ProjectConfig, version: string): void => {
+export const writeEtsConfig = (vfs: VirtualFsService, config: ProjectConfig, version: string): void => {
   const frontend = config.frontend[0] ?? "tanstack-start"
   const body = {
     version: FINGERPRINT_SCHEMA_VERSION,

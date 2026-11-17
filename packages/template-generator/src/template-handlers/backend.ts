@@ -1,4 +1,5 @@
-import type { VirtualFileSystem } from "../core/virtual-fs.ts"
+import * as Effect from "effect/Effect"
+
 import type { ProjectConfig } from "../types.ts"
 import { processTemplatesFromPrefix } from "./utils.ts"
 
@@ -6,11 +7,10 @@ import { processTemplatesFromPrefix } from "./utils.ts"
  * `backend=self` still emits `apps/server`. Services, Rpc, and HttpApi handlers live there;
  * TanStack Start mounts them. This is the Effect Core layout, not a BTS "self writes nothing" backend.
  */
-export const processBackendTemplates = (
-  vfs: VirtualFileSystem,
+export const processBackendTemplates = Effect.fnUntraced(function*(
   templates: ReadonlyMap<string, string>,
   config: ProjectConfig
-): void => {
+) {
   if (config.backend !== "self" && config.backend !== "server") return
-  processTemplatesFromPrefix(vfs, templates, config, "backend/server", "apps/server")
-}
+  yield* processTemplatesFromPrefix(templates, config, "backend/server", "apps/server")
+})
