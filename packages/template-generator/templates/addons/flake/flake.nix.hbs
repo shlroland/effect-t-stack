@@ -1,0 +1,38 @@
+{
+  description = "Dev shell for {{projectName}} (create-effect-t-stack)";
+
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+  };
+
+  outputs = {nixpkgs, ...}: let
+    forAllSystems = function:
+      nixpkgs.lib.genAttrs nixpkgs.lib.systems.flakeExposed (
+        system: function nixpkgs.legacyPackages.${system}
+      );
+  in {
+    formatter = forAllSystems (pkgs: pkgs.alejandra);
+
+    # Bun: default runtime / package manager for this stack.
+    # Node: Active LTS (nodejs_24 as of 2026-10) for tooling that expects Node.
+    # pnpm/yarn: optional when using --package-manager beyond bun.
+    devShells = forAllSystems (pkgs: {
+      default = pkgs.mkShell {
+        packages = with pkgs; [
+          bun
+          nodejs_24
+          pnpm
+          yarn
+          git
+        ];
+
+        shellHook = ''
+          echo "{{projectName}} flake shell"
+          echo "  bun:  $(bun --version 2>/dev/null || echo missing)"
+          echo "  node: $(node --version 2>/dev/null || echo missing)"
+          echo "  Next: bun install && bun run dev"
+        '';
+      };
+    });
+  };
+}

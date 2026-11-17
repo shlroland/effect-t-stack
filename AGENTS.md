@@ -133,7 +133,8 @@ ETS_GENERATED_BUILD=1 bun test packages/template-generator/test/generated-build.
 ## 运行时
 
 - Scaffold Product / 生成应用默认仍用 **Bun**（`bun test` / `bun --hot`），不要默认改成 Node/npm。
-- **Published CLI**（`npx` / `pnpm dlx`）目标 **Node ≥ 22.19**；`bin.ts` 在 `globalThis.Bun` 时用 BunServices，否则 NodeServices。generator 仍走 workspace 或 `templates/` 旁路（不打 dist）。
+- **Published CLI**（`npx` / `pnpm dlx`）目标 **Node ≥ 24**（Active LTS）；`bin.ts` 在 `globalThis.Bun` 时用 BunServices，否则 NodeServices。generator 仍走 workspace 或 `templates/` 旁路（不打 dist）。
+- Optional Nix: root `flake.nix` → `nix develop`（Bun + `nodejs_24` LTS）。默认 addon `flake` 也会写进生成应用；不是 monorepo task runner。
 - 生成应用的 env：`apps/web/.env`（见模板里的 `.env.example`）。备选独立 server：`apps/server/.env`。
 - Scaffold / CLI `check` 需要完整 workspace 解析；在 Cursor agent 里跑时对 `bun run check` / `bun run --filter=create-effect-t-stack check` 使用非沙箱权限（否则会出现假红的 missing `@effect/platform-bun` / bun types）。
 

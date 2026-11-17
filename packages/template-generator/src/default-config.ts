@@ -10,7 +10,8 @@ export const DEFAULT_ADDONS = [
   "repos",
   "language-service",
   "mcp",
-  "effect-style"
+  "effect-style",
+  "flake"
 ] as const
 
 export const hasAddon = (config: ProjectConfig, addon: string): boolean => config.addons.includes(addon)

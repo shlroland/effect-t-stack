@@ -121,6 +121,7 @@ describe("template generator contract", () => {
         "package.json",
         "ets.jsonc",
         "turbo.json",
+        "flake.nix",
         ".oxlintrc.json",
         "packages/domain/src/index.ts",
         "packages/protocol/src/rpc/AppRpcs.ts",
@@ -200,6 +201,7 @@ describe("template generator contract", () => {
     expect(fingerprint["cliVersion"]).toBe("0.1.0")
     expect(fingerprint["examples"]).toEqual(["todo"])
     expect(fingerprint["addons"]).toContain("effect-style")
+    expect(fingerprint["addons"]).toContain("flake")
     const apiOptions = fingerprint["apiOptions"] as { import: string; secondary: { api: string; import: string } }
     expect(apiOptions.import).toBe("@smoke/protocol/rpc")
     expect(apiOptions.secondary.api).toBe("httpapi")

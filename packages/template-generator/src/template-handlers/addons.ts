@@ -19,4 +19,7 @@ export const processAddonTemplates = Effect.fnUntraced(function*(
   if (hasAddon(config, "skills")) {
     yield* processTemplatesFromPrefix(templates, config, "addons/skills", "")
   }
+  if (hasAddon(config, "flake")) {
+    yield* processTemplatesFromPrefix(templates, config, "addons/flake", "")
+  }
 })
