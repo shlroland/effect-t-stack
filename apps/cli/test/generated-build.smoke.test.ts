@@ -6,6 +6,7 @@ import { mkdtemp, readFile, rm } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { createProject } from "../src/create/create.ts"
+import type { ApiPrimary } from "../src/create/CreateOptions.ts"
 
 /**
  * Generated-build smoke: materialize a project and typecheck.
@@ -15,46 +16,62 @@ describe("generated-build smoke", () => {
   const temps: Array<string> = []
 
   afterAll(async () => {
-    await Promise.all(temps.map((dir) => rm(dir, { recursive: true, force: true })))
-  })
+    await Promise.all(temps.map((dir) => rm(dir, { recursive: true, force: true, maxRetries: 5 })))
+  }, 120_000)
 
   test("create --yes then bun run check-types", async () => {
-    if (process.env["ETS_GENERATED_BUILD"] !== "1") {
-      return
-    }
-    const cwd = await mkdtemp(join(tmpdir(), "ets-gen-"))
-    temps.push(cwd)
-    const result = await Effect.runPromise(
-      createProject({
-        projectName: "smoke",
-        yes: true,
-        yolo: false,
-        dryRun: false,
-        install: true,
-        git: true,
-        verbose: false,
-        renderTitle: false,
-        open: undefined,
-        manualDb: false,
-        directoryConflict: "error",
-        packageManager: "bun",
-        api: "rpc",
-        effectStyle: true,
-        cwd
-      }).pipe(Effect.provide(BunServices.layer)) as Effect.Effect<{
-        readonly targetDir: string
-        readonly scope: string
-        readonly fileCount: number
-        readonly dryRun: boolean
-      }, unknown>
-    )
-    const pkg = JSON.parse(await readFile(join(result.targetDir, "package.json"), "utf8")) as {
-      name: string
-    }
-    expect(pkg.name).toBe("smoke")
-    await run("bun", ["run", "check-types"], result.targetDir)
-  }, 600_000)
+    if (process.env["ETS_GENERATED_BUILD"] !== "1") return
+    await createAndTypecheck(temps, "smoke", "rpc")
+  }, 900_000)
+
+  test("create --yes --api httpapi then bun run check-types", async () => {
+    if (process.env["ETS_GENERATED_BUILD"] !== "1") return
+    const targetDir = await createAndTypecheck(temps, "smoke-httpapi", "httpapi")
+    const todos = await readFile(join(targetDir, "apps/web/src/atoms/todos.ts"), "utf8")
+    expect(todos).toContain("HttpApiAtoms")
+  }, 900_000)
 })
+
+const createAndTypecheck = async (
+  temps: Array<string>,
+  projectName: string,
+  api: ApiPrimary
+): Promise<string> => {
+  const cwd = await mkdtemp(join(tmpdir(), "ets-gen-"))
+  temps.push(cwd)
+  const result = await Effect.runPromise(
+    createProject({
+      projectName,
+      yes: true,
+      yolo: false,
+      dryRun: false,
+      install: true,
+      git: true,
+      verbose: false,
+      renderTitle: false,
+      open: undefined,
+      manualDb: false,
+      directoryConflict: "error",
+      packageManager: "bun",
+      api,
+      effectStyle: true,
+      cwd
+    }).pipe(Effect.provide(BunServices.layer)) as Effect.Effect<{
+      readonly targetDir: string
+      readonly scope: string
+      readonly fileCount: number
+      readonly dryRun: boolean
+      readonly api: ApiPrimary
+    }, unknown>
+  )
+  expect(result.api).toBe(api)
+  const pkg = JSON.parse(await readFile(join(result.targetDir, "package.json"), "utf8")) as {
+    name: string
+  }
+  expect(pkg.name).toBe(projectName)
+  await run("bun", ["run", "check-types"], result.targetDir)
+  return result.targetDir
+}
 
 const run = (command: string, argv: ReadonlyArray<string>, cwd: string): Promise<void> =>
   new Promise((resolve, reject) => {

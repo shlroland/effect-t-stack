@@ -23,8 +23,8 @@ jobs:
       - name: Lint, typecheck, test (CLI + template generator + effect-oxc)
         run: bun run check
 
-      - name: Generated-build (template generator default stack)
+      - name: Generated-build (template generator — rpc default + httpapi primary)
         run: ETS_GENERATED_BUILD=1 bun test packages/template-generator/test/generated-build.test.ts
 
-      - name: Generated-build (create --yes via template generator)
+      - name: Generated-build (create --yes rpc + --api httpapi)
         run: ETS_GENERATED_BUILD=1 bun test apps/cli/test/generated-build.smoke.test.ts

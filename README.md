@@ -35,6 +35,7 @@ Smoke tiers:
 ```sh
 # Generated-build (gated, slow)
 ETS_GENERATED_BUILD=1 bun test apps/cli/test/generated-build.smoke.test.ts
+# both files also cover --api httpapi (AtomHttpApi primary)
 # Live CI: Actions → live-smoke (workflow_dispatch / weekly)
 ```
 
