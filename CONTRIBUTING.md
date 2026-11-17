@@ -14,8 +14,8 @@ Edit a template fragment or a post-processor, then prove it with a generated-bui
 
 ## Prerequisites
 
-- **Bun ≥ 1.4.4** (see root `packageManager` / `engines`)
-- Node is not required for the default path; Workers notes land with L3 `--runtime`
+- **Bun ≥ 1.4.4** for Scaffold Product development / `bun run check` (see root `packageManager`)
+- **Node ≥ 22.19** for the published CLI (`npx` / `pnpm dlx`). Generated default apps still target Bun runtime until a later runtime matrix lands
 
 ## Setup
 

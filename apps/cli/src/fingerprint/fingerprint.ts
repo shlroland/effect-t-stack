@@ -2,7 +2,7 @@ import * as Effect from "effect/Effect"
 import * as FileSystem from "effect/FileSystem"
 import * as Path from "effect/Path"
 import { CreateError } from "../shared/CreateError.ts"
-import { CLI_VERSION, ETS_SCHEMA_URL } from "./cliVersion.ts"
+import { ETS_SCHEMA_URL } from "./cliVersion.ts"
 import { decodeFingerprintJson, decodeFingerprintJsonSync, type Fingerprint } from "./FingerprintSchema.ts"
 
 export type { Fingerprint } from "./FingerprintSchema.ts"
@@ -83,6 +83,7 @@ export type CreateStampInput = {
   readonly scope: string
   readonly packageManager: string
   readonly reproducibleCommand: string
+  readonly cliVersion: string
   readonly manualDb?: boolean
 }
 
@@ -95,7 +96,7 @@ export const stampCreateFingerprint = (raw: string, input: CreateStampInput): st
     name: input.scope,
     packageManager: input.packageManager,
     createdAt: fp.createdAt ?? new Date().toISOString(),
-    cliVersion: CLI_VERSION,
+    cliVersion: input.cliVersion,
     reproducibleCommand: input.reproducibleCommand,
     ...(input.manualDb
       ? { dbSetupOptions: { ...fp.dbSetupOptions, mode: "manual" as const } }
@@ -109,6 +110,7 @@ export const stampCreateFingerprint = (raw: string, input: CreateStampInput): st
 export const recordAddon = (
   fingerprint: Fingerprint,
   addon: string,
+  version: string,
   options?: Record<string, unknown>
 ): Fingerprint => {
   const addons = fingerprint.addons.includes(addon)
@@ -127,7 +129,7 @@ export const recordAddon = (
     ...fingerprint,
     addons,
     addonOptions,
-    cliVersion: CLI_VERSION
+    cliVersion: version
   }
 }
 

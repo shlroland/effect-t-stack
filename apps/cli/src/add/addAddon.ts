@@ -2,7 +2,7 @@ import * as Console from "effect/Console"
 import * as Effect from "effect/Effect"
 import * as Path from "effect/Path"
 import { validateAddonAgainstFingerprint, validateDefaultAddon } from "../compatibility/index.ts"
-import { CLI_VERSION } from "../fingerprint/cliVersion.ts"
+import { cliVersion } from "../fingerprint/cliVersion.ts"
 import { loadFingerprint, recordAddon, writeFingerprint } from "../fingerprint/fingerprint.ts"
 import { appendHistory } from "../fingerprint/history.ts"
 
@@ -59,9 +59,9 @@ export const addAddon = Effect.fn("addAddon")(function*(options: AddAddonOptions
     return result
   }
 
+  const version = yield* cliVersion()
   const next = {
-    ...recordAddon(fingerprint, addon),
-    cliVersion: CLI_VERSION,
+    ...recordAddon(fingerprint, addon, version),
     reproducibleCommand: `create-effect-t-stack add ${addon}`
   }
   yield* writeFingerprint(etsPath, next)

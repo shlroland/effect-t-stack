@@ -1,14 +1,35 @@
-import { createRequire } from "node:module"
+import * as Effect from "effect/Effect"
+import * as FileSystem from "effect/FileSystem"
+import * as Path from "effect/Path"
+import * as Schema from "effect/Schema"
+import { CreateError } from "../shared/CreateError.ts"
 
-const require = createRequire(import.meta.url)
+const PackageJsonVersion = Schema.Struct({
+  version: Schema.String
+})
 
-/** CLI package version from apps/cli/package.json. */
-export const CLI_VERSION: string = (
-  require("../../package.json") as { readonly version: string }
-).version
+const PackageJsonVersionFromJsonString = Schema.fromJsonString(PackageJsonVersion)
+
+const causeMessage = (error: unknown): string => error instanceof Error ? error.message : String(error)
+
+/** CLI package version from `apps/cli/package.json` (FileSystem + Path). */
+export const cliVersion = Effect.fn("cliVersion")(function*() {
+  const fs = yield* FileSystem.FileSystem
+  const path = yield* Path.Path
+  const pkgPath = yield* path.fromFileUrl(new URL("../../package.json", import.meta.url)).pipe(
+    Effect.mapError((error) => new CreateError({ message: `CLI package.json path: ${causeMessage(error)}` }))
+  )
+  const raw = yield* fs.readFileString(pkgPath).pipe(
+    Effect.mapError((error) => new CreateError({ message: `Failed to read CLI package.json: ${causeMessage(error)}` }))
+  )
+  const pkg = yield* Schema.decodeUnknownEffect(PackageJsonVersionFromJsonString)(raw).pipe(
+    Effect.mapError((error) => new CreateError({ message: `Invalid CLI package.json: ${causeMessage(error)}` }))
+  )
+  return pkg.version
+})
 
 export const ETS_SCHEMA_URL =
   "https://raw.githubusercontent.com/shlroland/effect-t-stack/main/apps/cli/schemas/ets.schema.json"
 
-/** Fingerprint schema version (ets.jsonc `version` field). Independent of CLI_VERSION. */
+/** Fingerprint schema version (ets.jsonc `version` field). Independent of `cliVersion`. */
 export const FINGERPRINT_SCHEMA_VERSION = 1 as const

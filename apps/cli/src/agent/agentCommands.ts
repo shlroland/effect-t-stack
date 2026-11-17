@@ -2,6 +2,8 @@ import * as Command from "effect/cli/Command"
 import * as Flag from "effect/cli/Flag"
 import * as Console from "effect/Console"
 import * as Effect from "effect/Effect"
+import * as Stdio from "effect/Stdio"
+import * as Stream from "effect/Stream"
 import { addAddon } from "../add/addAddon.ts"
 import { addPackage } from "../add/addPackage.ts"
 import { resolveAddInput } from "../compatibility/index.ts"
@@ -12,13 +14,15 @@ import { decodeAddJsonInput, decodeCreateJsonInput, toCreateOptions } from "./ag
 import { emitSchema, type SchemaName } from "./schemaCommand.ts"
 
 const readStdinText = Effect.fn("readStdinText")(function*() {
-  return yield* Effect.tryPromise({
-    try: () => Bun.stdin.text().then((text) => text.trim()),
-    catch: (cause) =>
+  const stdio = yield* Stdio.Stdio
+  const text = yield* Stream.mkString(Stream.decodeText(stdio.stdin)).pipe(
+    Effect.mapError((error) =>
       new CreateError({
-        message: `Failed to read stdin: ${cause instanceof Error ? cause.message : String(cause)}`
+        message: `Failed to read stdin: ${error instanceof Error ? error.message : String(error)}`
       })
-  })
+    )
+  )
+  return text.trim()
 })
 
 export const createJsonCommand = Command.make("create-json").pipe(

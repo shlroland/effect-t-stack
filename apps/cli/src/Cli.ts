@@ -5,11 +5,11 @@ import { createCommand } from "./create/createCommand.ts"
 
 /**
  * Root CLI. Prefer subcommands (`create`, `add`, …).
- * `bin.ts` rewrites bare `my-app --yes` → `create my-app --yes` for bunx UX.
+ * `bin.ts` rewrites bare `my-app --yes` → `create my-app --yes` for npx / bunx UX.
  */
 export const createEffectTStack = Command.make("create-effect-t-stack").pipe(
   Command.withDescription(
-    "Scaffold and evolve Effect v4 apps from the Golden Sample (create · add · agent JSON)"
+    "Scaffold and evolve Effect v4 apps from packages/template-generator (create · add · agent JSON)"
   ),
   Command.withSubcommands([
     createCommand,

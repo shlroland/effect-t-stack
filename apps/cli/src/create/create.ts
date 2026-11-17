@@ -1,7 +1,7 @@
 import type { VirtualFileTree } from "@effect-t-stack/template-generator"
 import * as Effect from "effect/Effect"
 import { validateCreateOptions } from "../compatibility/index.ts"
-import { CLI_VERSION } from "../fingerprint/cliVersion.ts"
+import { cliVersion } from "../fingerprint/cliVersion.ts"
 import { appendHistory } from "../fingerprint/history.ts"
 import { CreateError } from "../shared/CreateError.ts"
 import { confirmCreate } from "./confirmCreate.ts"
@@ -66,30 +66,30 @@ const planProject = (prepared: CreatePrepared) =>
       targetDir
     })),
     Effect.flatMap((state) =>
-      loadGenerator.pipe(
-        Effect.flatMap((generator) =>
-          generator.generate({
-            config: generator.projectConfig(state.scope, {
-              packageManager: state.options.packageManager,
-              api: state.options.api
-            }),
-            templates: generator.EMBEDDED_TEMPLATES,
-            version: CLI_VERSION
-          }).pipe(
-            Effect.mapError((error) =>
-              new CreateError({
-                message: `${error.phase}: ${error.message}`
-              })
-            ),
-            Effect.map((tree): CreatePlanned => ({
-              ...state,
-              phases: [...state.phases, "generate"],
-              tree,
-              reproducibleCommand: reproducibleCommandFor(state.scope, state.options)
-            }))
+      Effect.gen(function*() {
+        const version = yield* cliVersion()
+        const generator = yield* loadGenerator
+        const tree = yield* generator.generate({
+          config: generator.projectConfig(state.scope, {
+            packageManager: state.options.packageManager,
+            api: state.options.api
+          }),
+          templates: generator.EMBEDDED_TEMPLATES,
+          version
+        }).pipe(
+          Effect.mapError((error) =>
+            new CreateError({
+              message: `${error.phase}: ${error.message}`
+            })
           )
         )
-      )
+        return {
+          ...state,
+          phases: [...state.phases, "generate"],
+          tree,
+          reproducibleCommand: reproducibleCommandFor(state.scope, state.options)
+        } satisfies CreatePlanned
+      })
     ),
     Effect.tap((state) =>
       printPlanSummary({

@@ -36,7 +36,7 @@ export { formatVerbose, makeCreateResult } from "./create/CreateResult.ts"
 export { emitPackageManagerArtifacts, installCommand, resolvePackageManagerPin } from "./create/packageManagers.ts"
 export type { PackageManager } from "./create/packageManagers.ts"
 export { resolveTargetDirectory } from "./create/targetDirectory.ts"
-export { CLI_VERSION, ETS_SCHEMA_URL, FINGERPRINT_SCHEMA_VERSION } from "./fingerprint/cliVersion.ts"
+export { cliVersion, ETS_SCHEMA_URL, FINGERPRINT_SCHEMA_VERSION } from "./fingerprint/cliVersion.ts"
 export {
   DEFAULT_ADDONS,
   FingerprintFromJsonString,

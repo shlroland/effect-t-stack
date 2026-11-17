@@ -4,7 +4,8 @@ Scaffold an Effect **v4** app by generating it from `packages/template-generator
 
 ## Requirements
 
-- **Bun ≥ 1.4.4**
+- **Node ≥ 22.19** to run the published CLI via `npx` / `pnpm dlx` (TypeScript entry, Effect-style)
+- **Bun ≥ 1.4.4** optional: `bunx` / local Scaffold Product development (D3). `bin.ts` uses BunServices when `globalThis.Bun` is set, otherwise NodeServices
 
 ## Source layout
 
@@ -27,10 +28,12 @@ Scaffold an Effect **v4** app by generating it from `packages/template-generator
 ## Usage
 
 ```sh
+npx create-effect-t-stack@latest my-app --yes
+pnpm dlx create-effect-t-stack@latest my-app --yes
 bunx create-effect-t-stack@latest my-app --yes
 # equivalent explicit subcommand:
-bunx create-effect-t-stack@latest create my-app --yes
-# from a Scaffold Product checkout:
+npx create-effect-t-stack@latest create my-app --yes
+# from a Scaffold Product checkout (Bun):
 bun run create -- my-app --yes
 
 # L2
