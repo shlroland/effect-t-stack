@@ -4,8 +4,8 @@ Scaffold an Effect **v4** app by generating it from `packages/template-generator
 
 ## Requirements
 
-- **Node ≥ 24** (Active LTS) to run the published CLI via `npx` / `pnpm dlx` (TypeScript entry, Effect-style)
-- **Bun ≥ 1.4.4** optional: `bunx` / local Scaffold Product development (D3). `bin.ts` uses BunServices when `globalThis.Bun` is set, otherwise NodeServices
+- **Bun ≥ 1.4.4** required for the published CLI (`bunx` / `npx` wrapper re-execs with Bun for the TypeScript entry)
+- **Node ≥ 24** (Active LTS) accepted by `engines`; local Scaffold Product development still uses Bun (D3). `bin.ts` uses BunServices when `globalThis.Bun` is set, otherwise NodeServices
 - Default generate includes addon `flake` (`flake.nix` for `nix develop`)
 
 ## Source layout

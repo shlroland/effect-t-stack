@@ -2,9 +2,13 @@
 /**
  * Copy packages/template-generator into apps/cli/templates/template-generator
  * so a packed CLI can generate from the embedded templates.
+ *
+ * Runtime deps of the embedded generator (`memfs`, `handlebars`, `effect`) must
+ * also be listed on `create-effect-t-stack` itself — bunx/npx only install the
+ * CLI package, not this nested package.json.
  */
 import { spawn } from "node:child_process"
-import { cp, mkdir, rm } from "node:fs/promises"
+import { cp, mkdir, readFile, rm, writeFile } from "node:fs/promises"
 import { dirname, join, relative } from "node:path"
 import { fileURLToPath } from "node:url"
 
@@ -24,6 +28,27 @@ const run = (command: string, argv: ReadonlyArray<string>, cwd: string): Promise
     })
   })
 
+const rewriteEmbeddedPackageJson = async () => {
+  const cliPkg = JSON.parse(await readFile(join(cliRoot, "package.json"), "utf8")) as {
+    dependencies?: Record<string, string>
+  }
+  const embeddedPath = join(destRoot, "package.json")
+  const embedded = JSON.parse(await readFile(embeddedPath, "utf8")) as {
+    private?: boolean
+    dependencies?: Record<string, string>
+    devDependencies?: Record<string, string>
+  }
+  const cliDeps = cliPkg.dependencies ?? {}
+  const nextDeps: Record<string, string> = {}
+  for (const [name, range] of Object.entries(embedded.dependencies ?? {})) {
+    nextDeps[name] = range === "catalog:" ? (cliDeps[name] ?? range) : range
+  }
+  embedded.dependencies = nextDeps
+  delete embedded.devDependencies
+  embedded.private = true
+  await writeFile(embeddedPath, `${JSON.stringify(embedded, null, 2)}\n`)
+}
+
 const main = async () => {
   await run("bun", ["run", "prebuild"], sourceRoot)
   await rm(destRoot, { recursive: true, force: true })
@@ -31,6 +56,7 @@ const main = async () => {
   for (const name of ["package.json", "README.md", "src", "templates"]) {
     await cp(join(sourceRoot, name), join(destRoot, name), { recursive: true })
   }
+  await rewriteEmbeddedPackageJson()
   console.log(`Packed template-generator → ${relative(repoRoot, destRoot)}`)
 }
 
