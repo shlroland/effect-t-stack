@@ -207,11 +207,14 @@ describe("template generator contract", () => {
       packageManager: string
       scripts: Record<string, string>
       workspaces: { catalog: Record<string, string> }
+      allowScripts?: ReadonlyArray<string>
     }
     expect(root.name).toBe("smoke")
     expect(root.packageManager).toBe("bun@1.4.4")
     expect(root.scripts["dev"]).toBe("turbo run dev --filter=@smoke/web")
+    expect(root.scripts["check"]).toBe("bun run lint && bun run check-types && bun run test")
     expect(root.scripts["prepare"]).toBe("effect-language-service patch && lefthook install")
+    expect(root["allowScripts"]).toBeUndefined()
     expect(root.workspaces.catalog["effect"]).toBe(dependencyVersionMap.effect)
     expect(root.workspaces.catalog["typescript"]).toBe(dependencyVersionMap.typescript)
 
@@ -276,7 +279,7 @@ describe("template generator contract", () => {
     expect(treePaths(tree).includes("ets.jsonc")).toBe(false)
   })
 
-  test("npm keeps explicit pins and skips the catalog", () => {
+  test("npm keeps explicit pins, skips the catalog, and stamps allowScripts", () => {
     const tree = generateDefault("smoke", { packageManager: "npm" }, "0.1.0")
     const domain = JSON.parse(readTreeFile(tree, "packages/domain/package.json")) as {
       dependencies: Record<string, string>
@@ -284,24 +287,65 @@ describe("template generator contract", () => {
     const protocol = JSON.parse(readTreeFile(tree, "packages/protocol/package.json")) as {
       dependencies: Record<string, string>
     }
-    const root = JSON.parse(readTreeFile(tree, "package.json")) as { workspaces: unknown }
+    const root = JSON.parse(readTreeFile(tree, "package.json")) as {
+      workspaces: unknown
+      scripts: Record<string, string>
+      allowScripts?: ReadonlyArray<string>
+      packageManager?: string
+    }
     expect(domain.dependencies["effect"]).toBe(dependencyVersionMap.effect)
     expect(protocol.dependencies["@smoke/domain"]).toBe("*")
     expect(root.workspaces).toEqual(["apps/*", "packages/*"])
+    expect(root.packageManager).toBe("npm@latest")
+    expect(root.scripts["check"]).toBe("npm run lint && npm run check-types && npm run test")
+    expect(root.allowScripts).toEqual(["esbuild", "dprint", "lefthook"])
     expect(treePaths(tree).includes("pnpm-workspace.yaml")).toBe(false)
+    expect(readTreeFile(tree, "lefthook.yml")).toContain("npx oxlint")
+    expect(readTreeFile(tree, "README.md")).toContain("`npm run check`")
+    expect(readTreeFile(tree, "flake.nix")).toContain("npm install && npm run dev")
+    const fingerprint = parseJsonc(readTreeFile(tree, "ets.jsonc"))
+    const addonOptions = fingerprint["addonOptions"] as {
+      "effect-style": { ci: { command: string } }
+      mcp: { effectSolutions: { cli: string } }
+    }
+    expect(addonOptions["effect-style"].ci.command).toBe("npm run check")
+    expect(addonOptions.mcp.effectSolutions.cli).toBe("npx effect-solutions@latest")
+    expect(fingerprint["reproducibleCommand"]).toBe(
+      "npx create-effect-t-stack@0.1.0 smoke --yes --package-manager npm"
+    )
   })
 
-  test("pnpm writes a workspace catalog", () => {
-    const tree = generateDefault("smoke", { packageManager: "pnpm" })
+  test("pnpm writes a workspace catalog and allowBuilds", () => {
+    const tree = generateDefault("smoke", { packageManager: "pnpm" }, "0.1.0")
     const yaml = readTreeFile(tree, "pnpm-workspace.yaml")
     expect(yaml).toContain("\"effect\"")
     expect(yaml).toContain(dependencyVersionMap.effect)
+    expect(yaml).toContain("allowBuilds:")
+    expect(yaml).toContain("\"esbuild\": true")
+    expect(yaml).toContain("\"dprint\": true")
+    expect(yaml).toContain("\"lefthook\": true")
     const domain = JSON.parse(readTreeFile(tree, "packages/domain/package.json")) as {
       dependencies: Record<string, string>
     }
     expect(domain.dependencies["effect"]).toBe("catalog:")
-    const root = JSON.parse(readTreeFile(tree, "package.json")) as { workspaces?: unknown }
+    const root = JSON.parse(readTreeFile(tree, "package.json")) as {
+      workspaces?: unknown
+      scripts: Record<string, string>
+      allowScripts?: unknown
+    }
     expect(root.workspaces).toBeUndefined()
+    expect(root.allowScripts).toBeUndefined()
+    expect(root.scripts["check"]).toBe("pnpm run lint && pnpm run check-types && pnpm run test")
+    expect(readTreeFile(tree, "lefthook.yml")).toContain("pnpm exec oxlint")
+    expect(readTreeFile(tree, "README.md")).toContain("`pnpm run check`")
+    expect(readTreeFile(tree, "flake.nix")).toContain("pnpm install && pnpm run dev")
+    const fingerprint = parseJsonc(readTreeFile(tree, "ets.jsonc"))
+    const addonOptions = fingerprint["addonOptions"] as {
+      "effect-style": { ci: { command: string } }
+      mcp: { effectSolutions: { cli: string } }
+    }
+    expect(addonOptions["effect-style"].ci.command).toBe("pnpm run check")
+    expect(addonOptions.mcp.effectSolutions.cli).toBe("pnpm dlx effect-solutions@latest")
   })
 
   test("writeTree materializes the project directory", async () => {

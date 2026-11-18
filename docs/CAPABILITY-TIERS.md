@@ -142,7 +142,7 @@ See [ADR-0005](./adr/0005-l0-exit-and-fingerprint-hygiene.md).
 - [x] Whole-tree copy of Golden Sample + project/package rename (no conditional `.hbs` yet)
 - [x] Workspace rename protocol: `@ets/*` → `@<project>/*`; root `name`; turbo `--filter` / script names stay consistent
 - [x] `--package-manager` `npm` | `pnpm` | `bun`
-- [x] Emit PM artifacts by choice: `pnpm-workspace.yaml` / `.npmrc` as needed (bun default; full catalog↔npm/pnpm fidelity can deepen later)
+- [x] Emit PM artifacts by choice: catalogs / `pnpm-workspace.yaml`; npm skips catalog; npm `allowScripts` + pnpm `allowBuilds`; PM-keyed root `check` / README / lefthook / flake (`.npmrc` only when a future frontend needs it, same as BTS)
 - [x] `--install` / `--no-install`
 - [x] `--git` / `--no-git`
 - [x] `--directory-conflict` `merge` | `overwrite` | `increment` | `error`
@@ -203,7 +203,7 @@ See [ADR-0005](./adr/0005-l0-exit-and-fingerprint-hygiene.md).
 
 > **L3 exit (this map) is met.** `packages/template-generator` is the only product source of truth. `examples/golden` is deleted. `create` uses `generate` + `writeTree`. `--yes` is proven by a generated-build (install, typecheck, lint) in CI, with no `repos/` required for lint. See [ADR-0007](./adr/0007-templates-are-the-source-of-truth.md).
 >
-> The checkboxes below are **backlog**, not exit blockers. Preference order after exit: API primary flip ✓, then database/ORM (`sqlite`/`postgres` ✓), then runtime `node`, then auth (`better-auth`), then the rest. L0–L2 sections that mention a Golden Sample are historical records of the deleted sample.
+> The checkboxes below are **backlog**, not exit blockers. Preference order after exit: API primary flip ✓ → database/ORM (`sqlite`/`postgres` ✓) → **package-manager fidelity** (npm/pnpm catalogs, root scripts, allowScripts/allowBuilds) → monorepo task runners (`nx` / `vite-plus`) → runtime `node` → auth (`better-auth`) → the rest. L0–L2 sections that mention a Golden Sample are historical records of the deleted sample.
 
 ### Exit criteria
 

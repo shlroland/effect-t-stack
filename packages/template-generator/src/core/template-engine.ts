@@ -3,6 +3,7 @@ import * as Layer from "effect/Layer"
 import Handlebars from "handlebars"
 
 import type { ProjectConfig } from "../types.ts"
+import { getPackageManagerConfig } from "../utils/package-manager.ts"
 import { basenamePosix } from "./paths.ts"
 
 /** Marker stored in the template map and VFS for files `writeTree` copies as bytes. */
@@ -81,7 +82,18 @@ export const makeTemplateEngine = (): TemplateEngineService => {
   return TemplateEngine.of({
     binaryMarker: BINARY_MARKER,
     isBinaryTemplatePath,
-    compile: (source, config) => handlebars.compile(source, { noEscape: true })(config),
+    compile: (source, config) => {
+      const pm = getPackageManagerConfig(config.packageManager)
+      return handlebars.compile(source, { noEscape: true })({
+        ...config,
+        pm: {
+          name: pm.name,
+          exec: pm.exec,
+          dlx: pm.dlx,
+          install: pm.install
+        }
+      })
+    },
     transformTemplatePath,
     transformFilename: (name) => transformTemplatePath(basenamePosix(name))
   })

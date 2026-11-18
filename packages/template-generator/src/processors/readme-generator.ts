@@ -1,15 +1,18 @@
 import type { VirtualFsService } from "../core/virtual-fs.ts"
 import { hasAddon } from "../default-config.ts"
 import type { ProjectConfig } from "../types.ts"
+import { getPackageManagerConfig } from "../utils/package-manager.ts"
 
 /** README is generated from config. There is no `README.md.hbs` on the default path. */
 export const processReadme = (vfs: VirtualFsService, config: ProjectConfig): void => {
+  const pm = getPackageManagerConfig(config.packageManager)
   const lines = [
     `# ${config.projectName}`,
     "",
     "Effect v4 app created by create-effect-t-stack.",
     "",
     `- Runtime: ${config.runtime}`,
+    `- Package manager: ${config.packageManager}`,
     config.api === "httpapi"
       ? "- API: httpapi primary (`/api`), Rpc secondary (`/rpc`)"
       : "- API: rpc primary (`/rpc`), HttpApi secondary (`/api`)",
@@ -32,10 +35,18 @@ export const processReadme = (vfs: VirtualFsService, config: ProjectConfig): voi
   lines.push(
     "## Scripts",
     "",
-    "- `bun run dev` — TanStack Start",
-    "- `bun run dev:server` — standalone Bun server",
-    "- `bun run check` — lint, typecheck, and test",
+    `- \`${pm.install}\` — install workspace dependencies`,
+    `- \`${pm.run("dev")}\` — TanStack Start`,
+    `- \`${pm.run("dev:server")}\` — standalone Bun server`,
+    `- \`${pm.run("check")}\` — lint, typecheck, and test`,
     ""
   )
+  if (config.runtime === "bun" && config.packageManager !== "bun") {
+    lines.push(
+      `Workspace package \`test\` / \`dev\` scripts still use the Bun runtime while \`runtime=bun\`.`,
+      `Install Bun on PATH even when developing with ${config.packageManager}.`,
+      ""
+    )
+  }
   vfs.writeFile("README.md", lines.join("\n"))
 }

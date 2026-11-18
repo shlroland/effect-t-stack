@@ -2,6 +2,8 @@ import type { VirtualFsService } from "../core/virtual-fs.ts"
 import { hasAddon } from "../default-config.ts"
 import { GeneratorError, type ProjectConfig } from "../types.ts"
 import { packageJsonPath } from "../utils/add-deps.ts"
+import { getAllowedDependencyScripts } from "../utils/dependency-scripts.ts"
+import { getPackageManagerConfig } from "../utils/package-manager.ts"
 
 type PackageJson = Record<string, unknown>
 
@@ -41,10 +43,11 @@ const readPackage = (vfs: VirtualFsService, path: string): PackageJson | undefin
 const turboRun = (config: ProjectConfig, script: string, pkg: string): string => {
   const filter = `@${config.projectName}/${pkg}`
   if (hasAddon(config, "turborepo")) return `turbo run ${script} --filter=${filter}`
-  return `bun run --filter=${filter} ${script}`
+  return getPackageManagerConfig(config.packageManager).filter(filter, script)
 }
 
 const rootScripts = (vfs: VirtualFsService, config: ProjectConfig): Record<string, string> => {
+  const pm = getPackageManagerConfig(config.packageManager)
   const scripts: Record<string, string> = {}
   if (vfs.fileExists("apps/web/package.json")) {
     scripts["dev"] = turboRun(config, "dev", "web")
@@ -53,16 +56,18 @@ const rootScripts = (vfs: VirtualFsService, config: ProjectConfig): Record<strin
   if (vfs.fileExists("apps/server/package.json")) {
     scripts["dev:server"] = turboRun(config, "dev", "server")
   }
-  scripts["check-types"] = hasAddon(config, "turborepo") ? "turbo run check-types" : "bun run --filter='*' check-types"
-  scripts["test"] = hasAddon(config, "turborepo") ? "turbo run test" : "bun run --filter='*' test"
+  scripts["check-types"] = hasAddon(config, "turborepo")
+    ? "turbo run check-types"
+    : pm.recursive("check-types")
+  scripts["test"] = hasAddon(config, "turborepo") ? "turbo run test" : pm.recursive("test")
   if (hasAddon(config, "effect-style")) {
     scripts["lint"] = "oxlint -c .oxlintrc.json -f unix apps packages && dprint check"
     scripts["lint-fix"] = "oxlint -c .oxlintrc.json --fix apps packages && dprint fmt"
   }
   const check = [
-    ...(hasAddon(config, "effect-style") ? ["bun run lint"] : []),
-    "bun run check-types",
-    "bun run test"
+    ...(hasAddon(config, "effect-style") ? [pm.run("lint")] : []),
+    pm.run("check-types"),
+    pm.run("test")
   ]
   scripts["check"] = check.join(" && ")
   if (
@@ -99,7 +104,15 @@ export const processPackageConfigs = (vfs: VirtualFsService, config: ProjectConf
   }
   root["name"] = config.projectName
   root["scripts"] = rootScripts(vfs, config)
-  if (config.packageManager === "bun") root["packageManager"] = BUN_PACKAGE_MANAGER_PIN
+  // Bun keeps a concrete pin. npm/pnpm use `@latest` here; the CLI overwrites with the
+  // detected PATH version after writeTree (turbo requires a packageManager field).
+  root["packageManager"] = config.packageManager === "bun"
+    ? BUN_PACKAGE_MANAGER_PIN
+    : `${config.packageManager}@latest`
+  if (config.packageManager === "npm") {
+    const allowScripts = getAllowedDependencyScripts(config)
+    if (allowScripts.length > 0) root["allowScripts"] = [...allowScripts]
+  }
   vfs.writeJson(rootPath, root)
 
   for (const [directory, name] of WORKSPACE_PACKAGES) {

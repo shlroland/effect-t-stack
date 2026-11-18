@@ -2,7 +2,11 @@ import { Todo, type TodoId, type TodoTitle } from "@{{projectName}}/domain"
 import { eq } from "drizzle-orm"
 import { Context, Effect, Layer, Record, Schema } from "effect"
 import { Database, mapDatabaseError } from "./Database.ts"
+{{#if (eq database "postgres")}}
 import { DatabaseError, TodoDecodeError, type TodosRepositoryError } from "./errors.ts"
+{{else}}
+import { type DatabaseError, TodoDecodeError, type TodosRepositoryError } from "./errors.ts"
+{{/if}}
 import { todos } from "./schema.ts"
 
 export { TodoDecodeError }

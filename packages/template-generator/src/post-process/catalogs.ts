@@ -1,6 +1,7 @@
 import type { VirtualFsService } from "../core/virtual-fs.ts"
 import { GeneratorError, type ProjectConfig } from "../types.ts"
 import { asStringRecord, sortStringRecord } from "../utils/add-deps.ts"
+import { getAllowedDependencyScripts } from "../utils/dependency-scripts.ts"
 
 type PackageJson = Record<string, unknown>
 
@@ -101,6 +102,13 @@ export const processCatalogs = (vfs: VirtualFsService, config: ProjectConfig): v
       lines.push("catalog:")
       for (const [name, version] of Object.entries(sorted)) {
         lines.push(`  ${JSON.stringify(name)}: ${JSON.stringify(version)}`)
+      }
+    }
+    const allowBuilds = getAllowedDependencyScripts(config)
+    if (allowBuilds.length > 0) {
+      lines.push("allowBuilds:")
+      for (const name of allowBuilds) {
+        lines.push(`  ${JSON.stringify(name)}: true`)
       }
     }
     vfs.writeFile("pnpm-workspace.yaml", `${lines.join("\n")}\n`)

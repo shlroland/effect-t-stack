@@ -6,8 +6,10 @@
   };
 
   outputs = {nixpkgs, ...}: let
+    # nixpkgs flakeExposed dropped x86_64-darwin; keep Intel Macs working.
+    systems = nixpkgs.lib.unique (nixpkgs.lib.systems.flakeExposed ++ ["x86_64-darwin"]);
     forAllSystems = function:
-      nixpkgs.lib.genAttrs nixpkgs.lib.systems.flakeExposed (
+      nixpkgs.lib.genAttrs systems (
         system: function nixpkgs.legacyPackages.${system}
       );
   in {
@@ -30,7 +32,7 @@
           echo "{{projectName}} flake shell"
           echo "  bun:  $(bun --version 2>/dev/null || echo missing)"
           echo "  node: $(node --version 2>/dev/null || echo missing)"
-          echo "  Next: bun install && bun run dev"
+          echo "  Next: {{pm.install}} && {{pm.name}} run dev"
         '';
       };
     });

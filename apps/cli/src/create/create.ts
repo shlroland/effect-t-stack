@@ -137,7 +137,7 @@ const finishWrite = (state: CreatePlanned) =>
         written,
         written.phases,
         false,
-        `Done. Next: cd ${written.targetDir} && bun run dev`
+        `Done. Next: cd ${written.targetDir} && ${written.options.packageManager} run dev`
       )
     )
   )

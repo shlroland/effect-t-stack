@@ -1,5 +1,6 @@
 import type { VirtualFsService } from "./core/virtual-fs.ts"
 import type { ProjectConfig } from "./types.ts"
+import { getPackageManagerConfig } from "./utils/package-manager.ts"
 import { reproducibleCommand } from "./utils/reproducible-command.ts"
 
 export const ETS_SCHEMA_URL =
@@ -182,7 +183,10 @@ export const writeEtsConfig = (vfs: VirtualFsService, config: ProjectConfig, ver
         scripts: ["lint", "lint-fix"],
         checkIncludesLint: true,
         preCommit: { tool: "lefthook", config: "lefthook.yml" },
-        ci: { workflow: ".github/workflows/check.yml", command: "bun run check" },
+        ci: {
+          workflow: ".github/workflows/check.yml",
+          command: getPackageManagerConfig(config.packageManager).run("check")
+        },
         prepare: "effect-language-service patch && lefthook install",
         catalog: "docs/DEPENDENCY-CATALOG.md"
       },
@@ -241,7 +245,7 @@ export const writeEtsConfig = (vfs: VirtualFsService, config: ProjectConfig, ver
           enabled: false,
           package: "effect-solutions",
           authority: "secondary",
-          cli: "bunx effect-solutions@latest",
+          cli: `${getPackageManagerConfig(config.packageManager).dlx} effect-solutions@latest`,
           note: "Enable for scenario patterns only; AGENTS.md + repos/effect win on conflict."
         }
       }
