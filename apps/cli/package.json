@@ -38,6 +38,9 @@
     "src",
     "templates"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "start": "bun run src/bin.ts",
     "pack:generator": "bun run scripts/pack-generator.ts",

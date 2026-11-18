@@ -1,0 +1,79 @@
+name: publish
+
+# Publishes create-effect-t-stack to npm via OIDC trusted publishing.
+# First version must be published manually (trusted publisher needs an existing package).
+# Afterwards: bump apps/cli version → commit → tag vX.Y.Z → push tag.
+#
+# npm Trusted Publisher (after first manual publish):
+#   Package → Settings → Trusted Publisher → GitHub Actions
+#   Owner: shlroland  Repo: effect-t-stack  Workflow: publish.yml
+#   Allow: npm publish (and optionally npm dist-tag)
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Run check + pack only; do not npm publish"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.4"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+          package-manager-cache: false
+
+      - name: Upgrade npm for OIDC trusted publishing
+        run: npm install -g npm@latest
+
+      - name: Install Scaffold Product
+        run: bun install --frozen-lockfile
+
+      - name: Check CLI + template-generator
+        run: bun run check
+
+      - name: Verify tag matches apps/cli package.json version
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME#v}"
+          PKG="$(node -p "require('./apps/cli/package.json').version")"
+          if [ "$TAG" != "$PKG" ]; then
+            echo "Tag v${TAG} does not match apps/cli version ${PKG}"
+            exit 1
+          fi
+          echo "Publishing create-effect-t-stack@${PKG}"
+
+      - name: Pack (prepack embeds template-generator)
+        run: bun run pack:cli
+
+      - name: Publish to npm
+        if: >-
+          startsWith(github.ref, 'refs/tags/v') ||
+          (github.event_name == 'workflow_dispatch' && inputs.dry_run == 'false')
+        working-directory: apps/cli
+        run: npm publish --access public
+        # No NODE_AUTH_TOKEN: OIDC trusted publishing authenticates.
+        # Provenance is generated automatically for public repos + trusted publish.

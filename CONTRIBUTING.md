@@ -52,7 +52,7 @@ bun run check
 
 ## Publishing the CLI
 
-See [`apps/cli/README.md`](./apps/cli/README.md). `prepack` embeds `packages/template-generator` into `apps/cli/templates/template-generator` (gitignored).
+See [`apps/cli/README.md`](./apps/cli/README.md) **Publish**. First cut is **manual** `npm publish`; later cuts are tag-driven CI (`.github/workflows/publish.yml` + npm Trusted Publisher / OIDC). `prepack` embeds `packages/template-generator` into `apps/cli/templates/template-generator` (gitignored).
 
 ## Style
 

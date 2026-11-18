@@ -60,13 +60,44 @@ Needs a full Bun workspace install. In Cursor, run this **outside the sandbox** 
 
 ## Publish (maintainers)
 
-From the repo root:
+`prepack` runs `pack:generator`: it prebuilds templates and copies `packages/template-generator` into `templates/template-generator` (gitignored). The packed CLI loads that copy when the workspace package is not installed.
+
+### 1. First publish (manual — required once)
+
+npm **Trusted Publishing** can only be configured after the package exists on the registry. Do the first cut locally:
 
 ```sh
 bun install
-bun run --filter=create-effect-t-stack pack:generator
-cd apps/cli && bun pm pack   # inspect tarball
-npm publish --access public  # requires npm auth; bumps version first
+bun run --filter=create-effect-t-stack check
+bun run pack:cli                 # inspect the tarball
+cd apps/cli
+# ensure "version" in package.json is what you want (e.g. 0.1.0)
+npm login
+npm publish --access public
 ```
 
-`prepack` runs `pack:generator`: it prebuilds templates and copies `packages/template-generator` into `templates/template-generator` (gitignored). The packed CLI loads that copy when the workspace package is not installed.
+Then on [npmjs.com → create-effect-t-stack → Settings → Trusted Publisher](https://www.npmjs.com/package/create-effect-t-stack):
+
+| Field                | Value                         |
+| -------------------- | ----------------------------- |
+| Provider             | GitHub Actions                |
+| Organization or user | `shlroland`                   |
+| Repository           | `effect-t-stack`              |
+| Workflow filename    | `publish.yml` (filename only) |
+| Allowed actions      | allow **npm publish**         |
+
+Complete the **first OIDC publish within 2 days** of saving that config (npm expires unused trusted-publisher rows). Prefer bumping to `0.1.1` (or next), tagging, and letting CI publish — do not re-publish the same version.
+
+### 2. Later publishes (GitHub Actions)
+
+Workflow: [`.github/workflows/publish.yml`](../../.github/workflows/publish.yml). Trigger: push tag `v*` whose name matches `apps/cli/package.json` `version` (e.g. tag `v0.1.1` ↔ `"version": "0.1.1"`).
+
+```sh
+# on main, after bumping apps/cli/package.json "version"
+git add apps/cli/package.json
+git commit -m "chore(cli): release v0.1.1"
+git tag v0.1.1
+git push origin main --tags
+```
+
+CI runs `bun run check`, packs via `prepack`, then `npm publish --access public` with OIDC (no `NPM_TOKEN`). Optional dry-run: Actions → **publish** → Run workflow → keep `dry_run` checked.
