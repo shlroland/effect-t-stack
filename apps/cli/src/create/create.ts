@@ -50,13 +50,16 @@ const prepare = (options: CreateOptions) =>
   printTitle(options).pipe(
     Effect.andThen(validateCreateOptions(options)),
     Effect.andThen(resolveCreateContext(options)),
-    Effect.tap((ctx) => confirmCreate(options, ctx.scope)),
-    Effect.map((ctx): CreatePrepared => ({
-      options,
-      phases: [],
-      cwd: ctx.cwd,
-      scope: ctx.scope
-    }))
+    Effect.flatMap((ctx) =>
+      confirmCreate(options, ctx.scope).pipe(
+        Effect.map((scope): CreatePrepared => ({
+          options,
+          phases: [],
+          cwd: ctx.cwd,
+          scope
+        }))
+      )
+    )
   )
 
 const planProject = (prepared: CreatePrepared) =>
