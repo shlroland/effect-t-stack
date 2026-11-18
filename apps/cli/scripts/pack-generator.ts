@@ -53,8 +53,16 @@ const main = async () => {
   await run("bun", ["run", "prebuild"], sourceRoot)
   await rm(destRoot, { recursive: true, force: true })
   await mkdir(destRoot, { recursive: true })
-  for (const name of ["package.json", "README.md", "src", "templates"]) {
-    await cp(join(sourceRoot, name), join(destRoot, name), { recursive: true })
+  for (const name of ["package.json", "README.md", "src", "templates", "templates-binary"]) {
+    const from = join(sourceRoot, name)
+    try {
+      await cp(from, join(destRoot, name), { recursive: true })
+    } catch (error) {
+      if (name === "templates-binary" && (error as NodeJS.ErrnoException).code === "ENOENT") {
+        continue
+      }
+      throw error
+    }
   }
   await rewriteEmbeddedPackageJson()
   console.log(`Packed template-generator → ${relative(repoRoot, destRoot)}`)

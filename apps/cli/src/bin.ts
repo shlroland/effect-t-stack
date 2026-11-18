@@ -1,7 +1,8 @@
-#!/usr/bin/env bun
 /**
- * CLI entry. Published installs go through `bin/create-effect-t-stack.mjs`, which
- * re-execs this file with Bun. Local Scaffold Product checkouts also run under Bun.
+ * CLI entry (TypeScript source). Published installs run the `dist/bin.js` Node
+ * bundle (shebang injected by `scripts/build-publish.ts`) via
+ * `bin/create-effect-t-stack.mjs`. Local Scaffold Product checkouts use
+ * `bun run src/bin.ts`.
  * D1=b: Bun process → BunServices; otherwise NodeServices.
  */
 import * as Command from "effect/cli/Command"

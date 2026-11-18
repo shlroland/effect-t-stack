@@ -4,25 +4,25 @@ Scaffold an Effect **v4** app by generating it from `packages/template-generator
 
 ## Requirements
 
-- **Bun ≥ 1.4.4** required for the published CLI (`bunx` / `npx` wrapper re-execs with Bun for the TypeScript entry)
-- **Node ≥ 24** (Active LTS) accepted by `engines`; local Scaffold Product development still uses Bun (D3). `bin.ts` uses BunServices when `globalThis.Bun` is set, otherwise NodeServices
+- **Node ≥ 24** (Active LTS) for the published CLI (`npx` / `pnpm dlx` / `bunx`) — `prepack` emits a Node ESM bundle under `dist/`
+- **Bun ≥ 1.4.4** for Scaffold Product development (D3). `bin.ts` uses BunServices when `globalThis.Bun` is set, otherwise NodeServices
 - Default generate includes addon `flake` (`flake.nix` for `nix develop`)
 
 ## Source layout
 
-| Path                                                 | Role                                                                     |
-| ---------------------------------------------------- | ------------------------------------------------------------------------ |
-| `src/bin.ts` · `src/Cli.ts` · `src/normalizeArgv.ts` | Entrypoint / root command / bare-argv UX                                 |
-| `src/create/`                                        | `create` pipeline, flags, generator load, PM version stamp               |
-| `src/add/`                                           | `add` addon + `--package`                                                |
-| `src/agent/`                                         | `create-json` / `add-json` / `schema` / `history`                        |
-| `src/compatibility/`                                 | Illegal-combo engine + catalog (L2+)                                     |
-| `src/fingerprint/`                                   | `ets.jsonc` parse/stamp/history helpers                                  |
-| `src/template/`                                      | Denylist, paths, rename, project name                                    |
-| `src/shared/`                                        | Shared tagged errors                                                     |
-| `test/`                                              | **All** CLI tests (`bun test test`) — never put `*.test.ts` under `src/` |
-| `schemas/`                                           | Fingerprint JSON Schema                                                  |
-| `scripts/`                                           | `pack:generator` (prepack), layout asserts                               |
+| Path                                                 | Role                                                                       |
+| ---------------------------------------------------- | -------------------------------------------------------------------------- |
+| `src/bin.ts` · `src/Cli.ts` · `src/normalizeArgv.ts` | Entrypoint / root command / bare-argv UX                                   |
+| `src/create/`                                        | `create` pipeline, flags, generator load, PM version stamp                 |
+| `src/add/`                                           | `add` addon + `--package`                                                  |
+| `src/agent/`                                         | `create-json` / `add-json` / `schema` / `history`                          |
+| `src/compatibility/`                                 | Illegal-combo engine + catalog (L2+)                                       |
+| `src/fingerprint/`                                   | `ets.jsonc` parse/stamp/history helpers                                    |
+| `src/template/`                                      | Denylist, paths, rename, project name                                      |
+| `src/shared/`                                        | Shared tagged errors                                                       |
+| `test/`                                              | **All** CLI tests (`bun test ./test`) — never put `*.test.ts` under `src/` |
+| `schemas/`                                           | Fingerprint JSON Schema                                                    |
+| `scripts/`                                           | `pack:generator` (prepack), layout asserts                                 |
 
 `check` runs `assert:test-layout` so `src/**/*.test.ts` fails the build.
 

@@ -1,7 +1,8 @@
 import * as Effect from "effect/Effect"
 import * as FileSystem from "effect/FileSystem"
-import * as Path from "effect/Path"
 import * as Schema from "effect/Schema"
+import { join } from "node:path"
+import { cliPackageRoot } from "../packageRoot.ts"
 import { CreateError } from "../shared/CreateError.ts"
 
 const PackageJsonVersion = Schema.Struct({
@@ -12,13 +13,10 @@ const PackageJsonVersionFromJsonString = Schema.fromJsonString(PackageJsonVersio
 
 const causeMessage = (error: unknown): string => error instanceof Error ? error.message : String(error)
 
-/** CLI package version from `apps/cli/package.json` (FileSystem + Path). */
+/** CLI package version from `apps/cli/package.json` (via `cliPackageRoot` — works for src and dist). */
 export const cliVersion = Effect.fn("cliVersion")(function*() {
   const fs = yield* FileSystem.FileSystem
-  const path = yield* Path.Path
-  const pkgPath = yield* path.fromFileUrl(new URL("../../package.json", import.meta.url)).pipe(
-    Effect.mapError((error) => new CreateError({ message: `CLI package.json path: ${causeMessage(error)}` }))
-  )
+  const pkgPath = join(cliPackageRoot, "package.json")
   const raw = yield* fs.readFileString(pkgPath).pipe(
     Effect.mapError((error) => new CreateError({ message: `Failed to read CLI package.json: ${causeMessage(error)}` }))
   )

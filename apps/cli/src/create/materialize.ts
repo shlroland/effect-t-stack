@@ -1,12 +1,21 @@
 import type { VirtualFileTree } from "@effect-t-stack/template-generator"
 import * as Console from "effect/Console"
 import * as Effect from "effect/Effect"
+import { existsSync } from "node:fs"
+import { join } from "node:path"
+import { cliPackageRoot } from "../packageRoot.ts"
 import { CreateError } from "../shared/CreateError.ts"
 import type { CreateOptions } from "./CreateOptions.ts"
 import { loadWriter } from "./loadGenerator.ts"
 import { emitPackageManagerArtifacts, installCommand } from "./packageManagers.ts"
 import { runCommand } from "./runCommand.ts"
 import { stampManualDb } from "./stampManualDb.ts"
+
+const resolveBinaryRoot = (): string => {
+  const packed = join(cliPackageRoot, "templates/template-generator/templates-binary")
+  if (existsSync(packed)) return packed
+  return join(cliPackageRoot, "../packages/template-generator/templates-binary")
+}
 
 export type MaterializeInput = {
   readonly options: CreateOptions
@@ -25,7 +34,7 @@ const withPhase = <S extends { readonly phases: ReadonlyArray<string> }>(
 
 const write = (state: MaterializeInput) =>
   loadWriter.pipe(
-    Effect.flatMap((writer) => writer.writeTree(state.tree, state.targetDir)),
+    Effect.flatMap((writer) => writer.writeTree(state.tree, state.targetDir, { binaryRoot: resolveBinaryRoot() })),
     Effect.mapError((error) =>
       new CreateError({
         message: error._tag === "GeneratorError"

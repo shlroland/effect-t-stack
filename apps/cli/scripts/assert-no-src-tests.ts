@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 /**
- * Mechanical guard: CLI tests must live under test/ (bun test test).
+ * Mechanical guard: CLI tests must live under test/ (`bun test ./test`).
  * Any *.test.ts under src/ is invisible to `check` and must fail the build.
  */
 import { Glob } from "bun"
