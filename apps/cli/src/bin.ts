@@ -1,8 +1,8 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 /**
- * Published entry for `npx` / `pnpm dlx` / `bunx`.
+ * CLI entry. Published installs go through `bin/create-effect-t-stack.mjs`, which
+ * re-execs this file with Bun. Local Scaffold Product checkouts also run under Bun.
  * D1=b: Bun process → BunServices; otherwise NodeServices.
- * Scaffold Product local checkouts still develop/test under Bun (D3).
  */
 import * as Command from "effect/cli/Command"
 import * as Effect from "effect/Effect"

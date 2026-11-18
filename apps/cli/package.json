@@ -1,6 +1,6 @@
 {
   "name": "create-effect-t-stack",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Scaffold an Effect v4 full-stack app from effect-t-stack templates",
   "type": "module",
   "license": "MIT",

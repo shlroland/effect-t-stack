@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 /**
- * Published bin entry. npm rejects `.ts` bin paths; Node also refuses type-stripping
- * under `node_modules`. Prefer Bun for the TypeScript CLI entry; fall back to Node
- * only when Bun is unavailable (Node 24+ may still fail on node_modules .ts).
+ * Published bin entry. npm rejects `.ts` bin paths, and Node refuses type-stripping
+ * under `node_modules`, so this wrapper always re-execs the TypeScript CLI with Bun.
  */
 import { spawnSync } from "node:child_process"
 import { dirname, join } from "node:path"
@@ -20,16 +19,9 @@ if (bun.error == null && bun.status != null) {
   process.exit(bun.status)
 }
 
-const node = spawnSync(process.execPath, ["--experimental-strip-types", entry, ...args], {
-  stdio: "inherit",
-  env: process.env
-})
-
-if (node.error == null && node.status != null) {
-  process.exit(node.status)
-}
-
+const detail = bun.error?.message ?? `status=${String(bun.status)}`
 console.error(
-  "create-effect-t-stack: could not start CLI. Install Bun (https://bun.sh) and retry, or use Node ≥ 24 with Bun on PATH."
+  `create-effect-t-stack: Bun is required to run the published CLI (https://bun.sh).\n` +
+    `Could not exec \`bun\`: ${detail}`
 )
 process.exit(1)
