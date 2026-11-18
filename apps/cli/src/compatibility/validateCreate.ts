@@ -3,6 +3,7 @@ import type { CreateOptions } from "../create/CreateOptions.ts"
 import { CreateError } from "../shared/CreateError.ts"
 import {
   CREATE_APIS,
+  CREATE_AUTHS,
   CREATE_DATABASES,
   CREATE_DIRECTORY_CONFLICTS,
   CREATE_PACKAGE_MANAGERS,
@@ -22,6 +23,9 @@ const validateCreateEnums = (options: CreateOptions): Effect.Effect<void, Create
   }
   if (!isOneOf(options.database, CREATE_DATABASES)) {
     return Effect.fail(new CreateError({ message: ruleMessage("create.enums.database") }))
+  }
+  if (!isOneOf(options.auth, CREATE_AUTHS)) {
+    return Effect.fail(new CreateError({ message: ruleMessage("create.enums.auth") }))
   }
   if (!isOneOf(options.directoryConflict, CREATE_DIRECTORY_CONFLICTS)) {
     return Effect.fail(new CreateError({ message: ruleMessage("create.enums.directoryConflict") }))

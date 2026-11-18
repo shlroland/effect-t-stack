@@ -1,0 +1,10 @@
+import { CurrentUser, Unauthorized } from "@{{projectName}}/domain"
+import * as RpcMiddleware from "effect/rpc/RpcMiddleware"
+
+/** Rpc session gate: {@link CurrentUser} from Better Auth `getSession` (implemented in `@auth`). */
+export class AuthMiddleware extends RpcMiddleware.Service<AuthMiddleware, {
+  provides: CurrentUser
+}>()("AuthMiddleware", {
+  error: Unauthorized,
+  requiredForClient: false
+}) {}

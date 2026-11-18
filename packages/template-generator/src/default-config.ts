@@ -95,7 +95,7 @@ const STACK_CHECKS: ReadonlyArray<StackCheck> = [
   requireOneOf("api", ["rpc", "httpapi"]),
   requireOneOf("database", ["sqlite", "postgres"]),
   requireEq("orm", "drizzle"),
-  requireEq("auth", "none"),
+  requireOneOf("auth", ["none", "better-auth"]),
   requireEq("backend", "self"),
   requireEq("dbSetup", "none"),
   requireEq("webDeploy", "none"),
@@ -107,8 +107,8 @@ const STACK_CHECKS: ReadonlyArray<StackCheck> = [
 ]
 
 const unsupportedPreamble = "This generator currently emits the Golden default cell family only " +
-  "(api ∈ {rpc, httpapi}, database ∈ {sqlite, postgres}, Bun, Drizzle, auth none, TanStack Start, " +
-  "effect-style on, todo). Unsupported: "
+  "(api ∈ {rpc, httpapi}, database ∈ {sqlite, postgres}, Bun, Drizzle, auth ∈ {none, better-auth}, " +
+  "TanStack Start, effect-style on, todo). Unsupported: "
 
 /**
  * Default cell family: api + database variants. Other Option Matrix cells

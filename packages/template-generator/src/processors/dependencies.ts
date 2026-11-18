@@ -11,12 +11,14 @@ const workspaceProtocol = (config: ProjectConfig): string => config.packageManag
 const linkWorkspacePackages = (vfs: VirtualFsService, config: ProjectConfig): void => {
   const protocol = workspaceProtocol(config)
   const scope = config.projectName
+  const authLinks = config.auth === "better-auth" ? ["auth"] as const : []
   const links: Readonly<Record<string, ReadonlyArray<string>>> = {
     "packages/protocol": ["domain"],
     "packages/db": ["config", "domain"],
     "packages/client": ["protocol"],
-    "apps/server": ["config", "db", "domain", "protocol"],
-    "apps/web": ["client", "config", "domain", "protocol", "server"]
+    "packages/auth": ["config", "domain", "protocol"],
+    "apps/server": ["config", "db", "domain", "protocol", ...authLinks],
+    "apps/web": ["client", "config", "domain", "protocol", "server", ...authLinks]
   }
   for (const [directory, names] of Object.entries(links)) {
     const path = packageJsonPath(directory)
@@ -113,6 +115,19 @@ export const processDependencies = (vfs: VirtualFsService, config: ProjectConfig
     })
   }
 
+  if (vfs.fileExists("packages/auth/package.json")) {
+    const dependencies = ["@better-auth/drizzle-adapter", "better-auth", "drizzle-orm", "effect"]
+    if (config.database === "postgres") {
+      dependencies.push("postgres")
+    }
+    addPackageDependency({
+      vfs,
+      packagePath: "packages/auth",
+      dependencies,
+      devDependencies: ["@types/bun", "@types/node", "typescript"]
+    })
+  }
+
   if (vfs.fileExists("apps/server/package.json")) {
     const dependencies = ["effect"]
     if (config.runtime === "bun") dependencies.unshift("@effect/platform-bun")
@@ -134,18 +149,22 @@ export const processDependencies = (vfs: VirtualFsService, config: ProjectConfig
   }
 
   if (hasFrontend(config, "tanstack-start") && vfs.fileExists("apps/web/package.json")) {
+    const webDependencies = [
+      "@effect/atom-react",
+      "@tanstack/react-router",
+      "@tanstack/react-start",
+      "effect",
+      "react",
+      "react-dom",
+      "scheduler"
+    ]
+    if (config.auth === "better-auth") {
+      webDependencies.push("better-auth")
+    }
     addPackageDependency({
       vfs,
       packagePath: "apps/web",
-      dependencies: [
-        "@effect/atom-react",
-        "@tanstack/react-router",
-        "@tanstack/react-start",
-        "effect",
-        "react",
-        "react-dom",
-        "scheduler"
-      ],
+      dependencies: webDependencies,
       devDependencies: [
         "@types/bun",
         "@types/node",

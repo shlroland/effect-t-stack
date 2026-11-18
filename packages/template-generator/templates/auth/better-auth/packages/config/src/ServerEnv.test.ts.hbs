@@ -1,0 +1,108 @@
+import { describe, expect, it } from "bun:test"
+import { Effect } from "effect"
+import { mkdtempSync, writeFileSync } from "node:fs"
+import { tmpdir } from "node:os"
+import { join } from "node:path"
+import { loadServerEnv, makeServerEnvProvider, serverEnvConfig, ServerEnvDefaults } from "./ServerEnv.ts"
+
+describe("ServerEnv", () => {
+  it("uses defaults when env and file are empty", () => {
+    const env = loadServerEnv({ env: {}, envFile: false })
+    expect(env).toEqual({
+      DATABASE_URL: ServerEnvDefaults.DATABASE_URL,
+      PORT: 3737,
+      CORS_ORIGINS: [...ServerEnvDefaults.CORS_ORIGINS],
+      AUTH_SECRET: ServerEnvDefaults.AUTH_SECRET,
+      BETTER_AUTH_URL: ServerEnvDefaults.BETTER_AUTH_URL
+    })
+  })
+
+  it("prefers process env over .env file", () => {
+    const dir = mkdtempSync(join(tmpdir(), "ets-config-"))
+    const envFile = join(dir, ".env")
+    writeFileSync(
+      envFile,
+      "DATABASE_URL=./from-file.db\nPORT=1111\nCORS_ORIGINS=http://file.example\nAUTH_SECRET=file-secret-32-characters-minimum!!\nBETTER_AUTH_URL=http://file.example\n"
+    )
+
+    const env = loadServerEnv({
+      envFile,
+      env: {
+        DATABASE_URL: "./from-env.db",
+        PORT: "2222",
+        CORS_ORIGINS: "http://env.example,http://env2.example",
+        AUTH_SECRET: "env-secret-32-characters-minimum!!!!",
+        BETTER_AUTH_URL: "http://env.example"
+      }
+    })
+
+    expect(env).toEqual({
+      DATABASE_URL: "./from-env.db",
+      PORT: 2222,
+      CORS_ORIGINS: ["http://env.example", "http://env2.example"],
+      AUTH_SECRET: "env-secret-32-characters-minimum!!!!",
+      BETTER_AUTH_URL: "http://env.example"
+    })
+  })
+
+  it("fills gaps from .env when process env is missing keys", () => {
+    const dir = mkdtempSync(join(tmpdir(), "ets-config-"))
+    const envFile = join(dir, ".env")
+    writeFileSync(
+      envFile,
+      "DATABASE_URL=./from-file.db\nPORT=4444\nCORS_ORIGINS=http://file.example\nAUTH_SECRET=file-secret-32-characters-minimum!!\nBETTER_AUTH_URL=http://file.example\n"
+    )
+
+    const env = loadServerEnv({
+      envFile,
+      env: {}
+    })
+
+    expect(env).toEqual({
+      DATABASE_URL: "./from-file.db",
+      PORT: 4444,
+      CORS_ORIGINS: ["http://file.example"],
+      AUTH_SECRET: "file-secret-32-characters-minimum!!",
+      BETTER_AUTH_URL: "http://file.example"
+    })
+  })
+
+  it("ignores a missing .env file", () => {
+    const env = loadServerEnv({
+      env: { PORT: "5555" },
+      envFile: join(tmpdir(), "ets-config-missing-.env")
+    })
+
+    expect(env).toEqual({
+      DATABASE_URL: "./data.db",
+      PORT: 5555,
+      CORS_ORIGINS: [...ServerEnvDefaults.CORS_ORIGINS],
+      AUTH_SECRET: ServerEnvDefaults.AUTH_SECRET,
+      BETTER_AUTH_URL: ServerEnvDefaults.BETTER_AUTH_URL
+    })
+  })
+
+  it("parses camelCase via serverEnvConfig", () => {
+    const values = Effect.runSync(
+      serverEnvConfig.parse(
+        makeServerEnvProvider({
+          env: {
+            DATABASE_URL: "./x.db",
+            PORT: "8080",
+            CORS_ORIGINS: "http://a.test",
+            AUTH_SECRET: "x".repeat(32),
+            BETTER_AUTH_URL: "http://a.test"
+          },
+          envFile: false
+        })
+      )
+    )
+    expect(values).toEqual({
+      databaseUrl: "./x.db",
+      port: 8080,
+      corsOrigins: ["http://a.test"],
+      authSecret: "x".repeat(32),
+      betterAuthUrl: "http://a.test"
+    })
+  })
+})

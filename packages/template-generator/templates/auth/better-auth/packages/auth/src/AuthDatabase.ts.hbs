@@ -1,0 +1,27 @@
+{{#if (eq database "postgres")}}
+import { drizzle } from "drizzle-orm/postgres-js"
+import postgres from "postgres"
+/**
+ * Classic Drizzle client for Better Auth (not Effect SQL).
+ * Shares `DATABASE_URL` with the todos DB file / Postgres instance.
+ */
+export const createAuthDatabase = (databaseUrl: string) => {
+  const client = postgres(databaseUrl)
+  return drizzle({ client })
+}
+
+export type AuthDatabase = ReturnType<typeof createAuthDatabase>
+{{else}}
+import { Database } from "bun:sqlite"
+import { drizzle } from "drizzle-orm/bun-sqlite"
+/**
+ * Classic Bun SQLite Drizzle client for Better Auth (not Effect SQL).
+ * Shares `DATABASE_URL` with the todos SQLite file.
+ */
+export const createAuthDatabase = (databaseUrl: string) => {
+  const client = new Database(databaseUrl)
+  return drizzle({ client })
+}
+
+export type AuthDatabase = ReturnType<typeof createAuthDatabase>
+{{/if}}

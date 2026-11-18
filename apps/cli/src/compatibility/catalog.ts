@@ -5,9 +5,21 @@
  * agents do not invent them as active create/add behavior.
  */
 
-import { CREATE_APIS, CREATE_DATABASES, CREATE_DIRECTORY_CONFLICTS, CREATE_PACKAGE_MANAGERS } from "../shared/enums.ts"
+import {
+  CREATE_APIS,
+  CREATE_AUTHS,
+  CREATE_DATABASES,
+  CREATE_DIRECTORY_CONFLICTS,
+  CREATE_PACKAGE_MANAGERS
+} from "../shared/enums.ts"
 
-export { CREATE_APIS, CREATE_DATABASES, CREATE_DIRECTORY_CONFLICTS, CREATE_PACKAGE_MANAGERS } from "../shared/enums.ts"
+export {
+  CREATE_APIS,
+  CREATE_AUTHS,
+  CREATE_DATABASES,
+  CREATE_DIRECTORY_CONFLICTS,
+  CREATE_PACKAGE_MANAGERS
+} from "../shared/enums.ts"
 
 export type ValidationStage = "enums" | "combinations" | "authAddons" | "examples"
 
@@ -56,6 +68,13 @@ export const COMPATIBILITY_RULES: ReadonlyArray<CompatibilityRule> = [
     message: `Invalid directoryConflict. Allowed: ${CREATE_DIRECTORY_CONFLICTS.join(", ")}.`
   },
   {
+    id: "create.enums.auth",
+    stage: "enums",
+    status: "active",
+    summary: "auth ∈ {none, better-auth}",
+    message: `Invalid auth. Allowed: ${CREATE_AUTHS.join(", ")}.`
+  },
+  {
     id: "create.combinations.database.none+drizzle",
     stage: "combinations",
     status: "deferred",
@@ -74,7 +93,7 @@ export const COMPATIBILITY_RULES: ReadonlyArray<CompatibilityRule> = [
     stage: "authAddons",
     status: "deferred",
     summary: "No backend / no DB ⇒ force auth=none",
-    message: "Deferred to L3 auth × backend × database matrix."
+    message: "Deferred until backend/database=none dims are exposed (ADR-0008)."
   },
   {
     id: "create.auth.payments.requires-better-auth",

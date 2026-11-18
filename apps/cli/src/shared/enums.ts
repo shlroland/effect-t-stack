@@ -13,6 +13,11 @@ export const DatabaseSchema = Schema.Literals(["sqlite", "postgres"])
 export type Database = typeof DatabaseSchema.Type
 export const CREATE_DATABASES = DatabaseSchema.literals
 
+/** MVP auth surface — clerk stays generator-only until a later cell (ADR-0008). */
+export const AuthSchema = Schema.Literals(["none", "better-auth"])
+export type Auth = typeof AuthSchema.Type
+export const CREATE_AUTHS = AuthSchema.literals
+
 export const DirectoryConflictSchema = Schema.Literals([
   "error",
   "overwrite",

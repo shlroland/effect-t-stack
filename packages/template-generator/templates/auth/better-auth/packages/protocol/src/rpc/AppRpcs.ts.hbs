@@ -1,0 +1,52 @@
+import { Todo, TodoId, TodoNotFound, TodoTitle, Unauthorized } from "@{{projectName}}/domain"
+import { AuthMiddleware } from "./AuthMiddleware.ts"
+import { Schema } from "effect"
+import { Rpc, RpcGroup } from "effect/rpc"
+import { HealthResponse, ReadyResponse } from "../Health.ts"
+
+/**
+ * Mount path for Effect Rpc (HTTP + NDJSON).
+ * Distinct from HttpApi {@link ApiPrefix} (`/api`).
+ */
+export const RpcPrefix = "/rpc" as const
+
+/**
+ * Primary API surface (`api=rpc`) built with Effect `Rpc` / `RpcGroup`.
+ * Todo procedures require a session via {@link AuthMiddleware}; Health/Ready stay public.
+ */
+export const AppRpcs = RpcGroup.make(
+  Rpc.make("Health", {
+    success: HealthResponse
+  }),
+  Rpc.make("Ready", {
+    success: ReadyResponse
+  }),
+  Rpc.make("ListTodos", {
+    success: Schema.Array(Todo)
+  }).middleware(AuthMiddleware),
+  Rpc.make("CreateTodo", {
+    payload: { title: TodoTitle },
+    success: Todo
+  }).middleware(AuthMiddleware),
+  Rpc.make("GetTodo", {
+    payload: { id: TodoId },
+    success: Todo,
+    error: TodoNotFound
+  }).middleware(AuthMiddleware),
+  Rpc.make("UpdateTodo", {
+    payload: {
+      id: TodoId,
+      title: Schema.optional(TodoTitle),
+      completed: Schema.optional(Schema.Boolean)
+    },
+    success: Todo,
+    error: TodoNotFound
+  }).middleware(AuthMiddleware),
+  Rpc.make("RemoveTodo", {
+    payload: { id: TodoId },
+    success: Schema.Void,
+    error: TodoNotFound
+  }).middleware(AuthMiddleware)
+)
+
+export type AppRpcsErrors = TodoNotFound | Unauthorized

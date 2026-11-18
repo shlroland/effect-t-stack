@@ -1,0 +1,23 @@
+import { loadServerEnv, type MakeServerEnvProviderOptions } from "@{{projectName}}/config"
+import { createAuth, type Auth } from "./createAuth.ts"
+
+export const AuthApiPrefix = "/api/auth" as const
+
+export const isAuthRequestPath = (pathname: string): boolean =>
+  pathname === AuthApiPrefix || pathname.startsWith(`${AuthApiPrefix}/`)
+
+export type AuthWebHandler = {
+  readonly handler: (request: globalThis.Request) => globalThis.Response | Promise<globalThis.Response>
+  readonly auth: Auth
+}
+
+export const createAuthWebHandler = (options?: MakeServerEnvProviderOptions): AuthWebHandler => {
+  const env = loadServerEnv(options)
+  const auth = createAuth({
+    databaseUrl: env.DATABASE_URL,
+    secret: env.AUTH_SECRET,
+    baseURL: env.BETTER_AUTH_URL,
+    trustedOrigins: env.CORS_ORIGINS
+  })
+  return { handler: auth.handler, auth }
+}

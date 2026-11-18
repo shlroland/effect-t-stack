@@ -8,21 +8,21 @@ Always apply stages in this order:
 
 1. **enums** — values must be in the declared literal sets (`packageManager`, `api`, `directoryConflict`, …). CLI `Flag.Literals` enforces most of this at parse time; `create-json` still runs the same stage.
 2. **combinations** — Option Matrix cell rules (e.g. future `database=none`+`drizzle`; `api ∈ {rpc, httpapi}` and `database ∈ {sqlite, postgres}` are allowed).
-3. **auth/addons** — auth × backend/DB (deferred), payments ⇒ better-auth (deferred), default-addon allowlist, `effect-style` conflicts, `add` package↔addon mutex. `effect-style` does not require the `repos` checkout.
+3. **auth/addons** — `--auth` ∈ {none, better-auth} ([ADR-0008](./adr/0008-auth-better-auth-official-effect-http.md)); payments ⇒ better-auth (deferred); default-addon allowlist; `effect-style` conflicts; `add` package↔addon mutex. `effect-style` does not require the `repos` checkout.
 4. **examples** — deferred to L3 (`--examples`).
 
 Stop at the first failing active rule. Deferred catalog entries are documentation for agents — they are **not** enforced until the matching CLI flags / templates land (L3+).
 
 ## Active illegal / gated combos (L2)
 
-| Rule id                                | When                                                                |
-| -------------------------------------- | ------------------------------------------------------------------- |
-| `create.enums.*`                       | Unknown enum on create / create-json                                |
-| ~~`create.combinations.api.rpc-only`~~ | Removed — `api ∈ {rpc, httpapi}` (Todo UI AtomRpc ↔ AtomHttpApi)    |
-| `create.addons.effect-style.required`  | `--no-effect-style` (omit path until L3)                            |
-| `add.addons.default-only`              | `add <addon>` outside the default addon set                         |
-| `add.addons.effect-style.conflicts`    | `effect-style` with `biome` / `ultracite` / `oxlint-only` / `husky` |
-| `add.mutex.package-or-addon`           | CLI or `add-json` passes both package and addon                     |
+| Rule id                                | When                                                                                                    |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `create.enums.*`                       | Unknown enum on create / create-json (`packageManager`, `api`, `database`, `auth`, `directoryConflict`) |
+| ~~`create.combinations.api.rpc-only`~~ | Removed — `api ∈ {rpc, httpapi}` (Todo UI AtomRpc ↔ AtomHttpApi)                                        |
+| `create.addons.effect-style.required`  | `--no-effect-style` (omit path until L3)                                                                |
+| `add.addons.default-only`              | `add <addon>` outside the default addon set                                                             |
+| `add.addons.effect-style.conflicts`    | `effect-style` with `biome` / `ultracite` / `oxlint-only` / `husky`                                     |
+| `add.mutex.package-or-addon`           | CLI or `add-json` passes both package and addon                                                         |
 
 Default addons: `turborepo`, `skills`, `repos`, `language-service`, `mcp`, `effect-style`.
 
@@ -34,9 +34,10 @@ Examples mirrored in the catalog with `status: "deferred"`:
 
 - `database=none` + drizzle/prisma/mongoose (`--database` currently exposes `sqlite` \| `postgres` only)
 - `frontend=none` (API-only)
-- No backend / no DB ⇒ force `auth=none`
+- No backend / no DB ⇒ force `auth=none` (dims not exposed yet)
 - `payments=polar` without `better-auth`
 - Full `--examples` matrix
+- Optional CI `ETS_GENERATED_BUILD` cell for `auth=better-auth` (typecheck already proven locally)
 
 See [CAPABILITY-TIERS.md](./CAPABILITY-TIERS.md) L3 for the full surface.
 

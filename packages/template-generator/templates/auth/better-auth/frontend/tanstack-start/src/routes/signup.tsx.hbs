@@ -1,0 +1,74 @@
+import { authClient } from "@{{projectName}}/auth"
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"
+import { useState } from "react"
+
+export const Route = createFileRoute("/signup")({
+  component: SignupPage
+})
+
+function SignupPage() {
+  const navigate = useNavigate()
+  const [name, setName] = useState("")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState<string | null>(null)
+  const [pending, setPending] = useState(false)
+
+  const onSubmit = async (event: React.FormEvent) => {
+    event.preventDefault()
+    setPending(true)
+    setError(null)
+    const result = await authClient.signUp.email({ name, email, password })
+    setPending(false)
+    if (result.error) {
+      setError(result.error.message ?? "Sign up failed")
+      return
+    }
+    void navigate({ to: "/" })
+  }
+
+  return (
+    <main className="panel">
+      <h1>Sign up</h1>
+      <form className="stack" onSubmit={onSubmit}>
+        <label>
+          Name
+          <input
+            type="text"
+            autoComplete="name"
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            required
+          />
+        </label>
+        <label>
+          Email
+          <input
+            type="email"
+            autoComplete="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            required
+          />
+        </label>
+        <label>
+          Password
+          <input
+            type="password"
+            autoComplete="new-password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            required
+          />
+        </label>
+        {error !== null ? <p role="alert">{error}</p> : null}
+        <button type="submit" disabled={pending}>
+          {pending ? "Creating account…" : "Create account"}
+        </button>
+      </form>
+      <p>
+        Already have an account? <Link to="/login">Sign in</Link>
+      </p>
+    </main>
+  )
+}

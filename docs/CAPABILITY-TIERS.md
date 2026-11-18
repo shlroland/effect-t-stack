@@ -245,21 +245,28 @@ See [ADR-0005](./adr/0005-l0-exit-and-fingerprint-hygiene.md).
 
 ### Auth (`--auth`) — full surface
 
-- [ ] `none` (Golden Sample default)
-- [ ] `better-auth`
-  - [ ] Server wiring (Layer / HttpApi group)
-  - [ ] DB schema / migrations per ORM
-  - [ ] Session model
-  - [ ] Sign-in / sign-up UI
-  - [ ] Protected routes
-  - [ ] Typed client session helpers
+Decision: [ADR-0008](./adr/0008-auth-better-auth-official-effect-http.md) — `@auth` + Better Auth **official Effect HTTP** mount (`/api/auth/*`); Rpc only `getSession` → `CurrentUser` in MVP. Rpc-native SignIn deferred.
+
+- [x] `none` (default / `--yes`)
+- [x] `better-auth` (CLI `--auth better-auth`; overlays under `templates/auth/better-auth`)
+  - [x] `packages/auth` overlay + deps / env (`AUTH_SECRET`, `BETTER_AUTH_URL`)
+  - [x] DB schema / migrations (drizzle × sqlite + postgres branches)
+  - [x] Start dispatch: `/api/auth` before `/api` + `/rpc`
+  - [x] Server wiring (`auth.handler` on Start; standalone `HttpEffect.fromWebHandler`)
+  - [x] Rpc `AuthMiddleware` + `CurrentUser` (protect Todo; keep Health/Ready public)
+  - [x] Sign-in / sign-up UI (`/login`, `/signup`)
+  - [x] Typed client session helpers (`authClient` from `@auth`)
+  - [ ] generated-build CI cell `auth=better-auth` (local `check-types` proven)
+  - [ ] HttpApi Todo routes session-gated (Rpc gated in MVP)
 - [ ] `clerk`
   - [ ] Frontend SDK
   - [ ] Server token/session verification
   - [ ] Protected routes
 - [ ] Compatibility rules
+  - [x] `--auth` enum `none` \| `better-auth` (clerk not exposed)
+  - [x] Generator stack allows `auth ∈ {none, better-auth}`
   - [ ] No backend / no DB ⇒ force `auth=none`
-  - [ ] better-auth × ORM variants (drizzle / prisma / …)
+  - [ ] better-auth × ORM variants beyond drizzle
   - [ ] Auth × frontend variants (web + native as those land)
   - [ ] clerk × supported frontend/runtime matrix
 

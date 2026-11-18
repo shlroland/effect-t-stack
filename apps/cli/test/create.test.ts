@@ -27,6 +27,7 @@ const base = (overrides: Partial<CreateOptions> & Pick<CreateOptions, "projectNa
   packageManager: "bun",
   api: "rpc",
   database: "sqlite",
+  auth: "none",
   effectStyle: true,
   ...overrides
 })
@@ -157,6 +158,15 @@ describe("createProject (Effect)", () => {
     expect(result.dryRun).toBe(true)
     expect(result.fileCount).toBeGreaterThan(10)
     expect(result.database).toBe("postgres")
+  })
+
+  test("auth=better-auth dry-run succeeds (ADR-0008)", async () => {
+    const result = await Effect.runPromise(
+      provideBun(createProject(base({ projectName: "ba", cwd: tmpdir(), dryRun: true, auth: "better-auth" })))
+    )
+    expect(result.dryRun).toBe(true)
+    expect(result.auth).toBe("better-auth")
+    expect(result.fileCount).toBeGreaterThan(10)
   })
 
   test("effectStyle=false fails clearly until L3", async () => {

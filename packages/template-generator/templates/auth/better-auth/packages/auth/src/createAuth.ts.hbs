@@ -1,0 +1,38 @@
+import { drizzleAdapter } from "@better-auth/drizzle-adapter"
+import { betterAuth } from "better-auth"
+import { tanstackStartCookies } from "better-auth/tanstack-start"
+import { createAuthDatabase } from "./AuthDatabase.ts"
+import { authSchema } from "./authSchema.ts"
+
+export type CreateAuthOptions = {
+  readonly databaseUrl: string
+  readonly secret: string
+  readonly baseURL: string
+  readonly trustedOrigins?: ReadonlyArray<string>
+}
+
+{{#if (eq database "postgres")}}
+const drizzleProvider = "pg" as const
+{{else}}
+const drizzleProvider = "sqlite" as const
+{{/if}}
+
+export const createAuth = (options: CreateAuthOptions) => {
+  const db = createAuthDatabase(options.databaseUrl)
+  return betterAuth({
+    secret: options.secret,
+    baseURL: options.baseURL,
+    trustedOrigins: options.trustedOrigins ? [...options.trustedOrigins] : undefined,
+    database: drizzleAdapter(db, {
+      provider: drizzleProvider,
+      schema: authSchema
+    }),
+    emailAndPassword: {
+      enabled: true
+    },
+    // Last plugin — required for cookie writes via Start server functions / SSR.
+    plugins: [tanstackStartCookies()]
+  })
+}
+
+export type Auth = ReturnType<typeof createAuth>

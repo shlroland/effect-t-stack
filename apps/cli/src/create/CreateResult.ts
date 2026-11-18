@@ -1,4 +1,4 @@
-import type { ApiPrimary, CreateOptions, Database } from "./CreateOptions.ts"
+import type { ApiPrimary, Auth, CreateOptions, Database } from "./CreateOptions.ts"
 import type { PackageManager } from "./packageManagers.ts"
 
 export type { DirectoryConflict } from "./CreateOptions.ts"
@@ -12,6 +12,7 @@ export type CreateResult = {
   readonly packageManager: PackageManager
   readonly api: ApiPrimary
   readonly database: Database
+  readonly auth: Auth
   readonly effectStyle: boolean
   readonly phases: ReadonlyArray<string>
 }
@@ -32,6 +33,7 @@ export const makeCreateResult = (input: {
   packageManager: input.options.packageManager,
   api: input.options.api,
   database: input.options.database,
+  auth: input.options.auth,
   effectStyle: input.options.effectStyle,
   phases: input.phases
 })

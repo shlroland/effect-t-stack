@@ -61,7 +61,7 @@ git subtree pull --prefix=repos/effect https://github.com/Effect-TS/effect.git m
 | CLI         | `apps/cli`                                       | `create-effect-t-stack` via **`effect/cli`** + BunServices — generates from `packages/template-generator`; **no** domain/SQL/HTTP business logic |
 | Templates   | `packages/template-generator`                    | Only product source of truth for generated apps; **Effect** style (`generate` / `writeTree` return `Effect`, `Schema.TaggedError`)               |
 | Lint plugin | `packages/effect-oxc`                            | Owned copy of unpublished `@effect/oxc`; the template copies it into generated apps                                                              |
-| Docs / ADRs | `docs/`                                          | Capability Tiers, fingerprint, compatibility, decisions                                                                                          |
+| Docs / ADRs | `docs/`                                          | Capability Tiers, fingerprint, compatibility, decisions (auth: [ADR-0008](./docs/adr/0008-auth-better-auth-official-effect-http.md))             |
 | Pins        | `dependencyVersionMap` in the template generator | The only dependency pin table                                                                                                                    |
 
 **Ownership:** edit the Handlebars fragment or the post-processor, then prove it with a generated-build. Do not recreate a second default monorepo.

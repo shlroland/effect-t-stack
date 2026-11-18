@@ -1,0 +1,18 @@
+import { Context, Schema } from "effect"
+
+export const UserId = Schema.String.pipe(Schema.brand("UserId"))
+export type UserId = typeof UserId.Type
+
+export class AuthUser extends Schema.Class<AuthUser>("AuthUser")({
+  id: UserId,
+  email: Schema.String,
+  name: Schema.String
+}) {}
+
+export class CurrentUser extends Context.Service<CurrentUser, AuthUser>()("@{{projectName}}/domain/CurrentUser") {}
+
+export class Unauthorized extends Schema.TaggedError<Unauthorized>()(
+  "Unauthorized",
+  {},
+  { httpApiStatus: 401 }
+) {}

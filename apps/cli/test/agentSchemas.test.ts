@@ -22,6 +22,7 @@ describe("CreateJsonInput schema", () => {
       packageManager: "bun",
       api: "rpc",
       database: "sqlite",
+      auth: "none",
       effectStyle: true,
       directoryConflict: "error",
       manualDb: false
@@ -30,7 +31,8 @@ describe("CreateJsonInput schema", () => {
       projectName: "demo",
       verbose: true,
       renderTitle: false,
-      packageManager: "bun"
+      packageManager: "bun",
+      auth: "none"
     })
   })
 
@@ -71,6 +73,7 @@ describe("CreateJsonInput schema", () => {
     expect(properties["packageManager"]?.["enum"]).toEqual(["bun", "npm", "pnpm"])
     expect(properties["api"]?.["enum"]).toEqual(["rpc", "httpapi"])
     expect(properties["database"]?.["enum"]).toEqual(["sqlite", "postgres"])
+    expect(properties["auth"]?.["enum"]).toEqual(["none", "better-auth"])
   })
 })
 
