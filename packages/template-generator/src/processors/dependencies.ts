@@ -95,9 +95,16 @@ export const processDependencies = (vfs: VirtualFsService, config: ProjectConfig
     })
   }
 
-  if (config.orm === "drizzle" && config.database === "sqlite" && vfs.fileExists("packages/db/package.json")) {
+  if (
+    config.orm === "drizzle" &&
+    (config.database === "sqlite" || config.database === "postgres") &&
+    vfs.fileExists("packages/db/package.json")
+  ) {
     const dependencies = ["drizzle-orm", "effect"]
-    if (config.runtime === "bun") dependencies.unshift("@effect/platform-bun", "@effect/sql-sqlite-bun")
+    if (config.runtime === "bun") {
+      dependencies.unshift("@effect/platform-bun")
+      dependencies.push(config.database === "postgres" ? "@effect/sql-pg" : "@effect/sql-sqlite-bun")
+    }
     addPackageDependency({
       vfs,
       packagePath: "packages/db",

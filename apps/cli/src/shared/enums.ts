@@ -9,6 +9,10 @@ export const ApiPrimarySchema = Schema.Literals(["rpc", "httpapi"])
 export type ApiPrimary = typeof ApiPrimarySchema.Type
 export const CREATE_APIS = ApiPrimarySchema.literals
 
+export const DatabaseSchema = Schema.Literals(["sqlite", "postgres"])
+export type Database = typeof DatabaseSchema.Type
+export const CREATE_DATABASES = DatabaseSchema.literals
+
 export const DirectoryConflictSchema = Schema.Literals([
   "error",
   "overwrite",

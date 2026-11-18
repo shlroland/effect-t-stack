@@ -45,6 +45,17 @@ describe("create-effect-t-stack (effect/cli)", () => {
     ])
     expect(Exit.isSuccess(exit)).toBe(true)
   })
+
+  test("database postgres dry-run succeeds", async () => {
+    const exit = await runCli([
+      "demo-pg",
+      "--dry-run",
+      "--database",
+      "postgres",
+      "--no-render-title"
+    ])
+    expect(Exit.isSuccess(exit)).toBe(true)
+  })
 })
 
 describe("normalizeArgv", () => {

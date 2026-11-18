@@ -6,16 +6,23 @@ import { Database } from "./Database.ts"
 import { Migrations } from "./Migrations.ts"
 import { layerNoDeps } from "./TodosRepository.ts"
 
+{{#if (eq database "postgres")}}
+const enabled = process.env["ETS_PG_TEST"] === "1"
+const url = process.env["DATABASE_URL"] ?? "postgres://postgres:postgres@127.0.0.1:5432/ets"
+{{else}}
+const enabled = true
+const url = `:memory:`
+{{/if}}
+
 const TestLive = (() => {
-  const url = `:memory:`
   const DatabaseLive = Database.layer(url)
   const MigrationsLive = Migrations.layer().pipe(Layer.provide(DatabaseLive))
   const RepoLive = layerNoDeps.pipe(Layer.provide(DatabaseLive))
   return Layer.mergeAll(DatabaseLive, MigrationsLive, RepoLive)
 })()
 
-describe("TodosRepository (effect-sql)", () => {
-  it("persists todos in SQLite via Effect SQL", async () => {
+describe.skipIf(!enabled)("TodosRepository (effect-sql)", () => {
+  it("persists todos via Effect SQL", async () => {
     const result = await Effect.gen(function*() {
       const repo = yield* TodosRepository
       const created = yield* repo.create(TodoTitle.make("persist me"))

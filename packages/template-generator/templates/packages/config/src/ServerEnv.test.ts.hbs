@@ -9,7 +9,7 @@ describe("ServerEnv", () => {
   it("uses defaults when env and file are empty", () => {
     const env = loadServerEnv({ env: {}, envFile: false })
     expect(env).toEqual({
-      DATABASE_URL: "./data.db",
+      DATABASE_URL: ServerEnvDefaults.DATABASE_URL,
       PORT: 3737,
       CORS_ORIGINS: [...ServerEnvDefaults.CORS_ORIGINS]
     })

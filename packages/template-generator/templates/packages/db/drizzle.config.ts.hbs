@@ -8,7 +8,11 @@ const env = loadServerEnv({
 export default defineConfig({
   schema: "./src/schema.ts",
   out: "./drizzle",
+{{#if (eq database "postgres")}}
+  dialect: "postgresql",
+{{else}}
   dialect: "sqlite",
+{{/if}}
   dbCredentials: {
     url: env.DATABASE_URL
   }

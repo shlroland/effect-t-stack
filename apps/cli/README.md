@@ -45,7 +45,7 @@ bunx create-effect-t-stack history --json
 
 Notable create flags: `--dry-run`, `--verbose`, `--package-manager bun|npm|pnpm`, `--directory-conflict`, `--open <bin>`, `--manual-db`.
 
-Illegal combinations are rejected by the compatibility engine (`docs/compatibility.md`). `--api httpapi` flips Todo UI to AtomHttpApi (Rpc stays secondary). `--no-effect-style` stays gated until that L3 cell lands.
+Illegal combinations are rejected by the compatibility engine (`docs/compatibility.md`). `--api httpapi` flips Todo UI to AtomHttpApi (Rpc stays secondary). `--database postgres` switches Drizzle to `effect-postgres` + `@effect/sql-pg` (default remains sqlite). `--no-effect-style` stays gated until that L3 cell lands.
 
 ## Local check (agents)
 

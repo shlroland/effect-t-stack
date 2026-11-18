@@ -4,7 +4,9 @@ import type { ProjectConfig } from "../types.ts"
 /** Computed env files. `.env.example` stays a template; these are the files the app reads. */
 export const processEnvVariables = (vfs: VirtualFsService, config: ProjectConfig): void => {
   if (config.database === "none") return
-  const databaseUrl = config.database === "sqlite" ? "./data.db" : ""
+  const databaseUrl = config.database === "postgres"
+    ? "postgres://postgres:postgres@127.0.0.1:5432/ets"
+    : "./data.db"
   if (vfs.fileExists("apps/web/package.json")) {
     vfs.writeFile("apps/web/.env", `DATABASE_URL=${databaseUrl}\n`)
   }

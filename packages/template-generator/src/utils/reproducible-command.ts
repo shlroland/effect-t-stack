@@ -16,6 +16,7 @@ const runner = (config: ProjectConfig, version: string): string => {
 export const reproducibleCommand = (config: ProjectConfig, version: string): string => {
   const parts = [`${runner(config, version)} ${config.projectName}`, "--yes"]
   if (config.api !== "rpc") parts.push(`--api ${config.api}`)
+  if (config.database !== "sqlite") parts.push(`--database ${config.database}`)
   if (config.packageManager !== "bun") parts.push(`--package-manager ${config.packageManager}`)
   return parts.join(" ")
 }

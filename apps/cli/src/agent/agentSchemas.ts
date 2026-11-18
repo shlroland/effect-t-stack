@@ -4,9 +4,9 @@ import * as Schema from "effect/Schema"
 import type { CreateOptions } from "../create/CreateOptions.ts"
 import { DEFAULT_ADDONS } from "../fingerprint/fingerprint.ts"
 import { CreateError } from "../shared/CreateError.ts"
-import { ApiPrimarySchema, DirectoryConflictSchema, PackageManagerSchema } from "../shared/enums.ts"
+import { ApiPrimarySchema, DatabaseSchema, DirectoryConflictSchema, PackageManagerSchema } from "../shared/enums.ts"
 
-export { ApiPrimarySchema, DirectoryConflictSchema, PackageManagerSchema } from "../shared/enums.ts"
+export { ApiPrimarySchema, DatabaseSchema, DirectoryConflictSchema, PackageManagerSchema } from "../shared/enums.ts"
 
 const boolWithDefault = (defaultValue: boolean) =>
   Schema.Boolean.pipe(Schema.withDecodingDefaultKey(Effect.succeed(defaultValue)))
@@ -26,6 +26,7 @@ export const CreateJsonInput = Schema.Struct({
     Schema.withDecodingDefaultKey(Effect.succeed("bun" as const))
   ),
   api: ApiPrimarySchema.pipe(Schema.withDecodingDefaultKey(Effect.succeed("rpc" as const))),
+  database: DatabaseSchema.pipe(Schema.withDecodingDefaultKey(Effect.succeed("sqlite" as const))),
   effectStyle: boolWithDefault(true),
   directoryConflict: DirectoryConflictSchema.pipe(
     Schema.withDecodingDefaultKey(Effect.succeed("error" as const))
@@ -123,6 +124,7 @@ export const toCreateOptions = (input: CreateJsonInput): CreateOptions => ({
   directoryConflict: input.directoryConflict,
   packageManager: input.packageManager,
   api: input.api,
+  database: input.database,
   effectStyle: input.effectStyle,
   cwd: input.cwd
 })

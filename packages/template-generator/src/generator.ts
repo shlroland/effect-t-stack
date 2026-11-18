@@ -6,6 +6,7 @@ import { countTree, VirtualFs } from "./core/virtual-fs.ts"
 import { unsupportedStackMessage } from "./default-config.ts"
 import { writeEtsConfig } from "./ets-config.ts"
 import { processCatalogs } from "./post-process/catalogs.ts"
+import { processDatabaseDialect } from "./post-process/database-artifacts.ts"
 import { processPackageConfigs } from "./post-process/package-configs.ts"
 import { processDependencies } from "./processors/dependencies.ts"
 import { processEnvVariables } from "./processors/env-vars.ts"
@@ -48,6 +49,7 @@ export const generate = Effect.fn("generate")(function*(options: GenerateOptions
     yield* applyTemplateHandlers(options.templates, options.config)
     yield* Effect.try({
       try: () => {
+        processDatabaseDialect(vfs, options.config)
         processPackageConfigs(vfs, options.config)
         processDependencies(vfs, options.config)
         processEnvVariables(vfs, options.config)

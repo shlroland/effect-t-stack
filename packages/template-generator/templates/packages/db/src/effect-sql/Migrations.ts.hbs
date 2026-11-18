@@ -1,10 +1,20 @@
+{{#if (eq database "postgres")}}
+import { BunServices } from "@effect/platform-bun"
+import * as PgMigrator from "@effect/sql-pg/PgMigrator"
+{{else}}
 import { BunFileSystem, BunPath } from "@effect/platform-bun"
 import * as SqliteMigrator from "@effect/sql-sqlite-bun/SqliteMigrator"
+{{/if}}
 import { Context, Effect, Layer, Path } from "effect"
 import { SqlClient } from "effect/sql"
 import { type DatabaseError, mapDatabaseError } from "../Database.ts"
 
+{{#if (eq database "postgres")}}
+/** PgMigrator.dumpSchema needs ChildProcessSpawner (`pg_dump`) via BunServices. */
+const PlatformLive = BunServices.layer
+{{else}}
 const PlatformLive = Layer.mergeAll(BunFileSystem.layer, BunPath.layer)
+{{/if}}
 
 const resolveDefaultMigrationsFolder = Effect.gen(function*() {
   const path = yield* Path.Path
@@ -24,9 +34,15 @@ export class Migrations extends Context.Service<Migrations, {
 
         yield* mapDatabaseError(
           "migrations.run",
+{{#if (eq database "postgres")}}
+          PgMigrator.run({
+            loader: PgMigrator.fromFileSystem(folder)
+          })
+{{else}}
           SqliteMigrator.run({
             loader: SqliteMigrator.fromFileSystem(folder)
           })
+{{/if}}
         )
 
         return Migrations.of({

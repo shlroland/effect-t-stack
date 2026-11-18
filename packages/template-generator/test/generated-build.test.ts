@@ -34,6 +34,17 @@ describe("generated-build", () => {
     const fingerprint = await readFile(join(projectDir, "ets.jsonc"), "utf8")
     expect(fingerprint).toContain("\"api\": \"httpapi\"")
   }, 900_000)
+
+  test("database=postgres installs, typechecks, and lints Drizzle pg cell", async () => {
+    if (process.env["ETS_GENERATED_BUILD"] !== "1") return
+    const projectDir = await materializeAndCheck(temps, "smoke-pg", { database: "postgres" })
+    const schema = await readFile(join(projectDir, "packages/db/src/schema.ts"), "utf8")
+    expect(schema).toContain("pgTable")
+    const database = await readFile(join(projectDir, "packages/db/src/Database.ts"), "utf8")
+    expect(database).toContain("@effect/sql-pg")
+    const fingerprint = await readFile(join(projectDir, "ets.jsonc"), "utf8")
+    expect(fingerprint).toContain("\"database\": \"postgres\"")
+  }, 900_000)
 })
 
 const materializeAndCheck = async (

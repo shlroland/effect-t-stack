@@ -21,6 +21,7 @@ describe("CreateJsonInput schema", () => {
       git: true,
       packageManager: "bun",
       api: "rpc",
+      database: "sqlite",
       effectStyle: true,
       directoryConflict: "error",
       manualDb: false
@@ -69,6 +70,7 @@ describe("CreateJsonInput schema", () => {
     const properties = schema["properties"] as Record<string, Record<string, unknown>>
     expect(properties["packageManager"]?.["enum"]).toEqual(["bun", "npm", "pnpm"])
     expect(properties["api"]?.["enum"]).toEqual(["rpc", "httpapi"])
+    expect(properties["database"]?.["enum"]).toEqual(["sqlite", "postgres"])
   })
 })
 

@@ -7,6 +7,7 @@ export {
   createInputJsonSchema,
   CreateJsonInput,
   CreateJsonInputFromJsonString,
+  DatabaseSchema,
   decodeAddJsonInput,
   decodeCreateJsonInput,
   DirectoryConflictSchema,
@@ -30,7 +31,7 @@ export {
 } from "./compatibility/index.ts"
 export type { CompatibilityRule, ResolvedAddInput, ValidationStage } from "./compatibility/index.ts"
 export { createProject } from "./create/create.ts"
-export type { ApiPrimary, CreateOptions, DirectoryConflict } from "./create/CreateOptions.ts"
+export type { ApiPrimary, CreateOptions, Database, DirectoryConflict } from "./create/CreateOptions.ts"
 export type { CreateResult } from "./create/CreateResult.ts"
 export { formatVerbose, makeCreateResult } from "./create/CreateResult.ts"
 export { emitPackageManagerArtifacts, installCommand, resolvePackageManagerPin } from "./create/packageManagers.ts"
@@ -53,8 +54,10 @@ export { CreateError } from "./shared/CreateError.ts"
 export {
   ApiPrimarySchema as SharedApiPrimarySchema,
   CREATE_APIS,
+  CREATE_DATABASES,
   CREATE_DIRECTORY_CONFLICTS,
   CREATE_PACKAGE_MANAGERS,
+  DatabaseSchema as SharedDatabaseSchema,
   DirectoryConflictSchema as SharedDirectoryConflictSchema,
   PackageManagerSchema as SharedPackageManagerSchema
 } from "./shared/enums.ts"

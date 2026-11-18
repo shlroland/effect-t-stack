@@ -11,6 +11,7 @@ export const dependencyVersionMap = {
   "@effect/atom-react": "^4.1.3",
   "@effect/language-service": "0.87.5",
   "@effect/platform-bun": "^4.1.3",
+  "@effect/sql-pg": "^4.1.3",
   "@effect/sql-sqlite-bun": "^4.1.3",
   "@oxlint/plugins": "^1.93.0",
   "@tanstack/react-router": "^1.170.46",

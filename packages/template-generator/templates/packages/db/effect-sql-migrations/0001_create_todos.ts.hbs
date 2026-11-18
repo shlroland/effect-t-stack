@@ -3,6 +3,16 @@ import { SqlClient } from "effect/sql"
 
 export default Effect.gen(function*() {
   const sql = yield* SqlClient.SqlClient
+{{#if (eq database "postgres")}}
+  yield* sql`
+    CREATE TABLE IF NOT EXISTS todos (
+      id SERIAL PRIMARY KEY NOT NULL,
+      title TEXT NOT NULL,
+      completed BOOLEAN DEFAULT false NOT NULL,
+      created_at TIMESTAMPTZ DEFAULT now() NOT NULL
+    )
+  `
+{{else}}
   yield* sql`
     CREATE TABLE todos (
       id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -11,4 +21,5 @@ export default Effect.gen(function*() {
       created_at INTEGER DEFAULT (unixepoch('now') * 1000) NOT NULL
     )
   `
+{{/if}}
 })

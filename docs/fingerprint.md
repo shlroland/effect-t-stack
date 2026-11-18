@@ -4,19 +4,19 @@ Generated-app **fingerprint**. `create` writes `ets.jsonc` from `packages/templa
 
 ## Field classes
 
-| Class              | Examples                                                               | Rules                                                                                                                                                                       |
-| ------------------ | ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Stack dims**     | `runtime`, `api`, `orm`, `auth`, `frontend`, `backend`, `env`          | Root Option Matrix; prefer nested `*Options` over new root keys. `api` primary binding: [ADR-0006](./adr/0006-api-primary-rpc-with-httpapi-secondary.md)                    |
-| **`addons[]`**     | `turborepo`, `effect-style`, `mcp`                                     | Ordered list of enabled addons                                                                                                                                              |
-| **`addonOptions`** | `addonOptions.effect-style`                                            | Per-addon details; nest here instead of inventing root keys                                                                                                                 |
-| **Meta**           | `$schema`, `version`, `createdAt`, `reproducibleCommand`, `cliVersion` | The generator writes create-time meta when a CLI version is passed. `version` = **schema** version; `cliVersion` = CLI release. Schema: `apps/cli/schemas/ets.schema.json` |
+| Class              | Examples                                                                  | Rules                                                                                                                                                                                     |
+| ------------------ | ------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Stack dims**     | `runtime`, `api`, `database`, `orm`, `auth`, `frontend`, `backend`, `env` | Root Option Matrix; prefer nested `*Options` over new root keys. `api` primary binding: [ADR-0006](./adr/0006-api-primary-rpc-with-httpapi-secondary.md); `database` ∈ {sqlite, postgres} |
+| **`addons[]`**     | `turborepo`, `effect-style`, `mcp`                                        | Ordered list of enabled addons                                                                                                                                                            |
+| **`addonOptions`** | `addonOptions.effect-style`                                               | Per-addon details; nest here instead of inventing root keys                                                                                                                               |
+| **Meta**           | `$schema`, `version`, `createdAt`, `reproducibleCommand`, `cliVersion`    | The generator writes create-time meta when a CLI version is passed. `version` = **schema** version; `cliVersion` = CLI release. Schema: `apps/cli/schemas/ets.schema.json`                |
 
 ## Template-owned paths
 
-| Kind                       | Meaning                                                                                                                                                       |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Default templates**      | Fragments in `packages/template-generator/templates` for the default stack. Edit the fragment, then prove with a generated-build.                             |
-| **Template-only overlays** | Fragments that exist only for non-default Option Matrix cells (other runtime/db/auth/frontend). No second sample monorepo; prove with generated-builds.       |
+| Kind                       | Meaning                                                                                                                                                 |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Default templates**      | Fragments in `packages/template-generator/templates` for the default stack. Edit the fragment, then prove with a generated-build.                       |
+| **Template-only overlays** | Fragments that exist only for non-default Option Matrix cells (other runtime/db/auth/frontend). No second sample monorepo; prove with generated-builds. |
 
 `create` generates from those templates. It does not copy a sample tree.
 
@@ -32,7 +32,7 @@ Generated-app **fingerprint**. `create` writes `ets.jsonc` from `packages/templa
 
 | Command                    | Role                                                                                               |
 | -------------------------- | -------------------------------------------------------------------------------------------------- |
-| `create` / bare `my-app`   | Generate from templates and write `ets.jsonc`                                                       |
+| `create` / bare `my-app`   | Generate from templates and write `ets.jsonc`                                                      |
 | `add <addon>`              | Ensure a default addon is in the fingerprint (file overlays for new addons are backlog)            |
 | `add --package <name>`     | Scaffold `packages/<name>` + record under `addonOptions.packages`                                  |
 | `create-json` / `add-json` | Agent stdin/stdout JSON contracts                                                                  |

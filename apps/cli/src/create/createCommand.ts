@@ -82,6 +82,11 @@ const api = Flag.Literals("api", ["rpc", "httpapi"] as const).pipe(
   Flag.withDefault("rpc" as const)
 )
 
+const database = Flag.Literals("database", ["sqlite", "postgres"] as const).pipe(
+  Flag.withDescription("Database: sqlite (default) or postgres (Drizzle + @effect/sql-pg)"),
+  Flag.withDefault("sqlite" as const)
+)
+
 const effectStyle = Flag.Boolean("effect-style").pipe(
   Flag.withDescription("Include effect-style addon (default true; omit path is L3)"),
   Flag.withDefault(true)
@@ -101,6 +106,7 @@ export const createCommand = Command.make("create", {
   directoryConflict,
   packageManager,
   api,
+  database,
   effectStyle
 }).pipe(
   Command.withDescription(
@@ -121,6 +127,7 @@ export const createCommand = Command.make("create", {
       directoryConflict: config.directoryConflict,
       packageManager: config.packageManager,
       api: config.api,
+      database: config.database,
       effectStyle: config.effectStyle
     }).pipe(Effect.asVoid)
   )

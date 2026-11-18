@@ -17,7 +17,8 @@ See [ADR-0002](./adr/0002-dependency-currency.md) and [ADR-0007](./adr/0007-temp
 | ----------------------------- | ------------------------ | ----------------------------------------------------------------------------------------------------- |
 | `typescript`                  | **6.x** (`^6.0.3`)       | Stepping stone toward TS 7 / `@effect/tsgo`; keep `@effect/language-service` (TS 7+ switches to tsgo) |
 | `@effect/language-service`    | pinned minor (`0.87.5`)  | Paired with TypeScript 6.x (not for TS 7+)                                                            |
-| `drizzle-orm` / `drizzle-kit` | **`1.0.0-rc.5`** exact   | Required for `drizzle-orm/effect-sqlite-bun`; npm `latest` is still 0.45.x                            |
+| `drizzle-orm` / `drizzle-kit` | **`1.0.0-rc.5`** exact   | Required for `effect-sqlite-bun` / `effect-postgres`; npm `latest` is still 0.45.x                    |
+| `@effect/sql-pg`              | map (`^4.1.3`)           | Postgres cell (`--database postgres`); sqlite cell keeps `@effect/sql-sqlite-bun`                     |
 | `@effect/oxc`                 | unpublished → owned copy | `packages/effect-oxc`, taken from Effect commit `7865dbbb7`. Use the npm package when it exists.      |
 | `@effect/atom-react`          | map (`^4.1.3`)           | React bindings for Effect Atom; peer `scheduler` is also pinned in the map                            |
 

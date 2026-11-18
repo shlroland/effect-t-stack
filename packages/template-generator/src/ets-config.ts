@@ -50,6 +50,28 @@ const apiOptionsFor = (config: ProjectConfig) =>
       }
     }
 
+const ormOptionsFor = (config: ProjectConfig) => {
+  const isPostgres = config.database === "postgres"
+  return {
+    package: "drizzle-orm",
+    version: "catalog:",
+    kit: "drizzle-kit",
+    effectDriver: isPostgres ? "drizzle-orm/effect-postgres" : "drizzle-orm/effect-sqlite-bun",
+    sqlClient: isPostgres ? "@effect/sql-pg" : "@effect/sql-sqlite-bun",
+    catalog: "docs/DEPENDENCY-CATALOG.md",
+    secondary: {
+      orm: "effect-sql",
+      package: isPostgres ? "@effect/sql-pg" : "@effect/sql-sqlite-bun",
+      modules: isPostgres
+        ? ["SqlClient", "SqlSchema", "PgMigrator"]
+        : ["SqlClient", "SqlSchema", "SqliteMigrator"],
+      import: `${pkg(config, "db")}/effect-sql`,
+      migrations: "packages/db/effect-sql-migrations",
+      note: "Swap Database/Migrations/TodosRepository layers; shared service tag."
+    }
+  }
+}
+
 const atomOptionsFor = (config: ProjectConfig) =>
   config.api === "httpapi"
     ? {
@@ -94,22 +116,7 @@ export const writeEtsConfig = (vfs: VirtualFsService, config: ProjectConfig, ver
     apiOptions: apiOptionsFor(config),
     database: config.database,
     orm: config.orm,
-    ormOptions: {
-      package: "drizzle-orm",
-      version: "catalog:",
-      kit: "drizzle-kit",
-      effectDriver: "drizzle-orm/effect-sqlite-bun",
-      sqlClient: "@effect/sql-sqlite-bun",
-      catalog: "docs/DEPENDENCY-CATALOG.md",
-      secondary: {
-        orm: "effect-sql",
-        package: "@effect/sql-sqlite-bun",
-        modules: ["SqlClient", "SqlSchema", "SqliteMigrator"],
-        import: `${pkg(config, "db")}/effect-sql`,
-        migrations: "packages/db/effect-sql-migrations",
-        note: "Swap Database/Migrations/TodosRepository layers; shared service tag."
-      }
-    },
+    ormOptions: ormOptionsFor(config),
     auth: config.auth,
     frontend,
     frontendOptions: {
@@ -137,7 +144,9 @@ export const writeEtsConfig = (vfs: VirtualFsService, config: ProjectConfig, ver
       module: "ServerEnv",
       provider: ["fromEnv", "fromDotEnvContents"],
       defaults: {
-        DATABASE_URL: "./data.db",
+        DATABASE_URL: config.database === "postgres"
+          ? "postgres://postgres:postgres@127.0.0.1:5432/ets"
+          : "./data.db",
         PORT: 3737,
         CORS_ORIGINS: ["http://localhost:5173", "http://127.0.0.1:5173"]
       },

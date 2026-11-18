@@ -3,7 +3,11 @@ import { readFileSync } from "node:fs"
 import { fileURLToPath } from "node:url"
 
 export const ServerEnvDefaults = {
+{{#if (eq database "postgres")}}
+  DATABASE_URL: "postgres://postgres:postgres@127.0.0.1:5432/ets",
+{{else}}
   DATABASE_URL: "./data.db",
+{{/if}}
   PORT: 3737,
   CORS_ORIGINS: [
     "http://localhost:5173",

@@ -7,7 +7,7 @@
 Always apply stages in this order:
 
 1. **enums** — values must be in the declared literal sets (`packageManager`, `api`, `directoryConflict`, …). CLI `Flag.Literals` enforces most of this at parse time; `create-json` still runs the same stage.
-2. **combinations** — Option Matrix cell rules (e.g. future `database=none`+`drizzle`; `api ∈ {rpc, httpapi}` is allowed).
+2. **combinations** — Option Matrix cell rules (e.g. future `database=none`+`drizzle`; `api ∈ {rpc, httpapi}` and `database ∈ {sqlite, postgres}` are allowed).
 3. **auth/addons** — auth × backend/DB (deferred), payments ⇒ better-auth (deferred), default-addon allowlist, `effect-style` conflicts, `add` package↔addon mutex. `effect-style` does not require the `repos` checkout.
 4. **examples** — deferred to L3 (`--examples`).
 
@@ -32,7 +32,7 @@ Default addons: `turborepo`, `skills`, `repos`, `language-service`, `mcp`, `effe
 
 Examples mirrored in the catalog with `status: "deferred"`:
 
-- `database=none` + drizzle/prisma/mongoose
+- `database=none` + drizzle/prisma/mongoose (`--database` currently exposes `sqlite` \| `postgres` only)
 - `frontend=none` (API-only)
 - No backend / no DB ⇒ force `auth=none`
 - `payments=polar` without `better-auth`

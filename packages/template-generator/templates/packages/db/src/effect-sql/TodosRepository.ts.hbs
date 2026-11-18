@@ -10,8 +10,13 @@ import { Database } from "./Database.ts"
 const TodoRow = Schema.Struct({
   id: TodoId,
   title: TodoTitleSchema,
+{{#if (eq database "postgres")}}
+  completed: Schema.Boolean,
+  created_at: Schema.Date
+{{else}}
   completed: Schema.BooleanFromBit,
   created_at: Schema.DateFromMillis
+{{/if}}
 })
 
 const toTodo = (row: typeof TodoRow.Type): Todo =>
@@ -96,7 +101,11 @@ export const layerNoDeps = Layer.effect(
         clauses.push(sql`title = ${patch.title}`)
       }
       if (patch.completed !== undefined) {
+{{#if (eq database "postgres")}}
+        clauses.push(sql`completed = ${patch.completed}`)
+{{else}}
         clauses.push(sql`completed = ${patch.completed ? 1 : 0}`)
+{{/if}}
       }
       // Empty patch is a Service rule (return existing / TodoNotFound).
       if (clauses.length === 0) {

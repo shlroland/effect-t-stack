@@ -5,9 +5,9 @@
  * agents do not invent them as active create/add behavior.
  */
 
-import { CREATE_APIS, CREATE_DIRECTORY_CONFLICTS, CREATE_PACKAGE_MANAGERS } from "../shared/enums.ts"
+import { CREATE_APIS, CREATE_DATABASES, CREATE_DIRECTORY_CONFLICTS, CREATE_PACKAGE_MANAGERS } from "../shared/enums.ts"
 
-export { CREATE_APIS, CREATE_DIRECTORY_CONFLICTS, CREATE_PACKAGE_MANAGERS } from "../shared/enums.ts"
+export { CREATE_APIS, CREATE_DATABASES, CREATE_DIRECTORY_CONFLICTS, CREATE_PACKAGE_MANAGERS } from "../shared/enums.ts"
 
 export type ValidationStage = "enums" | "combinations" | "authAddons" | "examples"
 
@@ -42,6 +42,13 @@ export const COMPATIBILITY_RULES: ReadonlyArray<CompatibilityRule> = [
     message: `Invalid api. Allowed: ${CREATE_APIS.join(", ")}.`
   },
   {
+    id: "create.enums.database",
+    stage: "enums",
+    status: "active",
+    summary: "database ∈ {sqlite, postgres}",
+    message: `Invalid database. Allowed: ${CREATE_DATABASES.join(", ")}.`
+  },
+  {
     id: "create.enums.directoryConflict",
     stage: "enums",
     status: "active",
@@ -53,7 +60,7 @@ export const COMPATIBILITY_RULES: ReadonlyArray<CompatibilityRule> = [
     stage: "combinations",
     status: "deferred",
     summary: "database=none cannot pair with drizzle/prisma/mongoose",
-    message: "Deferred to L3 Option Matrix (no --database flag yet)."
+    message: "Deferred: --database currently allows sqlite|postgres only (none/mysql/mongodb later)."
   },
   {
     id: "create.combinations.frontend.none",

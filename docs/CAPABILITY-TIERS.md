@@ -203,7 +203,7 @@ See [ADR-0005](./adr/0005-l0-exit-and-fingerprint-hygiene.md).
 
 > **L3 exit (this map) is met.** `packages/template-generator` is the only product source of truth. `examples/golden` is deleted. `create` uses `generate` + `writeTree`. `--yes` is proven by a generated-build (install, typecheck, lint) in CI, with no `repos/` required for lint. See [ADR-0007](./adr/0007-templates-are-the-source-of-truth.md).
 >
-> The checkboxes below are **backlog**, not exit blockers. Preference order after exit: API primary flip, then database/ORM, then runtime `node`, then auth (`better-auth`), then the rest. L0–L2 sections that mention a Golden Sample are historical records of the deleted sample.
+> The checkboxes below are **backlog**, not exit blockers. Preference order after exit: API primary flip ✓, then database/ORM (`sqlite`/`postgres` ✓), then runtime `node`, then auth (`better-auth`), then the rest. L0–L2 sections that mention a Golden Sample are historical records of the deleted sample.
 
 ### Exit criteria
 
@@ -230,15 +230,15 @@ See [ADR-0005](./adr/0005-l0-exit-and-fingerprint-hygiene.md).
 
 ### Database (`--database`)
 
-- [ ] `sqlite` (default)
-- [ ] `postgres`
+- [x] `sqlite` (default)
+- [x] `postgres` (Drizzle `effect-postgres` + `@effect/sql-pg`; live DB tests via `ETS_PG_TEST=1`)
 - [ ] `mysql`
 - [ ] `mongodb`
 - [ ] `none`
 
 ### ORM (`--orm`)
 
-- [ ] `drizzle` (default)
+- [x] `drizzle` (default; postgres + sqlite cells)
 - [ ] `prisma`
 - [ ] `mongoose` (with mongodb)
 - [ ] `none`

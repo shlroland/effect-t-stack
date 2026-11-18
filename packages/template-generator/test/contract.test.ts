@@ -33,12 +33,48 @@ describe("template generator contract", () => {
   test("refuses stacks outside the default cell family", () => {
     const error = Effect.runSync(
       generate({
-        config: projectConfig("smoke", { database: "postgres" }),
+        config: projectConfig("smoke", { database: "mysql" }),
         templates: EMBEDDED_TEMPLATES
       }).pipe(Effect.flip)
     )
     expect(error.phase).toBe("initialization")
-    expect(error.message).toContain("database=postgres")
+    expect(error.message).toContain("database=mysql")
+  })
+
+  test("generates database=postgres with Drizzle pg schema and sql-pg", () => {
+    const tree = generateDefault("smoke", { database: "postgres" }, "0.1.0")
+    const schema = readTreeFile(tree, "packages/db/src/schema.ts")
+    expect(schema).toContain("pgTable")
+    expect(schema.includes("sqliteTable")).toBe(false)
+    const database = readTreeFile(tree, "packages/db/src/Database.ts")
+    expect(database).toContain("@effect/sql-pg")
+    expect(database).toContain("effect-postgres")
+    const migration = readTreeFile(tree, "packages/db/drizzle/20241027033320_init/migration.sql")
+    expect(migration).toContain("serial PRIMARY KEY")
+    const snapshot = JSON.parse(
+      readTreeFile(tree, "packages/db/drizzle/20241027033320_init/snapshot.json")
+    ) as { dialect: string }
+    expect(snapshot.dialect).toBe("postgresql")
+    const env = readTreeFile(tree, "apps/web/.env")
+    expect(env).toContain("postgres://")
+    const dbPkg = JSON.parse(readTreeFile(tree, "packages/db/package.json")) as {
+      dependencies: Record<string, string>
+    }
+    expect(dbPkg.dependencies["@effect/sql-pg"]).toBeDefined()
+    expect(dbPkg.dependencies["@effect/sql-sqlite-bun"]).toBeUndefined()
+    const fingerprint = parseJsonc(readTreeFile(tree, "ets.jsonc"))
+    expect(fingerprint["database"]).toBe("postgres")
+    const ormOptions = fingerprint["ormOptions"] as {
+      effectDriver: string
+      sqlClient: string
+      secondary: { package: string }
+    }
+    expect(ormOptions.effectDriver).toBe("drizzle-orm/effect-postgres")
+    expect(ormOptions.sqlClient).toBe("@effect/sql-pg")
+    expect(ormOptions.secondary.package).toBe("@effect/sql-pg")
+    expect(fingerprint["reproducibleCommand"]).toBe(
+      "bunx create-effect-t-stack@0.1.0 smoke --yes --database postgres"
+    )
   })
 
   test("generates api=httpapi primary with AtomHttpApi Todo UI", () => {

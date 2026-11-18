@@ -1,0 +1,15 @@
+{{#if (eq database "postgres")}}
+CREATE TABLE "todos" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"title" text NOT NULL,
+	"completed" boolean DEFAULT false NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+{{else}}
+CREATE TABLE `todos` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`title` text NOT NULL,
+	`completed` integer DEFAULT false NOT NULL,
+	`created_at` integer DEFAULT (unixepoch('now') * 1000) NOT NULL
+);
+{{/if}}

@@ -1,6 +1,6 @@
-import type { ApiPrimary, DirectoryConflict, PackageManager } from "../shared/enums.ts"
+import type { ApiPrimary, Database, DirectoryConflict, PackageManager } from "../shared/enums.ts"
 
-export type { ApiPrimary, DirectoryConflict, PackageManager } from "../shared/enums.ts"
+export type { ApiPrimary, Database, DirectoryConflict, PackageManager } from "../shared/enums.ts"
 
 export type CreateOptions = {
   readonly projectName: string
@@ -16,6 +16,7 @@ export type CreateOptions = {
   readonly directoryConflict: DirectoryConflict
   readonly packageManager: PackageManager
   readonly api: ApiPrimary
+  readonly database: Database
   readonly effectStyle: boolean
   readonly cwd?: string
 }

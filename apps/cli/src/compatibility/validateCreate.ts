@@ -1,7 +1,13 @@
 import * as Effect from "effect/Effect"
 import type { CreateOptions } from "../create/CreateOptions.ts"
 import { CreateError } from "../shared/CreateError.ts"
-import { CREATE_APIS, CREATE_DIRECTORY_CONFLICTS, CREATE_PACKAGE_MANAGERS, ruleMessage } from "./catalog.ts"
+import {
+  CREATE_APIS,
+  CREATE_DATABASES,
+  CREATE_DIRECTORY_CONFLICTS,
+  CREATE_PACKAGE_MANAGERS,
+  ruleMessage
+} from "./catalog.ts"
 
 const isOneOf = <T extends string>(value: string, allowed: ReadonlyArray<T>): value is T =>
   (allowed as ReadonlyArray<string>).includes(value)
@@ -14,13 +20,16 @@ const validateCreateEnums = (options: CreateOptions): Effect.Effect<void, Create
   if (!isOneOf(options.api, CREATE_APIS)) {
     return Effect.fail(new CreateError({ message: ruleMessage("create.enums.api") }))
   }
+  if (!isOneOf(options.database, CREATE_DATABASES)) {
+    return Effect.fail(new CreateError({ message: ruleMessage("create.enums.database") }))
+  }
   if (!isOneOf(options.directoryConflict, CREATE_DIRECTORY_CONFLICTS)) {
     return Effect.fail(new CreateError({ message: ruleMessage("create.enums.directoryConflict") }))
   }
   return Effect.void
 }
 
-/** Stage: combinations — api ∈ {rpc, httpapi}; other matrix dims wait for later L3 cells. */
+/** Stage: combinations — api × database cells; other matrix dims wait for later L3. */
 const validateCreateCombinations = (_options: CreateOptions): Effect.Effect<void, CreateError> => Effect.void
 
 /** Stage: auth/addons — effect-style omit path waits for L3. */

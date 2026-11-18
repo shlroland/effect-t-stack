@@ -38,6 +38,7 @@ const reproducibleCommandFor = (scope: string, options: CreateOptions): string =
     options.packageManager !== "bun" ? `--package-manager ${options.packageManager}` : undefined,
     options.manualDb ? "--manual-db" : undefined,
     options.api !== "rpc" ? `--api ${options.api}` : undefined,
+    options.database !== "sqlite" ? `--database ${options.database}` : undefined,
     !options.effectStyle ? "--no-effect-style" : undefined
   ].filter((part): part is string => part !== undefined).join(" ")
 
@@ -72,7 +73,8 @@ const planProject = (prepared: CreatePrepared) =>
         const tree = yield* generator.generate({
           config: generator.projectConfig(state.scope, {
             packageManager: state.options.packageManager,
-            api: state.options.api
+            api: state.options.api,
+            database: state.options.database
           }),
           templates: generator.EMBEDDED_TEMPLATES,
           version

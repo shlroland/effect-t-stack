@@ -68,7 +68,7 @@ git subtree pull --prefix=repos/effect https://github.com/Effect-TS/effect.git m
 
 ## Default stack
 
-Effect **v4** · Bun · **Rpc primary / HttpApi secondary** ([ADR-0006](./docs/adr/0006-api-primary-rpc-with-httpapi-secondary.md)) · SQLite + **Drizzle 1.0 RC** · auth **none** · frontend **TanStack Start** (Todo UI = `AtomRpc`) · backend **self** · env `@{{projectName}}/config` · addons `turborepo` + `skills` + `repos` + `language-service` (TS 6.x) + `mcp` + `effect-style`.
+Effect **v4** · Bun · **Rpc primary / HttpApi secondary** ([ADR-0006](./docs/adr/0006-api-primary-rpc-with-httpapi-secondary.md)) · **SQLite** (default) or **Postgres** (`--database`) + **Drizzle 1.0 RC** · auth **none** · frontend **TanStack Start** (Todo UI = `AtomRpc`) · backend **self** · env `@{{projectName}}/config` · addons `turborepo` + `skills` + `repos` + `language-service` (TS 6.x) + `mcp` + `effect-style` + `flake`.
 
 Change that stack in the templates, then update the fingerprint the generator writes.
 

@@ -6,8 +6,16 @@ import { TodoDecodeError } from "./errors.ts"
 import { Migrations } from "./Migrations.ts"
 import { TodosRepository } from "./TodosRepository.ts"
 
+{{#if (eq database "postgres")}}
+/** Live Postgres required. Set ETS_PG_TEST=1 and DATABASE_URL=postgres://… */
+const enabled = process.env["ETS_PG_TEST"] === "1"
+const url = process.env["DATABASE_URL"] ?? "postgres://postgres:postgres@127.0.0.1:5432/ets"
+{{else}}
+const enabled = true
+const url = `:memory:`
+{{/if}}
+
 const TestLive = (() => {
-  const url = `:memory:`
   const DatabaseLive = Database.layer(url)
   const MigrationsLive = Migrations.layer().pipe(Layer.provide(DatabaseLive))
   const RepoLive = TodosRepository.layerNoDeps.pipe(Layer.provide(DatabaseLive))
@@ -17,8 +25,8 @@ const TestLive = (() => {
 const run = <A, E>(effect: Effect.Effect<A, E, Database | Migrations | TodosRepository>) =>
   effect.pipe(Effect.provide(TestLive), Effect.scoped, Effect.runPromise)
 
-describe("TodosRepository", () => {
-  it("persists todos in SQLite via Drizzle", async () => {
+describe.skipIf(!enabled)("TodosRepository", () => {
+  it("persists todos via Drizzle", async () => {
     const result = await run(
       Effect.gen(function*() {
         const repo = yield* TodosRepository
@@ -75,9 +83,15 @@ describe("TodosRepository", () => {
     const error = await run(
       Effect.gen(function*() {
         const db = yield* Database
+{{#if (eq database "postgres")}}
+        yield* db.execute(
+          "INSERT INTO todos (title, completed, created_at) VALUES ('', false, now())"
+        )
+{{else}}
         yield* db.run(
           "INSERT INTO todos (title, completed, created_at) VALUES ('', 0, 0)"
         )
+{{/if}}
         const repo = yield* TodosRepository
         return yield* repo.all().pipe(Effect.flip)
       })

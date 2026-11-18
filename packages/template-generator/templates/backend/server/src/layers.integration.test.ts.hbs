@@ -1,29 +1,37 @@
 import { BunHttpServer } from "@effect/platform-bun"
 import { TodoTitle } from "@{{projectName}}/domain"
 import { Api } from "@{{projectName}}/protocol/http-api"
-import { afterAll, describe, expect, it } from "bun:test"
+import { {{#unless (eq database "postgres")}}afterAll, {{/unless}}describe, expect, it } from "bun:test"
 import { Effect, Layer } from "effect"
 import { HttpApiTest } from "effect/http-api"
+{{#unless (eq database "postgres")}}
 import { mkdtempSync, rmSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
+{{/unless}}
 import { SystemApiHandlers } from "./http/System/http.ts"
 import { TodosApiHandlers } from "./http/Todos/http.ts"
 import { makeAppLive } from "./layers.ts"
 
+{{#if (eq database "postgres")}}
+const enabled = process.env["ETS_PG_TEST"] === "1"
+const databaseUrl = process.env["DATABASE_URL"] ?? "postgres://postgres:postgres@127.0.0.1:5432/ets"
+{{else}}
+const enabled = true
 const tempDir = mkdtempSync(join(tmpdir(), "ets-app-live-"))
 const databaseUrl = join(tempDir, "integration.sqlite")
 
 afterAll(() => {
   rmSync(tempDir, { recursive: true, force: true })
 })
+{{/if}}
 
 const AppHandlersLive = Layer.mergeAll(SystemApiHandlers, TodosApiHandlers).pipe(
   Layer.provide(makeAppLive({ databaseUrl }))
 )
 
-describe("makeAppLive integration", () => {
-  it("runs migrations, readiness, and Todo CRUD against real SQLite", async () => {
+describe.skipIf(!enabled)("makeAppLive integration", () => {
+  it("runs migrations, readiness, and Todo CRUD against the database", async () => {
     await Effect.gen(function*() {
       // system is topLevel (flattened); todos stays under `client.todos`
       const client = yield* HttpApiTest.groups(Api, ["system", "todos"])

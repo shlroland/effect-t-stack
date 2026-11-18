@@ -1,4 +1,8 @@
+{{#if (eq database "postgres")}}
+import { migrate } from "drizzle-orm/effect-postgres/migrator"
+{{else}}
 import { migrate } from "drizzle-orm/effect-sqlite-bun/migrator"
+{{/if}}
 import { Context, Effect, Layer, Path } from "effect"
 import { Database, mapDatabaseError, ping } from "./Database.ts"
 import type { DatabaseError } from "./errors.ts"

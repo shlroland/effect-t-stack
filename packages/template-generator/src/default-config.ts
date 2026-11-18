@@ -93,7 +93,7 @@ const STACK_CHECKS: ReadonlyArray<StackCheck> = [
   requireProjectName,
   requireEq("runtime", "bun"),
   requireOneOf("api", ["rpc", "httpapi"]),
-  requireEq("database", "sqlite"),
+  requireOneOf("database", ["sqlite", "postgres"]),
   requireEq("orm", "drizzle"),
   requireEq("auth", "none"),
   requireEq("backend", "self"),
@@ -107,11 +107,11 @@ const STACK_CHECKS: ReadonlyArray<StackCheck> = [
 ]
 
 const unsupportedPreamble = "This generator currently emits the Golden default cell family only " +
-  "(api ∈ {rpc, httpapi}, Bun, SQLite, Drizzle, auth none, TanStack Start, " +
+  "(api ∈ {rpc, httpapi}, database ∈ {sqlite, postgres}, Bun, Drizzle, auth none, TanStack Start, " +
   "effect-style on, todo). Unsupported: "
 
 /**
- * Default cell family: rpc or httpapi primary. Other Option Matrix cells
+ * Default cell family: api + database variants. Other Option Matrix cells
  * are refused instead of emitting a partial tree.
  */
 export const unsupportedStackMessage = (config: ProjectConfig): Option.Option<string> =>

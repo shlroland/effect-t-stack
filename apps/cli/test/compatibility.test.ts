@@ -24,6 +24,7 @@ const baseOptions = (overrides: Partial<CreateOptions> = {}): CreateOptions => (
   directoryConflict: "error",
   packageManager: "bun",
   api: "rpc",
+  database: "sqlite",
   effectStyle: true,
   ...overrides
 })

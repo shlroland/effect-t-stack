@@ -26,6 +26,7 @@ const base = (overrides: Partial<CreateOptions> & Pick<CreateOptions, "projectNa
   directoryConflict: "error",
   packageManager: "bun",
   api: "rpc",
+  database: "sqlite",
   effectStyle: true,
   ...overrides
 })
@@ -145,6 +146,17 @@ describe("createProject (Effect)", () => {
     expect(result.dryRun).toBe(true)
     expect(result.fileCount).toBeGreaterThan(10)
     expect(result.api).toBe("httpapi")
+  })
+
+  test("database=postgres dry-run plans postgres cell", async () => {
+    const cwd = await mkdtemp(join(tmpdir(), "ets-cli-pg-"))
+    temps.push(cwd)
+    const result = await Effect.runPromise(
+      provideBun(createProject(base({ projectName: "pg", cwd, dryRun: true, database: "postgres" })))
+    )
+    expect(result.dryRun).toBe(true)
+    expect(result.fileCount).toBeGreaterThan(10)
+    expect(result.database).toBe("postgres")
   })
 
   test("effectStyle=false fails clearly until L3", async () => {
