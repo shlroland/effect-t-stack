@@ -10,6 +10,7 @@ import { effectiveDirectoryConflict } from "./CreateOptions.ts"
 import { buildResult, emitResult, printPlanSummary, printTitle } from "./createReport.ts"
 import { loadGenerator } from "./loadGenerator.ts"
 import { materializeProject } from "./materialize.ts"
+import { promptProjectKind } from "./promptProjectKind.ts"
 import { resolveCreateContext } from "./resolveScope.ts"
 import { resolveTargetDirectory } from "./targetDirectory.ts"
 
@@ -48,17 +49,20 @@ const reproducibleCommandFor = (scope: string, options: CreateOptions): string =
 
 const prepare = (options: CreateOptions) =>
   printTitle(options).pipe(
-    Effect.andThen(validateCreateOptions(options)),
     Effect.andThen(resolveCreateContext(options)),
     Effect.flatMap((ctx) =>
-      confirmCreate(options, ctx.scope).pipe(
-        Effect.map((scope): CreatePrepared => ({
-          options,
+      Effect.gen(function*() {
+        const template = yield* promptProjectKind(options)
+        const nextOptions = template === options.template ? options : { ...options, template }
+        yield* validateCreateOptions(nextOptions)
+        const scope = yield* confirmCreate(nextOptions, ctx.scope)
+        return {
+          options: nextOptions,
           phases: [],
           cwd: ctx.cwd,
           scope
-        }))
-      )
+        } satisfies CreatePrepared
+      })
     )
   )
 
