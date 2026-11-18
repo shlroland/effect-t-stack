@@ -10,6 +10,7 @@ import { effectiveDirectoryConflict } from "./CreateOptions.ts"
 import { buildResult, emitResult, printPlanSummary, printTitle } from "./createReport.ts"
 import { loadGenerator } from "./loadGenerator.ts"
 import { materializeProject } from "./materialize.ts"
+import { promptPackageManager } from "./promptPackageManager.ts"
 import { promptProjectKind } from "./promptProjectKind.ts"
 import { resolveCreateContext } from "./resolveScope.ts"
 import { resolveTargetDirectory } from "./targetDirectory.ts"
@@ -53,7 +54,10 @@ const prepare = (options: CreateOptions) =>
     Effect.flatMap((ctx) =>
       Effect.gen(function*() {
         const template = yield* promptProjectKind(options)
-        const nextOptions = template === options.template ? options : { ...options, template }
+        const packageManager = yield* promptPackageManager(options)
+        const nextOptions = template === options.template && packageManager === options.packageManager
+          ? options
+          : { ...options, template, packageManager }
         yield* validateCreateOptions(nextOptions)
         const scope = yield* confirmCreate(nextOptions, ctx.scope)
         return {
