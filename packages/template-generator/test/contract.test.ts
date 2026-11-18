@@ -53,13 +53,17 @@ describe("template generator contract", () => {
       name: string
       private?: boolean
       exports: Record<string, string>
-      dependencies: Record<string, string>
+      dependencies?: Record<string, string>
+      peerDependencies: Record<string, string>
+      devDependencies: Record<string, string>
       scripts: Record<string, string>
     }
     expect(root.name).toBe("greet")
     expect(root.private).toBeUndefined()
     expect(root.exports["."]).toBe("./src/index.ts")
-    expect(root.dependencies["effect"]).toBe(dependencyVersionMap.effect)
+    expect(root.dependencies?.["effect"]).toBeUndefined()
+    expect(root.peerDependencies["effect"]).toBe(dependencyVersionMap.effect)
+    expect(root.devDependencies["effect"]).toBe(dependencyVersionMap.effect)
     expect(root.scripts["check"]).toContain("check-types")
     expect(root.scripts["lint"]).toContain("src test packages")
     expect(root.scripts["dev"]).toBeUndefined()

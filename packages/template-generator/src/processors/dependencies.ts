@@ -58,8 +58,9 @@ export const processDependencies = (vfs: VirtualFsService, config: ProjectConfig
     addPackageDependency({
       vfs,
       packagePath: "",
-      dependencies: ["effect"],
-      devDependencies: rootDevDependencies(config)
+      peerDependencies: ["effect"],
+      // Peer + dev so authors can typecheck/test without a consumer install.
+      devDependencies: ["effect", ...rootDevDependencies(config)]
     })
     if (hasAddon(config, "effect-style") && vfs.fileExists("packages/effect-oxc/package.json")) {
       addPackageDependency({

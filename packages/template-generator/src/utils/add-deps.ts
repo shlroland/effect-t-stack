@@ -7,9 +7,11 @@ export type AddPackageDependencyInput = {
   /** Package directory. `""` is the repo root. */
   readonly packagePath: string
   readonly dependencies?: ReadonlyArray<string>
+  readonly peerDependencies?: ReadonlyArray<string>
   readonly devDependencies?: ReadonlyArray<string>
   /** Bypass `dependencyVersionMap` (intentional lags / workspace protocols). */
   readonly customDependencies?: Readonly<Record<string, string>>
+  readonly customPeerDependencies?: Readonly<Record<string, string>>
   readonly customDevDependencies?: Readonly<Record<string, string>>
 }
 
@@ -53,16 +55,22 @@ const readPackage = (vfs: VirtualFsService, path: string): PackageJson => {
 
 /**
  * Look up each name in `dependencyVersionMap` and merge it into the package.
- * A name listed as both a runtime and a dev dependency stays in `dependencies` only.
+ * Hard `dependencies` win over peers/dev. Peers may also appear in
+ * `devDependencies` (local install for library authors).
  */
 export const addPackageDependency = (input: AddPackageDependencyInput): void => {
   const path = packageJsonPath(input.packagePath)
   const pkg = readPackage(input.vfs, path)
   const dependencies = asStringRecord(pkg["dependencies"])
+  const peerDependencies = asStringRecord(pkg["peerDependencies"])
   const devDependencies = asStringRecord(pkg["devDependencies"])
 
   for (const name of input.dependencies ?? []) dependencies[name] = pinnedVersion(name)
   for (const [name, version] of Object.entries(input.customDependencies ?? {})) dependencies[name] = version
+  for (const name of input.peerDependencies ?? []) peerDependencies[name] = pinnedVersion(name)
+  for (const [name, version] of Object.entries(input.customPeerDependencies ?? {})) {
+    peerDependencies[name] = version
+  }
   for (const name of input.devDependencies ?? []) {
     if (name in dependencies) continue
     devDependencies[name] = pinnedVersion(name)
@@ -71,10 +79,15 @@ export const addPackageDependency = (input: AddPackageDependencyInput): void => 
     if (name in dependencies) continue
     devDependencies[name] = version
   }
-  for (const name of Object.keys(dependencies)) delete devDependencies[name]
+  for (const name of Object.keys(dependencies)) {
+    delete peerDependencies[name]
+    delete devDependencies[name]
+  }
 
   if (Object.keys(dependencies).length === 0) delete pkg["dependencies"]
   else pkg["dependencies"] = sortStringRecord(dependencies)
+  if (Object.keys(peerDependencies).length === 0) delete pkg["peerDependencies"]
+  else pkg["peerDependencies"] = sortStringRecord(peerDependencies)
   if (Object.keys(devDependencies).length === 0) delete pkg["devDependencies"]
   else pkg["devDependencies"] = sortStringRecord(devDependencies)
   input.vfs.writeJson(path, pkg)
