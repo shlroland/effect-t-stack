@@ -64,6 +64,7 @@ const createAndTypecheck = async (
       manualDb: false,
       directoryConflict: "error",
       packageManager: "bun",
+      template: "default",
       api,
       database,
       auth: "none",

@@ -1,0 +1,34 @@
+import { Context, Effect, Layer, Schema } from "effect"
+
+export const Name = Schema.String.pipe(
+  Schema.check(Schema.isMinLength(1)),
+  Schema.brand("Name")
+)
+export type Name = typeof Name.Type
+
+export class Greeting extends Schema.Class<Greeting>("Greeting")({
+  name: Name,
+  message: Schema.String
+}) {}
+
+export class EmptyName extends Schema.TaggedError<EmptyName>()("EmptyName", {}) {}
+
+/**
+ * Minimal Context.Service sample for a publishable Effect library.
+ * Replace with your domain modules; keep PascalCase files and named exports.
+ */
+export class Greeter extends Context.Service<Greeter, {
+  readonly greet: (name: Name) => Effect.Effect<Greeting>
+}>()("{{projectName}}/Greeter") {
+  static readonly layer = Layer.succeed(
+    Greeter,
+    Greeter.of({
+      greet: Effect.fn("Greeter.greet")(function*(name: Name) {
+        return Greeting.make({
+          name,
+          message: `Hello, ${name}!`
+        })
+      })
+    })
+  )
+}

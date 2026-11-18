@@ -5,7 +5,13 @@ export { loadTemplates, readTemplateEntries, resolveTemplatesRoot, TemplateReade
 export type { TemplateEntry, TemplateReaderService } from "./core/template-reader.ts"
 export { createVirtualFileSystem, makeMemVirtualFs, seedTextFiles, VirtualFs } from "./core/virtual-fs.ts"
 export type { VirtualFsService } from "./core/virtual-fs.ts"
-export { DEFAULT_ADDONS, projectConfig } from "./default-config.ts"
+export {
+  DEFAULT_ADDONS,
+  isLibraryTemplate,
+  LIBRARY_ADDONS,
+  libraryProjectConfig,
+  projectConfig
+} from "./default-config.ts"
 export { ETS_SCHEMA_URL, FINGERPRINT_SCHEMA_VERSION, writeEtsConfig } from "./ets-config.ts"
 export { generate } from "./generator.ts"
 export { EMBEDDED_TEMPLATES, TEMPLATE_COUNT } from "./templates.generated.ts"

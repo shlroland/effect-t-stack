@@ -10,7 +10,8 @@ import {
   CREATE_AUTHS,
   CREATE_DATABASES,
   CREATE_DIRECTORY_CONFLICTS,
-  CREATE_PACKAGE_MANAGERS
+  CREATE_PACKAGE_MANAGERS,
+  CREATE_TEMPLATES
 } from "../shared/enums.ts"
 
 export {
@@ -18,7 +19,8 @@ export {
   CREATE_AUTHS,
   CREATE_DATABASES,
   CREATE_DIRECTORY_CONFLICTS,
-  CREATE_PACKAGE_MANAGERS
+  CREATE_PACKAGE_MANAGERS,
+  CREATE_TEMPLATES
 } from "../shared/enums.ts"
 
 export type ValidationStage = "enums" | "combinations" | "authAddons" | "examples"
@@ -75,6 +77,13 @@ export const COMPATIBILITY_RULES: ReadonlyArray<CompatibilityRule> = [
     message: `Invalid auth. Allowed: ${CREATE_AUTHS.join(", ")}.`
   },
   {
+    id: "create.enums.template",
+    stage: "enums",
+    status: "active",
+    summary: "template ∈ {default, library}",
+    message: `Invalid template. Allowed: ${CREATE_TEMPLATES.join(", ")}.`
+  },
+  {
     id: "create.combinations.database.none+drizzle",
     stage: "combinations",
     status: "deferred",
@@ -86,14 +95,22 @@ export const COMPATIBILITY_RULES: ReadonlyArray<CompatibilityRule> = [
     stage: "combinations",
     status: "deferred",
     summary: "frontend=none is API-only shape",
-    message: "Deferred to L3 (no --frontend flag yet)."
+    message: "Deferred to L3 (no --frontend flag yet; use --template library for a package-only cell)."
+  },
+  {
+    id: "create.combinations.library.stack-flags",
+    stage: "combinations",
+    status: "active",
+    summary: "library preset forbids full-stack auth/api/database/manual-db overrides",
+    message: "--template library cannot combine with --auth better-auth, non-default --api/--database, or --manual-db."
   },
   {
     id: "create.auth.none-without-backend-db",
     stage: "authAddons",
     status: "deferred",
     summary: "No backend / no DB ⇒ force auth=none",
-    message: "Deferred until backend/database=none dims are exposed (ADR-0008)."
+    message:
+      "Deferred until backend/database=none dims are exposed (ADR-0008). Library preset already forces auth=none."
   },
   {
     id: "create.auth.payments.requires-better-auth",

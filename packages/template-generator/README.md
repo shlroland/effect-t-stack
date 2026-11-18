@@ -1,15 +1,15 @@
 # `@effect-t-stack/template-generator`
 
-In-memory generator for `create-effect-t-stack`, written in **Effect** style. These templates are the only product source of truth. The default stack is Rpc primary, HttpApi secondary, Bun, SQLite + Drizzle, auth none, TanStack Start, effect-style on, todo. `create` calls `generate` + `writeTree`.
+In-memory generator for `create-effect-t-stack`, written in **Effect** style. These templates are the only product source of truth. The default stack is Rpc primary, HttpApi secondary, Bun, SQLite + Drizzle, auth none, TanStack Start, effect-style on, todo. `--template library` emits a publishable single-package Effect library. `create` calls `generate` + `writeTree`.
 
 ```ts
-import { EMBEDDED_TEMPLATES, generate, projectConfig } from "@effect-t-stack/template-generator"
+import { EMBEDDED_TEMPLATES, generate, libraryProjectConfig, projectConfig } from "@effect-t-stack/template-generator"
 import { writeTree } from "@effect-t-stack/template-generator/fs-writer"
 import { Effect } from "effect"
 
 const program = Effect.gen(function*() {
   const tree = yield* generate({
-    config: projectConfig("my-app"),
+    config: projectConfig("my-app"), // or libraryProjectConfig("my-lib")
     templates: EMBEDDED_TEMPLATES,
     version: "0.1.0"
   })
@@ -19,7 +19,7 @@ const program = Effect.gen(function*() {
 await Effect.runPromise(program)
 ```
 
-- Templates are Handlebars fragments under `templates/`. Scope is `@{{projectName}}/…`.
+- Templates are Handlebars fragments under `templates/` (`library/` for the library preset). App scope is `@{{projectName}}/…`; library root name is `projectName`.
 - `generate` is an `Effect` that provides `GenerateLayers` (`VirtualFs` + `TemplateEngine`), then runs post-processors. It does not touch the disk.
 - `writeTree` (Node-only entry `./fs-writer`) is an `Effect` that materializes the tree. Binary files use the `[Binary file]` marker plus `templates-binary/`.
 - Failures are `GeneratorError` (`Schema.TaggedError`) with a `phase`.

@@ -15,14 +15,15 @@ Stop at the first failing active rule. Deferred catalog entries are documentatio
 
 ## Active illegal / gated combos (L2)
 
-| Rule id                                | When                                                                                                    |
-| -------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| `create.enums.*`                       | Unknown enum on create / create-json (`packageManager`, `api`, `database`, `auth`, `directoryConflict`) |
-| ~~`create.combinations.api.rpc-only`~~ | Removed — `api ∈ {rpc, httpapi}` (Todo UI AtomRpc ↔ AtomHttpApi)                                        |
-| `create.addons.effect-style.required`  | `--no-effect-style` (omit path until L3)                                                                |
-| `add.addons.default-only`              | `add <addon>` outside the default addon set                                                             |
-| `add.addons.effect-style.conflicts`    | `effect-style` with `biome` / `ultracite` / `oxlint-only` / `husky`                                     |
-| `add.mutex.package-or-addon`           | CLI or `add-json` passes both package and addon                                                         |
+| Rule id                                   | When                                                                                                                |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `create.enums.*`                          | Unknown enum on create / create-json (`packageManager`, `template`, `api`, `database`, `auth`, `directoryConflict`) |
+| ~~`create.combinations.api.rpc-only`~~    | Removed — `api ∈ {rpc, httpapi}` (Todo UI AtomRpc ↔ AtomHttpApi)                                                    |
+| `create.combinations.library.stack-flags` | `--template library` with `--auth better-auth`, non-default `--api`/`--database`, or `--manual-db`                  |
+| `create.addons.effect-style.required`     | `--no-effect-style` (omit path until L3)                                                                            |
+| `add.addons.default-only`                 | `add <addon>` outside the default addon set                                                                         |
+| `add.addons.effect-style.conflicts`       | `effect-style` with `biome` / `ultracite` / `oxlint-only` / `husky`                                                 |
+| `add.mutex.package-or-addon`              | CLI or `add-json` passes both package and addon                                                                     |
 
 Default addons: `turborepo`, `skills`, `repos`, `language-service`, `mcp`, `effect-style`.
 
@@ -33,8 +34,8 @@ Default addons: `turborepo`, `skills`, `repos`, `language-service`, `mcp`, `effe
 Examples mirrored in the catalog with `status: "deferred"`:
 
 - `database=none` + drizzle/prisma/mongoose (`--database` currently exposes `sqlite` \| `postgres` only)
-- `frontend=none` (API-only)
-- No backend / no DB ⇒ force `auth=none` (dims not exposed yet)
+- `frontend=none` (API-only app shape; distinct from `--template library`)
+- No backend / no DB ⇒ force `auth=none` (dims not exposed yet; library preset already forces `auth=none`)
 - `payments=polar` without `better-auth`
 - Full `--examples` matrix
 - Optional CI `ETS_GENERATED_BUILD` cell for `auth=better-auth` (typecheck already proven locally)

@@ -25,6 +25,7 @@ const base = (overrides: Partial<CreateOptions> & Pick<CreateOptions, "projectNa
   manualDb: false,
   directoryConflict: "error",
   packageManager: "bun",
+  template: "default",
   api: "rpc",
   database: "sqlite",
   auth: "none",
@@ -177,6 +178,49 @@ describe("createProject (Effect)", () => {
     )
     expect(Exit.isFailure(exit)).toBe(true)
     expect(String(exit)).toContain("effect-style")
+  })
+
+  test("template=library generates a publishable Effect package", async () => {
+    const cwd = await mkdtemp(join(tmpdir(), "ets-cli-lib-"))
+    temps.push(cwd)
+    const result = await Effect.runPromise(
+      provideBun(createProject(base({ projectName: "greet", cwd, template: "library" })))
+    )
+    expect(result.template).toBe("library")
+    expect(result.targetDir).toBe(join(cwd, "greet"))
+    const rootPkg = JSON.parse(await readFile(join(result.targetDir, "package.json"), "utf8")) as {
+      name: string
+      private?: boolean
+      exports?: Record<string, string>
+      dependencies?: Record<string, string>
+    }
+    expect(rootPkg.name).toBe("greet")
+    expect(rootPkg.private).toBeUndefined()
+    expect(rootPkg.exports?.["."]).toBe("./src/index.ts")
+    expect(rootPkg.dependencies?.["effect"]).toBeDefined()
+    await expect(stat(join(result.targetDir, "src/Greeting.ts"))).resolves.toBeDefined()
+    await expect(stat(join(result.targetDir, "apps/web"))).rejects.toThrow()
+    await expect(stat(join(result.targetDir, "packages/domain"))).rejects.toThrow()
+    const ets = await readFile(join(result.targetDir, "ets.jsonc"), "utf8")
+    expect(ets).toContain("\"template\": \"library\"")
+    expect(ets).toContain("--template library")
+    expect(ets).not.toContain("apiOptions")
+  })
+
+  test("template=library rejects better-auth", async () => {
+    const exit = await Effect.runPromise(
+      provideBun(
+        createProject(base({
+          projectName: "bad",
+          cwd: tmpdir(),
+          dryRun: true,
+          template: "library",
+          auth: "better-auth"
+        }))
+      ).pipe(Effect.exit)
+    )
+    expect(Exit.isFailure(exit)).toBe(true)
+    expect(String(exit)).toContain("library")
   })
 
   test("CreateError tag", () => {

@@ -18,6 +18,10 @@ export const AuthSchema = Schema.Literals(["none", "better-auth"])
 export type Auth = typeof AuthSchema.Type
 export const CREATE_AUTHS = AuthSchema.literals
 
+export const TemplateSchema = Schema.Literals(["default", "library"])
+export type TemplateId = typeof TemplateSchema.Type
+export const CREATE_TEMPLATES = TemplateSchema.literals
+
 export const DirectoryConflictSchema = Schema.Literals([
   "error",
   "overwrite",

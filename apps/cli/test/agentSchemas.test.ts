@@ -20,6 +20,7 @@ describe("CreateJsonInput schema", () => {
       install: true,
       git: true,
       packageManager: "bun",
+      template: "default",
       api: "rpc",
       database: "sqlite",
       auth: "none",
@@ -32,6 +33,7 @@ describe("CreateJsonInput schema", () => {
       verbose: true,
       renderTitle: false,
       packageManager: "bun",
+      template: "default",
       auth: "none"
     })
   })

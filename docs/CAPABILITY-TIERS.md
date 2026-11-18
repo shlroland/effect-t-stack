@@ -313,8 +313,10 @@ Decision: [ADR-0008](./adr/0008-auth-better-auth-official-effect-http.md) — `@
 
 ### Presets
 
-- [ ] `--template` `none`
-- [ ] Effect-oriented presets (optional analogues of mern/pern/t3 — names TBD)
+- [x] `--template` `default` (full-stack Golden cell; implicit when omitted)
+- [x] `--template` `library` (publishable single-package Effect library; no apps/db/auth)
+- [ ] `--template` `none` / API-only (`frontend=none`) — separate from library
+- [ ] Other Effect-oriented presets (optional analogues of mern/pern/t3 — names TBD)
 
 ### Template engine
 

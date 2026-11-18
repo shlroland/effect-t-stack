@@ -9,7 +9,8 @@ import {
   AuthSchema,
   DatabaseSchema,
   DirectoryConflictSchema,
-  PackageManagerSchema
+  PackageManagerSchema,
+  TemplateSchema
 } from "../shared/enums.ts"
 
 export {
@@ -17,7 +18,8 @@ export {
   AuthSchema,
   DatabaseSchema,
   DirectoryConflictSchema,
-  PackageManagerSchema
+  PackageManagerSchema,
+  TemplateSchema
 } from "../shared/enums.ts"
 
 const boolWithDefault = (defaultValue: boolean) =>
@@ -37,6 +39,7 @@ export const CreateJsonInput = Schema.Struct({
   packageManager: PackageManagerSchema.pipe(
     Schema.withDecodingDefaultKey(Effect.succeed("bun" as const))
   ),
+  template: TemplateSchema.pipe(Schema.withDecodingDefaultKey(Effect.succeed("default" as const))),
   api: ApiPrimarySchema.pipe(Schema.withDecodingDefaultKey(Effect.succeed("rpc" as const))),
   database: DatabaseSchema.pipe(Schema.withDecodingDefaultKey(Effect.succeed("sqlite" as const))),
   auth: AuthSchema.pipe(Schema.withDecodingDefaultKey(Effect.succeed("none" as const))),
@@ -136,6 +139,7 @@ export const toCreateOptions = (input: CreateJsonInput): CreateOptions => ({
   manualDb: input.manualDb,
   directoryConflict: input.directoryConflict,
   packageManager: input.packageManager,
+  template: input.template,
   api: input.api,
   database: input.database,
   auth: input.auth,

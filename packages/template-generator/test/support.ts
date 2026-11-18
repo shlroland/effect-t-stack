@@ -1,5 +1,5 @@
 import * as Effect from "effect/Effect"
-import { projectConfig } from "../src/default-config.ts"
+import { libraryProjectConfig, projectConfig } from "../src/default-config.ts"
 import { generate } from "../src/generator.ts"
 import { EMBEDDED_TEMPLATES } from "../src/templates.generated.ts"
 import type { ProjectConfig, VirtualFileTree, VirtualNode } from "../src/types.ts"
@@ -12,6 +12,19 @@ export const generateDefault = (
   Effect.runSync(
     generate({
       config: projectConfig(name, patch),
+      templates: EMBEDDED_TEMPLATES,
+      ...(version === undefined ? {} : { version })
+    })
+  )
+
+export const generateLibrary = (
+  name: string,
+  patch?: Partial<Omit<ProjectConfig, "projectName" | "template">>,
+  version?: string
+): VirtualFileTree =>
+  Effect.runSync(
+    generate({
+      config: libraryProjectConfig(name, patch),
       templates: EMBEDDED_TEMPLATES,
       ...(version === undefined ? {} : { version })
     })

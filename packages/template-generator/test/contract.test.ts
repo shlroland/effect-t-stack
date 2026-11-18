@@ -16,7 +16,7 @@ import { EMBEDDED_TEMPLATES, TEMPLATE_COUNT } from "../src/templates.generated.t
 import type { VirtualFileTree } from "../src/types.ts"
 import { addPackageDependency } from "../src/utils/add-deps.ts"
 import { dependencyVersionMap } from "../src/utils/dependency-versions.ts"
-import { generateDefault, parseJsonc, readTreeFile, treePaths } from "./support.ts"
+import { generateDefault, generateLibrary, parseJsonc, readTreeFile, treePaths } from "./support.ts"
 
 const repoRoot = resolve(import.meta.dir, "../../..")
 const source = (relativePath: string): string => readFileSync(new URL(relativePath, import.meta.url), "utf8")
@@ -39,6 +39,50 @@ describe("template generator contract", () => {
     )
     expect(error.phase).toBe("initialization")
     expect(error.message).toContain("database=mysql")
+  })
+
+  test("generates template=library as a publishable Effect package", () => {
+    const tree = generateLibrary("greet", undefined, "0.1.0")
+    const paths = treePaths(tree)
+    expect(paths.includes("src/Greeting.ts")).toBe(true)
+    expect(paths.includes("test/Greeting.test.ts")).toBe(true)
+    expect(paths.includes("packages/effect-oxc/package.json")).toBe(true)
+    expect(paths.includes("apps/web/package.json")).toBe(false)
+    expect(paths.includes("packages/domain/package.json")).toBe(false)
+    const root = JSON.parse(readTreeFile(tree, "package.json")) as {
+      name: string
+      private?: boolean
+      exports: Record<string, string>
+      dependencies: Record<string, string>
+      scripts: Record<string, string>
+    }
+    expect(root.name).toBe("greet")
+    expect(root.private).toBeUndefined()
+    expect(root.exports["."]).toBe("./src/index.ts")
+    expect(root.dependencies["effect"]).toBe(dependencyVersionMap.effect)
+    expect(root.scripts["check"]).toContain("check-types")
+    expect(root.scripts["lint"]).toContain("src test packages")
+    expect(root.scripts["dev"]).toBeUndefined()
+    const greeting = readTreeFile(tree, "src/Greeting.ts")
+    expect(greeting).toContain("Context.Service")
+    expect(greeting).toContain("greet/Greeter")
+    const fingerprint = parseJsonc(readTreeFile(tree, "ets.jsonc"))
+    expect(fingerprint["template"]).toBe("library")
+    expect(fingerprint["api"]).toBe("none")
+    expect(fingerprint["database"]).toBe("none")
+    expect(fingerprint["frontend"]).toBe("none")
+    expect(fingerprint["backend"]).toBe("none")
+    expect(fingerprint["apiOptions"]).toBeUndefined()
+    expect(fingerprint["reproducibleCommand"]).toBe(
+      "bunx create-effect-t-stack@0.1.0 greet --yes --template library"
+    )
+    expect(fingerprint["addons"]).toEqual([
+      "skills",
+      "language-service",
+      "mcp",
+      "effect-style",
+      "flake"
+    ])
   })
 
   test("generates database=postgres with Drizzle pg schema and sql-pg", () => {
@@ -114,7 +158,9 @@ describe("template generator contract", () => {
   test("auth=better-auth emits @auth overlay and env pins", () => {
     const tree = generateDefault("smoke-ba", { auth: "better-auth" }, "0.1.0")
     expect(treePaths(tree).includes("packages/auth/src/AuthMiddlewareLive.ts")).toBe(true)
+    expect(treePaths(tree).includes("packages/auth/src/AuthHttpMiddlewareLive.ts")).toBe(true)
     expect(treePaths(tree).includes("packages/protocol/src/rpc/AuthMiddleware.ts")).toBe(true)
+    expect(treePaths(tree).includes("packages/protocol/src/http-api/AuthHttpMiddleware.ts")).toBe(true)
     expect(treePaths(tree).includes("packages/auth/package.json")).toBe(true)
     const authPkg = JSON.parse(readTreeFile(tree, "packages/auth/package.json")) as {
       dependencies: Record<string, string>
@@ -131,6 +177,13 @@ describe("template generator contract", () => {
     expect(env).toContain("AUTH_SECRET=")
     expect(env).toContain("BETTER_AUTH_URL=")
     expect(readTreeFile(tree, "packages/auth/src/createAuth.ts")).toContain("tanstackStartCookies")
+    expect(readTreeFile(tree, "packages/protocol/src/http-api/TodosApi.ts")).toContain(
+      ".middleware(AuthHttpMiddleware)"
+    )
+    expect(readTreeFile(tree, "apps/server/src/http/createHttpApiWebHandler.ts")).toContain(
+      "AuthHttpMiddlewareLive"
+    )
+    expect(readTreeFile(tree, "apps/web/src/atoms/http-api.ts")).toContain("credentials: \"include\"")
   })
 
   test("handlebars helpers see the project config", () => {

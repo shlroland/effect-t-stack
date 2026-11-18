@@ -1,5 +1,5 @@
 import type { VirtualFsService } from "../core/virtual-fs.ts"
-import { hasAddon, hasFrontend } from "../default-config.ts"
+import { hasAddon, hasFrontend, isLibraryTemplate } from "../default-config.ts"
 import type { ProjectConfig } from "../types.ts"
 import { addPackageDependency, asStringRecord, packageJsonPath, sortStringRecord } from "../utils/add-deps.ts"
 import { processTurboConfig } from "./turbo-generator.ts"
@@ -41,10 +41,11 @@ const linkWorkspacePackages = (vfs: VirtualFsService, config: ProjectConfig): vo
 
 const rootDevDependencies = (config: ProjectConfig): Array<string> => {
   const names = ["typescript"]
+  if (isLibraryTemplate(config)) names.push("@types/bun")
   if (hasAddon(config, "turborepo")) names.push("turbo")
   if (hasAddon(config, "effect-style")) names.push("@oxlint/plugins", "dprint", "lefthook", "oxlint")
   if (hasAddon(config, "language-service")) names.push("@effect/language-service")
-  if (hasAddon(config, "skills")) names.push("effect")
+  if (hasAddon(config, "skills") && !isLibraryTemplate(config)) names.push("effect")
   return names
 }
 
@@ -53,6 +54,25 @@ const rootDevDependencies = (config: ProjectConfig): Array<string> => {
  * Versions are not written in templates.
  */
 export const processDependencies = (vfs: VirtualFsService, config: ProjectConfig): void => {
+  if (isLibraryTemplate(config)) {
+    addPackageDependency({
+      vfs,
+      packagePath: "",
+      dependencies: ["effect"],
+      devDependencies: rootDevDependencies(config)
+    })
+    if (hasAddon(config, "effect-style") && vfs.fileExists("packages/effect-oxc/package.json")) {
+      addPackageDependency({
+        vfs,
+        packagePath: "packages/effect-oxc",
+        dependencies: ["@oxlint/plugins", "typescript"],
+        devDependencies: ["@types/node", "typescript"]
+      })
+    }
+    processTurboConfig(vfs, config)
+    return
+  }
+
   linkWorkspacePackages(vfs, config)
 
   addPackageDependency({

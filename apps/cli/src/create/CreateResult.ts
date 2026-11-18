@@ -1,4 +1,4 @@
-import type { ApiPrimary, Auth, CreateOptions, Database } from "./CreateOptions.ts"
+import type { ApiPrimary, Auth, CreateOptions, Database, TemplateId } from "./CreateOptions.ts"
 import type { PackageManager } from "./packageManagers.ts"
 
 export type { DirectoryConflict } from "./CreateOptions.ts"
@@ -10,6 +10,7 @@ export type CreateResult = {
   readonly fileCount: number
   readonly dryRun: boolean
   readonly packageManager: PackageManager
+  readonly template: TemplateId
   readonly api: ApiPrimary
   readonly database: Database
   readonly auth: Auth
@@ -31,6 +32,7 @@ export const makeCreateResult = (input: {
   fileCount: input.fileCount,
   dryRun: input.dryRun,
   packageManager: input.options.packageManager,
+  template: input.options.template,
   api: input.options.api,
   database: input.options.database,
   auth: input.options.auth,

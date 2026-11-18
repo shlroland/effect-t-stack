@@ -23,6 +23,7 @@ const baseOptions = (overrides: Partial<CreateOptions> = {}): CreateOptions => (
   manualDb: false,
   directoryConflict: "error",
   packageManager: "bun",
+  template: "default",
   api: "rpc",
   database: "sqlite",
   auth: "none",
@@ -40,6 +41,8 @@ describe("compatibility catalog", () => {
     const ids = COMPATIBILITY_RULES.filter((rule) => rule.status === "active").map((rule) => rule.id)
     expect(ids).not.toContain("create.combinations.api.rpc-only")
     expect(ids).toContain("create.enums.auth")
+    expect(ids).toContain("create.enums.template")
+    expect(ids).toContain("create.combinations.library.stack-flags")
     expect(ids).not.toContain("create.auth.better-auth.templates-pending")
     expect(ids).toContain("create.addons.effect-style.required")
     expect(ids).toContain("add.addons.default-only")
@@ -51,6 +54,21 @@ describe("validateCreateOptions", () => {
   test("accepts default stack", async () => {
     const exit = await Effect.runPromise(validateCreateOptions(baseOptions()).pipe(Effect.exit))
     expect(Exit.isSuccess(exit)).toBe(true)
+  })
+
+  test("accepts template=library with default stack flags", async () => {
+    const exit = await Effect.runPromise(
+      validateCreateOptions(baseOptions({ template: "library" })).pipe(Effect.exit)
+    )
+    expect(Exit.isSuccess(exit)).toBe(true)
+  })
+
+  test("rejects template=library with better-auth", async () => {
+    const exit = await Effect.runPromise(
+      validateCreateOptions(baseOptions({ template: "library", auth: "better-auth" })).pipe(Effect.exit)
+    )
+    expect(Exit.isFailure(exit)).toBe(true)
+    expect(String(exit)).toContain("library")
   })
 
   test("rejects invalid packageManager enum", async () => {

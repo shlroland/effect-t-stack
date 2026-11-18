@@ -1,5 +1,5 @@
 import type { VirtualFsService } from "../core/virtual-fs.ts"
-import { hasAddon } from "../default-config.ts"
+import { hasAddon, isLibraryTemplate } from "../default-config.ts"
 import { GeneratorError, type ProjectConfig } from "../types.ts"
 import { packageJsonPath } from "../utils/add-deps.ts"
 import { getAllowedDependencyScripts } from "../utils/dependency-scripts.ts"
@@ -47,23 +47,31 @@ const turboRun = (config: ProjectConfig, script: string, pkg: string): string =>
   return getPackageManagerConfig(config.packageManager).filter(filter, script)
 }
 
+const lintPaths = (config: ProjectConfig): string => isLibraryTemplate(config) ? "src test packages" : "apps packages"
+
 const rootScripts = (vfs: VirtualFsService, config: ProjectConfig): Record<string, string> => {
   const pm = getPackageManagerConfig(config.packageManager)
   const scripts: Record<string, string> = {}
-  if (vfs.fileExists("apps/web/package.json")) {
-    scripts["dev"] = turboRun(config, "dev", "web")
-    scripts["dev:web"] = turboRun(config, "dev", "web")
+  if (isLibraryTemplate(config)) {
+    scripts["check-types"] = "tsc --noEmit -p tsconfig.json"
+    scripts["test"] = "bun test"
+  } else {
+    if (vfs.fileExists("apps/web/package.json")) {
+      scripts["dev"] = turboRun(config, "dev", "web")
+      scripts["dev:web"] = turboRun(config, "dev", "web")
+    }
+    if (vfs.fileExists("apps/server/package.json")) {
+      scripts["dev:server"] = turboRun(config, "dev", "server")
+    }
+    scripts["check-types"] = hasAddon(config, "turborepo")
+      ? "turbo run check-types"
+      : pm.recursive("check-types")
+    scripts["test"] = hasAddon(config, "turborepo") ? "turbo run test" : pm.recursive("test")
   }
-  if (vfs.fileExists("apps/server/package.json")) {
-    scripts["dev:server"] = turboRun(config, "dev", "server")
-  }
-  scripts["check-types"] = hasAddon(config, "turborepo")
-    ? "turbo run check-types"
-    : pm.recursive("check-types")
-  scripts["test"] = hasAddon(config, "turborepo") ? "turbo run test" : pm.recursive("test")
   if (hasAddon(config, "effect-style")) {
-    scripts["lint"] = "oxlint -c .oxlintrc.json -f unix apps packages && dprint check"
-    scripts["lint-fix"] = "oxlint -c .oxlintrc.json --fix apps packages && dprint fmt"
+    const paths = lintPaths(config)
+    scripts["lint"] = `oxlint -c .oxlintrc.json -f unix ${paths} && dprint check`
+    scripts["lint-fix"] = `oxlint -c .oxlintrc.json --fix ${paths} && dprint fmt`
   }
   const check = [
     ...(hasAddon(config, "effect-style") ? [pm.run("lint")] : []),
@@ -80,10 +88,12 @@ const rootScripts = (vfs: VirtualFsService, config: ProjectConfig): Record<strin
   }
   if (hasAddon(config, "language-service")) {
     scripts["effect:diagnostics"] = "effect-language-service diagnostics --format json"
-    scripts["effect:diagnostics:server"] =
-      "effect-language-service diagnostics --project apps/server/tsconfig.json --format json"
-    scripts["effect:diagnostics:web"] =
-      "effect-language-service diagnostics --project apps/web/tsconfig.json --format json"
+    if (!isLibraryTemplate(config)) {
+      scripts["effect:diagnostics:server"] =
+        "effect-language-service diagnostics --project apps/server/tsconfig.json --format json"
+      scripts["effect:diagnostics:web"] =
+        "effect-language-service diagnostics --project apps/web/tsconfig.json --format json"
+    }
   }
   const prepare = [
     ...(hasAddon(config, "language-service") ? ["effect-language-service patch"] : []),
@@ -100,7 +110,9 @@ export const processPackageConfigs = (vfs: VirtualFsService, config: ProjectConf
   if (root === undefined) {
     throw new GeneratorError({
       phase: "package-configs",
-      message: "base template did not write package.json"
+      message: isLibraryTemplate(config)
+        ? "library template did not write package.json"
+        : "base template did not write package.json"
     })
   }
   root["name"] = config.projectName

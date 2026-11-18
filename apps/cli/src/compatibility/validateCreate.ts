@@ -7,6 +7,7 @@ import {
   CREATE_DATABASES,
   CREATE_DIRECTORY_CONFLICTS,
   CREATE_PACKAGE_MANAGERS,
+  CREATE_TEMPLATES,
   ruleMessage
 } from "./catalog.ts"
 
@@ -17,6 +18,9 @@ const isOneOf = <T extends string>(value: string, allowed: ReadonlyArray<T>): va
 const validateCreateEnums = (options: CreateOptions): Effect.Effect<void, CreateError> => {
   if (!isOneOf(options.packageManager, CREATE_PACKAGE_MANAGERS)) {
     return Effect.fail(new CreateError({ message: ruleMessage("create.enums.packageManager") }))
+  }
+  if (!isOneOf(options.template, CREATE_TEMPLATES)) {
+    return Effect.fail(new CreateError({ message: ruleMessage("create.enums.template") }))
   }
   if (!isOneOf(options.api, CREATE_APIS)) {
     return Effect.fail(new CreateError({ message: ruleMessage("create.enums.api") }))
@@ -33,8 +37,18 @@ const validateCreateEnums = (options: CreateOptions): Effect.Effect<void, Create
   return Effect.void
 }
 
-/** Stage: combinations — api × database cells; other matrix dims wait for later L3. */
-const validateCreateCombinations = (_options: CreateOptions): Effect.Effect<void, CreateError> => Effect.void
+/** Stage: combinations — api × database cells; library rejects full-stack overrides. */
+const validateCreateCombinations = (options: CreateOptions): Effect.Effect<void, CreateError> => {
+  if (options.template !== "library") return Effect.void
+  const illegalStack = options.auth !== "none" ||
+    options.api !== "rpc" ||
+    options.database !== "sqlite" ||
+    options.manualDb
+  if (illegalStack) {
+    return Effect.fail(new CreateError({ message: ruleMessage("create.combinations.library.stack-flags") }))
+  }
+  return Effect.void
+}
 
 /** Stage: auth/addons — effect-style omit path waits for L3. */
 const validateCreateAuthAddons = (options: CreateOptions): Effect.Effect<void, CreateError> => {

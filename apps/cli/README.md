@@ -32,10 +32,13 @@ Scaffold an Effect **v4** app by generating it from `packages/template-generator
 npx create-effect-t-stack@latest my-app --yes
 pnpm dlx create-effect-t-stack@latest my-app --yes
 bunx create-effect-t-stack@latest my-app --yes
+# publishable Effect library (no apps/db):
+bunx create-effect-t-stack@latest my-lib --yes --template library
 # equivalent explicit subcommand:
 npx create-effect-t-stack@latest create my-app --yes
 # from a Scaffold Product checkout (Bun):
 bun run create -- my-app --yes
+bun run create -- my-lib --yes --template library
 
 # L2
 bunx create-effect-t-stack add --package billing
@@ -43,9 +46,9 @@ bunx create-effect-t-stack schema --name fingerprint
 bunx create-effect-t-stack history --json
 ```
 
-Notable create flags: `--dry-run`, `--verbose`, `--package-manager bun|npm|pnpm`, `--directory-conflict`, `--open <bin>`, `--manual-db`.
+Notable create flags: `--template default|library`, `--dry-run`, `--verbose`, `--package-manager bun|npm|pnpm`, `--directory-conflict`, `--open <bin>`, `--manual-db`.
 
-Illegal combinations are rejected by the compatibility engine (`docs/compatibility.md`). `--api httpapi` flips Todo UI to AtomHttpApi (Rpc stays secondary). `--database postgres` switches Drizzle to `effect-postgres` + `@effect/sql-pg` (default remains sqlite). `--auth better-auth` adds `@auth` + Better Auth HTTP at `/api/auth` ([ADR-0008](../../docs/adr/0008-auth-better-auth-official-effect-http.md)). `--no-effect-style` stays gated until that L3 cell lands.
+Illegal combinations are rejected by the compatibility engine (`docs/compatibility.md`). `--template library` scaffolds a publishable Effect package (`src/` + effect-style); it rejects `--auth better-auth` and non-default `--api`/`--database`/`--manual-db`. `--api httpapi` flips Todo UI to AtomHttpApi (Rpc stays secondary). `--database postgres` switches Drizzle to `effect-postgres` + `@effect/sql-pg` (default remains sqlite). `--auth better-auth` adds `@auth` + Better Auth HTTP at `/api/auth` ([ADR-0008](../../docs/adr/0008-auth-better-auth-official-effect-http.md)). `--no-effect-style` stays gated until that L3 cell lands.
 
 ## Local check (agents)
 

@@ -35,11 +35,14 @@ const reproducibleCommandFor = (scope: string, options: CreateOptions): string =
     "create",
     scope,
     options.yes || options.yolo ? "--yes" : undefined,
+    options.template === "library" ? "--template library" : undefined,
     options.packageManager !== "bun" ? `--package-manager ${options.packageManager}` : undefined,
-    options.manualDb ? "--manual-db" : undefined,
-    options.api !== "rpc" ? `--api ${options.api}` : undefined,
-    options.database !== "sqlite" ? `--database ${options.database}` : undefined,
-    options.auth !== "none" ? `--auth ${options.auth}` : undefined,
+    options.template === "default" && options.manualDb ? "--manual-db" : undefined,
+    options.template === "default" && options.api !== "rpc" ? `--api ${options.api}` : undefined,
+    options.template === "default" && options.database !== "sqlite"
+      ? `--database ${options.database}`
+      : undefined,
+    options.template === "default" && options.auth !== "none" ? `--auth ${options.auth}` : undefined,
     !options.effectStyle ? "--no-effect-style" : undefined
   ].filter((part): part is string => part !== undefined).join(" ")
 
@@ -71,13 +74,18 @@ const planProject = (prepared: CreatePrepared) =>
       Effect.gen(function*() {
         const version = yield* cliVersion()
         const generator = yield* loadGenerator
-        const tree = yield* generator.generate({
-          config: generator.projectConfig(state.scope, {
+        const config = state.options.template === "library"
+          ? generator.libraryProjectConfig(state.scope, {
+            packageManager: state.options.packageManager
+          })
+          : generator.projectConfig(state.scope, {
             packageManager: state.options.packageManager,
             api: state.options.api,
             database: state.options.database,
             auth: state.options.auth
-          }),
+          })
+        const tree = yield* generator.generate({
+          config,
           templates: generator.EMBEDDED_TEMPLATES,
           version
         }).pipe(
@@ -139,7 +147,9 @@ const finishWrite = (state: CreatePlanned) =>
         written,
         written.phases,
         false,
-        `Done. Next: cd ${written.targetDir} && ${written.options.packageManager} run dev`
+        written.options.template === "library"
+          ? `Done. Next: cd ${written.targetDir} && ${written.options.packageManager} run check`
+          : `Done. Next: cd ${written.targetDir} && ${written.options.packageManager} run dev`
       )
     )
   )

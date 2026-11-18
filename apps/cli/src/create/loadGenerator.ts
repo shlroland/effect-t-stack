@@ -16,6 +16,10 @@ export type GeneratorApi = {
     projectName: string,
     patch?: Partial<Omit<ProjectConfig, "projectName">>
   ) => ProjectConfig
+  readonly libraryProjectConfig: (
+    projectName: string,
+    patch?: Partial<Omit<ProjectConfig, "projectName" | "template">>
+  ) => ProjectConfig
 }
 
 export type WriterApi = {

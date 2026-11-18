@@ -2,7 +2,7 @@ import * as Schema from "effect/Schema"
 
 export type Runtime = "bun" | "node" | "workers" | "none"
 
-export type ApiPrimary = "rpc" | "httpapi"
+export type ApiPrimary = "rpc" | "httpapi" | "none"
 
 export type Database = "sqlite" | "postgres" | "mysql" | "mongodb" | "none"
 
@@ -25,8 +25,12 @@ export type DbSetup = "none"
 
 export type DeployTarget = "none"
 
+/** `default` = full-stack Golden cell; `library` = publishable Effect package preset. */
+export type TemplateId = "default" | "library"
+
 export type ProjectConfig = {
   readonly projectName: string
+  readonly template: TemplateId
   readonly runtime: Runtime
   readonly api: ApiPrimary
   readonly database: Database

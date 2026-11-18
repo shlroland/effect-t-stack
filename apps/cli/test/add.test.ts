@@ -26,6 +26,7 @@ const base = (overrides: Partial<CreateOptions> & Pick<CreateOptions, "projectNa
   manualDb: false,
   directoryConflict: "error",
   packageManager: "bun",
+  template: "default",
   api: "rpc",
   database: "sqlite",
   auth: "none",

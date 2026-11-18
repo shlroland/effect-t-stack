@@ -77,6 +77,13 @@ const packageManager = Flag.Literals("package-manager", ["bun", "npm", "pnpm"] a
   Flag.withDefault("bun" as const)
 )
 
+const template = Flag.Literals("template", ["default", "library"] as const).pipe(
+  Flag.withDescription(
+    "Preset: default (full-stack) or library (publishable Effect package, no apps/db)"
+  ),
+  Flag.withDefault("default" as const)
+)
+
 const api = Flag.Literals("api", ["rpc", "httpapi"] as const).pipe(
   Flag.withDescription("API primary: rpc (AtomRpc Todo UI) or httpapi (AtomHttpApi Todo UI)"),
   Flag.withDefault("rpc" as const)
@@ -112,13 +119,14 @@ export const createCommand = Command.make("create", {
   manualDb,
   directoryConflict,
   packageManager,
+  template,
   api,
   database,
   auth,
   effectStyle
 }).pipe(
   Command.withDescription(
-    "Generate an Effect app from templates (@<name>/* scope)"
+    "Generate an Effect app or library from templates (@<name>/* scope for apps)"
   ),
   Command.withHandler((config) =>
     createProject({
@@ -134,6 +142,7 @@ export const createCommand = Command.make("create", {
       manualDb: config.manualDb,
       directoryConflict: config.directoryConflict,
       packageManager: config.packageManager,
+      template: config.template,
       api: config.api,
       database: config.database,
       auth: config.auth,

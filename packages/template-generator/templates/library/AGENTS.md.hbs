@@ -1,0 +1,22 @@
+# AGENTS.md — {{projectName}}
+
+Effect **v4** library scaffolded by `create-effect-t-stack --template library`.
+
+## Learning more about Effect
+
+Before writing Effect code, read Effect guidance first (skills / MCP / upstream docs). Prefer idioms from Effect source over training-data guesses.
+
+When the `skills` addon is present, start with `.agents/skills/effect-ts/SKILL.md`.
+
+## Conventions
+
+- Named exports only (no `export default` in library code)
+- PascalCase modules; `Context.Service`, `Schema.TaggedError`, `Effect.fn`
+- `.ts` extensions in relative imports
+- Format / lint via **effect-style** (`dprint` + `oxlint` + `packages/effect-oxc`) when that addon is enabled
+
+## Scripts
+
+- `bun run check` — lint, typecheck, test
+- `bun run test` — `bun test`
+- `bun run check-types` — `tsc --noEmit`
