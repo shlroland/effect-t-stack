@@ -13,6 +13,7 @@ const WORKSPACE_PACKAGES = [
   ["packages/db", "db"],
   ["packages/client", "client"],
   ["packages/config", "config"],
+  ["packages/auth", "auth"],
   ["packages/effect-oxc", "effect-oxc"],
   ["apps/server", "server"],
   ["apps/web", "web"]

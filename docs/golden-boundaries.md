@@ -4,21 +4,22 @@ Paths below are the layout `packages/template-generator` emits. The historical n
 
 ## Package set
 
-| 包 / 目录                   | 职责                                                                                        | 禁止                                          |
-| --------------------------- | ------------------------------------------------------------------------------------------- | --------------------------------------------- |
-| `packages/domain`           | Schema、branded types、domain tagged errors                                                 | IO、HTTP、Drizzle、Layer 组装                 |
-| `packages/config`           | 共享 `tsconfig.base.json` + Effect Schema/Config env（`ServerEnv` / `loadServerEnv`）       | HTTP、DB、业务规则、prod Layer 组装           |
-| `packages/protocol`         | 契约分目录：`http-api/`（`/api`）+ `rpc/`（`AppRpcs` → `/rpc`）                             | 业务规则、SQL、具体 handler                   |
-| `packages/db`               | Drizzle migrations / Repository（默认；`schema` 包内私有）；`@ets/db/effect-sql` 为第二选项 | HTTP 映射、业务规则                           |
-| `packages/client`           | 分入口：`@ets/client/http-api`（`ApiClient`）+ `@ets/client/rpc`（`AppRpcClient`）          | 服务端 Layer                                  |
-| `apps/server`               | Services / handlers / Layers（`@ets/server`）；可作独立 Bun 模板                            | 前端 UI                                       |
-| `apps/server/src/services`  | 业务规则（Service）                                                                         | SQL 行解码、HTTP 状态码细节                   |
-| `apps/server/src/http`      | HttpApi handlers、`createHttpApiWebHandler`、HTTP 错误映射                                  | 业务规则、SQL、Rpc                            |
-| `apps/server/src/rpc`       | Effect Rpc handlers、`createRpcWebHandler`                                                  | 业务规则、SQL、HttpApi                        |
-| `apps/server/src/layers.ts` | prod / test Layer 组装                                                                      | 新业务逻辑                                    |
-| `apps/web`                  | TanStack Start UI + 同源挂载 `/api`+`/rpc`（`src/server.ts`）                               | 在页面里直接碰 DB / 绕过 `@ets/server` Layers |
+| 包 / 目录                   | 职责                                                                                                                   | 禁止                                          |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| `packages/domain`           | Schema、branded types、domain tagged errors                                                                            | IO、HTTP、Drizzle、Layer 组装                 |
+| `packages/config`           | 共享 `tsconfig.base.json` + Effect Schema/Config env（`ServerEnv` / `loadServerEnv`）                                  | HTTP、DB、业务规则、prod Layer 组装           |
+| `packages/protocol`         | 契约分目录：`http-api/`（`/api`）+ `rpc/`（`AppRpcs` → `/rpc`）                                                        | 业务规则、SQL、具体 handler                   |
+| `packages/db`               | Drizzle migrations / Repository（默认；`schema` 包内私有）；`@ets/db/effect-sql` 为第二选项                            | HTTP 映射、业务规则                           |
+| `packages/client`           | 分入口：`@ets/client/http-api`（`ApiClient`）+ `@ets/client/rpc`（`AppRpcClient`）                                     | 服务端 Layer                                  |
+| `packages/auth`             | **仅 `auth=better-auth`：** `betterAuth` 实例、`/api/auth` handler、`CurrentUser`、Rpc AuthMiddleware、web auth client | 业务 Todo 规则、HttpApi/Rpc 业务 handler      |
+| `apps/server`               | Services / handlers / Layers（`@ets/server`）；可作独立 Bun 模板                                                       | 前端 UI                                       |
+| `apps/server/src/services`  | 业务规则（Service）                                                                                                    | SQL 行解码、HTTP 状态码细节                   |
+| `apps/server/src/http`      | HttpApi handlers、`createHttpApiWebHandler`、HTTP 错误映射                                                             | 业务规则、SQL、Rpc                            |
+| `apps/server/src/rpc`       | Effect Rpc handlers、`createRpcWebHandler`                                                                             | 业务规则、SQL、HttpApi                        |
+| `apps/server/src/layers.ts` | prod / test Layer 组装                                                                                                 | 新业务逻辑                                    |
+| `apps/web`                  | TanStack Start UI + 同源挂载 `/api`+`/rpc`（`src/server.ts`）；auth≠none 时先挂 `/api/auth`                            | 在页面里直接碰 DB / 绕过 `@ets/server` Layers |
 
-Always `domain | protocol | db | client | config`（不是 BTS `packages/api`）。
+Always `domain | protocol | db | client | config`（不是 BTS `packages/api`）。`packages/auth` 仅在 `auth=better-auth` 时生成 — [ADR-0008](./adr/0008-auth-better-auth-official-effect-http.md)。
 
 ## Architecture invariants
 
@@ -29,6 +30,7 @@ Always `domain | protocol | db | client | config`（不是 BTS `packages/api`）
 5. **运行时组装只在 Layers** — 入口与测试各自提供 prod / test Layer，勿在 handler 里 `new` 依赖。
 6. **默认 backend = self** — TanStack Start `src/server.ts` 挂载 Rpc（`/rpc`）与 HttpApi（`/api`）；独立 `apps/server`（BunHttpServer :3737）是第二选项，需设 `VITE_API_URL`。
 7. **API Primary** — 根指纹 `api` 默认 **`rpc`**；HttpApi 为 secondary。Primary flip 完整性在 L3（[ADR-0006](./adr/0006-api-primary-rpc-with-httpapi-secondary.md)）。
+8. **Auth（`auth=better-auth`）** — 登录 / cookie / OAuth 走 Better Auth HTTP（官方 Effect 挂载 `/api/auth/*`）；业务 Rpc 只做 `getSession` → `CurrentUser`。Rpc 原生 SignIn 后置（[ADR-0008](./adr/0008-auth-better-auth-official-effect-http.md)）。
 
 ## Effect Core layout notes
 

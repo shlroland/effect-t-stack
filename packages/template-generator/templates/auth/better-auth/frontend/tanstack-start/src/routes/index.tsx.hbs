@@ -1,0 +1,49 @@
+import { HydrationBoundary } from "@effect/atom-react"
+import { createFileRoute, Link } from "@tanstack/react-router"
+import type { Hydration } from "effect/reactivity"
+import { dehydrateTodosListPromise } from "../atoms/dehydrateTodos.ts"
+import { TodosAsyncView } from "../components/todos/TodosAsyncView.tsx"
+
+type HomeLoaderData = {
+  readonly dehydratedAtoms: ReadonlyArray<Hydration.DehydratedAtom>
+}
+
+export const Route = createFileRoute("/")({
+  loader: async (): Promise<HomeLoaderData> => {
+    try {
+      return { dehydratedAtoms: await dehydrateTodosListPromise() }
+    } catch {
+      return { dehydratedAtoms: [] }
+    }
+  },
+  component: TodosPage
+})
+
+function TodosPage() {
+  const { dehydratedAtoms } = Route.useLoaderData()
+
+  return (
+    <>
+      <h1 className="brand">effect-t-stack</h1>
+      <nav className="stack" aria-label="Account">
+        <Link to="/login">Sign in</Link>
+        <Link to="/signup">Sign up</Link>
+      </nav>
+      <p className="lede">
+{{#if (eq api "httpapi")}}
+        Effect v4：API primary 为 HttpApi（`/api`，OpenAPI），Rpc（`/rpc`）为 secondary。Todo UI 用 AtomHttpApi；Start
+        loader 预热 Atom 再注水，React 只订阅与分发。Todos Rpc 需要登录会话。
+{{else}}
+        Effect v4：API primary 为 Rpc（`/rpc`），HttpApi（`/api`，OpenAPI）为 secondary。Todo UI 用 AtomRpc；Start
+        loader 预热 Atom 再注水，React 只订阅与分发。Todos Rpc 需要登录会话。
+{{/if}}
+      </p>
+
+      <section className="panel">
+        <HydrationBoundary state={dehydratedAtoms}>
+          <TodosAsyncView />
+        </HydrationBoundary>
+      </section>
+    </>
+  )
+}

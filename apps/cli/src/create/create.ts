@@ -39,6 +39,7 @@ const reproducibleCommandFor = (scope: string, options: CreateOptions): string =
     options.manualDb ? "--manual-db" : undefined,
     options.api !== "rpc" ? `--api ${options.api}` : undefined,
     options.database !== "sqlite" ? `--database ${options.database}` : undefined,
+    options.auth !== "none" ? `--auth ${options.auth}` : undefined,
     !options.effectStyle ? "--no-effect-style" : undefined
   ].filter((part): part is string => part !== undefined).join(" ")
 
@@ -74,7 +75,8 @@ const planProject = (prepared: CreatePrepared) =>
           config: generator.projectConfig(state.scope, {
             packageManager: state.options.packageManager,
             api: state.options.api,
-            database: state.options.database
+            database: state.options.database,
+            auth: state.options.auth
           }),
           templates: generator.EMBEDDED_TEMPLATES,
           version

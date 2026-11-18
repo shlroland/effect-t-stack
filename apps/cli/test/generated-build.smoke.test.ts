@@ -66,6 +66,7 @@ const createAndTypecheck = async (
       packageManager: "bun",
       api,
       database,
+      auth: "none",
       effectStyle: true,
       cwd
     }).pipe(Effect.provide(BunServices.layer)) as Effect.Effect<{

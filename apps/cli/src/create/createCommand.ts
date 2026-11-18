@@ -87,6 +87,13 @@ const database = Flag.Literals("database", ["sqlite", "postgres"] as const).pipe
   Flag.withDefault("sqlite" as const)
 )
 
+const auth = Flag.Literals("auth", ["none", "better-auth"] as const).pipe(
+  Flag.withDescription(
+    "Auth: none (default) or better-auth (@auth + Better Auth HTTP — ADR-0008)"
+  ),
+  Flag.withDefault("none" as const)
+)
+
 const effectStyle = Flag.Boolean("effect-style").pipe(
   Flag.withDescription("Include effect-style addon (default true; omit path is L3)"),
   Flag.withDefault(true)
@@ -107,6 +114,7 @@ export const createCommand = Command.make("create", {
   packageManager,
   api,
   database,
+  auth,
   effectStyle
 }).pipe(
   Command.withDescription(
@@ -128,6 +136,7 @@ export const createCommand = Command.make("create", {
       packageManager: config.packageManager,
       api: config.api,
       database: config.database,
+      auth: config.auth,
       effectStyle: config.effectStyle
     }).pipe(Effect.asVoid)
   )

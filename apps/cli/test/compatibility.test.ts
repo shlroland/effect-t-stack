@@ -25,6 +25,7 @@ const baseOptions = (overrides: Partial<CreateOptions> = {}): CreateOptions => (
   packageManager: "bun",
   api: "rpc",
   database: "sqlite",
+  auth: "none",
   effectStyle: true,
   ...overrides
 })
@@ -38,6 +39,8 @@ describe("compatibility catalog", () => {
   test("active rules include create + add gates", () => {
     const ids = COMPATIBILITY_RULES.filter((rule) => rule.status === "active").map((rule) => rule.id)
     expect(ids).not.toContain("create.combinations.api.rpc-only")
+    expect(ids).toContain("create.enums.auth")
+    expect(ids).not.toContain("create.auth.better-auth.templates-pending")
     expect(ids).toContain("create.addons.effect-style.required")
     expect(ids).toContain("add.addons.default-only")
     expect(ids).toContain("add.mutex.package-or-addon")
@@ -63,6 +66,13 @@ describe("validateCreateOptions", () => {
   test("accepts api=httpapi primary flip", async () => {
     const exit = await Effect.runPromise(
       validateCreateOptions(baseOptions({ api: "httpapi" })).pipe(Effect.exit)
+    )
+    expect(Exit.isSuccess(exit)).toBe(true)
+  })
+
+  test("accepts auth=better-auth", async () => {
+    const exit = await Effect.runPromise(
+      validateCreateOptions(baseOptions({ auth: "better-auth" })).pipe(Effect.exit)
     )
     expect(Exit.isSuccess(exit)).toBe(true)
   })

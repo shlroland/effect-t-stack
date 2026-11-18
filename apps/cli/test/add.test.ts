@@ -28,6 +28,7 @@ const base = (overrides: Partial<CreateOptions> & Pick<CreateOptions, "projectNa
   packageManager: "bun",
   api: "rpc",
   database: "sqlite",
+  auth: "none",
   effectStyle: true,
   ...overrides
 })

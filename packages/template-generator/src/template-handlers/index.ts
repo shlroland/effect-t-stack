@@ -2,6 +2,7 @@ import * as Effect from "effect/Effect"
 
 import type { ProjectConfig } from "../types.ts"
 import { processAddonTemplates } from "./addons.ts"
+import { processAuthTemplates } from "./auth.ts"
 import { processBackendTemplates } from "./backend.ts"
 import { processBaseTemplates } from "./base.ts"
 import { processFrontendTemplates } from "./frontend.ts"
@@ -20,5 +21,6 @@ export const applyTemplateHandlers = Effect.fnUntraced(function*(
   yield* processPackageTemplates(templates, config)
   yield* processBackendTemplates(templates, config)
   yield* processFrontendTemplates(templates, config)
+  yield* processAuthTemplates(templates, config)
   yield* processAddonTemplates(templates, config)
 })

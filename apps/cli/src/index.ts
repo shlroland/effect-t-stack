@@ -31,7 +31,7 @@ export {
 } from "./compatibility/index.ts"
 export type { CompatibilityRule, ResolvedAddInput, ValidationStage } from "./compatibility/index.ts"
 export { createProject } from "./create/create.ts"
-export type { ApiPrimary, CreateOptions, Database, DirectoryConflict } from "./create/CreateOptions.ts"
+export type { ApiPrimary, Auth, CreateOptions, Database, DirectoryConflict } from "./create/CreateOptions.ts"
 export type { CreateResult } from "./create/CreateResult.ts"
 export { formatVerbose, makeCreateResult } from "./create/CreateResult.ts"
 export { emitPackageManagerArtifacts, installCommand, resolvePackageManagerPin } from "./create/packageManagers.ts"

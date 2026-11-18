@@ -111,6 +111,28 @@ describe("template generator contract", () => {
     expect(Exit.isFailure(exit)).toBe(true)
   })
 
+  test("auth=better-auth emits @auth overlay and env pins", () => {
+    const tree = generateDefault("smoke-ba", { auth: "better-auth" }, "0.1.0")
+    expect(treePaths(tree).includes("packages/auth/src/AuthMiddlewareLive.ts")).toBe(true)
+    expect(treePaths(tree).includes("packages/protocol/src/rpc/AuthMiddleware.ts")).toBe(true)
+    expect(treePaths(tree).includes("packages/auth/package.json")).toBe(true)
+    const authPkg = JSON.parse(readTreeFile(tree, "packages/auth/package.json")) as {
+      dependencies: Record<string, string>
+    }
+    expect(authPkg.dependencies["better-auth"]).toBe(dependencyVersionMap["better-auth"])
+    expect(authPkg.dependencies["@better-auth/drizzle-adapter"]).toBe(
+      dependencyVersionMap["@better-auth/drizzle-adapter"]
+    )
+    const fingerprint = parseJsonc(readTreeFile(tree, "ets.jsonc"))
+    expect(fingerprint["auth"]).toBe("better-auth")
+    const envExample = readTreeFile(tree, "apps/web/.env.example")
+    expect(envExample).toContain("AUTH_SECRET")
+    const env = readTreeFile(tree, "apps/web/.env")
+    expect(env).toContain("AUTH_SECRET=")
+    expect(env).toContain("BETTER_AUTH_URL=")
+    expect(readTreeFile(tree, "packages/auth/src/createAuth.ts")).toContain("tanstackStartCookies")
+  })
+
   test("handlebars helpers see the project config", () => {
     const engine = makeTemplateEngine()
     const config = projectConfig("smoke")

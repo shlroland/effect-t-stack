@@ -8,6 +8,7 @@ import { GeneratorError } from "../types.ts"
  * `drizzle-orm` / `drizzle-kit` 1.0.0-rc.5. `@effect/oxc` is vendored, not pinned here.
  */
 export const dependencyVersionMap = {
+  "@better-auth/drizzle-adapter": "^1.7.25",
   "@effect/atom-react": "^4.1.3",
   "@effect/language-service": "0.87.5",
   "@effect/platform-bun": "^4.1.3",
@@ -21,12 +22,14 @@ export const dependencyVersionMap = {
   "@types/react": "^19.3.0",
   "@types/react-dom": "^19.3.0",
   "@vitejs/plugin-react": "^6.3.0",
+  "better-auth": "^1.7.25",
   "dprint": "^0.64.3",
   "drizzle-kit": "1.0.0-rc.5",
   "drizzle-orm": "1.0.0-rc.5",
   "effect": "^4.1.4",
   "lefthook": "^2.2.2",
   "oxlint": "^1.93.0",
+  "postgres": "^3.4.7",
   "react": "^19.3.1",
   "react-dom": "^19.3.1",
   "scheduler": "^0.26.0",
