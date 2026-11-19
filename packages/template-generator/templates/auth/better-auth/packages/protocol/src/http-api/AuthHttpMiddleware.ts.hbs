@@ -1,0 +1,13 @@
+import { type CurrentUser, Unauthorized } from "@{{projectName}}/domain"
+import { HttpApiMiddleware } from "effect/http-api"
+
+/**
+ * HttpApi session gate: {@link CurrentUser} from Better Auth `getSession`
+ * (implemented in `@auth` as {@link AuthHttpMiddlewareLive}).
+ */
+export class AuthHttpMiddleware extends HttpApiMiddleware.Service<AuthHttpMiddleware, {
+  provides: CurrentUser
+}>()("AuthHttpMiddleware", {
+  error: Unauthorized,
+  requiredForClient: false
+}) {}

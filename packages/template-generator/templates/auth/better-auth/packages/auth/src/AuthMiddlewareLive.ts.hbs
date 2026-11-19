@@ -1,30 +1,9 @@
-import { AuthUser, CurrentUser, Unauthorized, UserId } from "@{{projectName}}/domain"
+import { CurrentUser, Unauthorized } from "@{{projectName}}/domain"
 import { AuthMiddleware } from "@{{projectName}}/protocol/rpc"
 import { loadServerEnv, type MakeServerEnvProviderOptions } from "@{{projectName}}/config"
 import { Effect, Layer } from "effect"
 import { createAuth } from "./createAuth.ts"
-
-const rpcHeadersToWeb = (headers: unknown): Headers => {
-  const web = new Headers()
-  if (headers === null || typeof headers !== "object") {
-    return web
-  }
-  for (const [key, value] of Object.entries(headers as Record<string, string>)) {
-    if (typeof value === "string") {
-      web.append(key, value)
-    }
-  }
-  return web
-}
-
-const userFromSession = (session: {
-  readonly user: { readonly id: string; readonly email: string; readonly name: string }
-}): AuthUser =>
-  new AuthUser({
-    id: session.user.id as UserId,
-    email: session.user.email,
-    name: session.user.name
-  })
+import { headersToWeb, userFromSession } from "./session.ts"
 
 export const AuthMiddlewareLive = (options?: MakeServerEnvProviderOptions) =>
   Layer.sync(AuthMiddleware, () => {
@@ -39,7 +18,7 @@ export const AuthMiddlewareLive = (options?: MakeServerEnvProviderOptions) =>
     return AuthMiddleware.of((effect, rpcOptions) =>
       Effect.gen(function*() {
         const session = yield* Effect.tryPromise({
-          try: () => auth.api.getSession({ headers: rpcHeadersToWeb(rpcOptions.headers) }),
+          try: () => auth.api.getSession({ headers: headersToWeb(rpcOptions.headers) }),
           catch: () => new Unauthorized({})
         })
         if (session === null || session.user === undefined) {

@@ -49,4 +49,4 @@ Prefix `templates/auth/better-auth/…` overlays `packages/auth`, `packages/db`,
 - CLI: `--auth none|better-auth` (default `none`). `clerk` stays in generator types only until a later cell.
 - Compatibility: `better-auth` requires a real DB/ORM cell; no backend/no DB ⇒ `auth=none` (enforced when those dims exist).
 - Generator `unsupportedStackMessage` allows `auth ∈ {none, better-auth}`. Overlay handler: `processAuthTemplates` (after frontend).
-- Docs: Capability Tiers Auth checkboxes track remaining backlog (HttpApi gating, generated-build CI cell, OAuth, Rpc-native SignIn).
+- Docs: Capability Tiers Auth checkboxes track remaining backlog (OAuth, Rpc-native SignIn, Clerk, payments). HttpApi Todo session gating + generated-build `auth=better-auth` cell are shipped.

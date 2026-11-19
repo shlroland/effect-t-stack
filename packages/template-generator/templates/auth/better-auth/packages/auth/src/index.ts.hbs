@@ -1,5 +1,7 @@
+export { AuthHttpMiddlewareLive } from "./AuthHttpMiddlewareLive.ts"
 export { AuthMiddlewareLive } from "./AuthMiddlewareLive.ts"
 export { AuthApiPrefix, createAuthWebHandler, isAuthRequestPath, type AuthWebHandler } from "./createAuthWebHandler.ts"
 export { authClient } from "./client.ts"
 export { createAuth, type Auth, type CreateAuthOptions } from "./createAuth.ts"
 export { authSchema } from "./authSchema.ts"
+export { headersToWeb, userFromSession } from "./session.ts"

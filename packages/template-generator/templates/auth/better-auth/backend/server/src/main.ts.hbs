@@ -2,7 +2,12 @@
  * Secondary standalone Bun server template.
  * The default app embeds HttpApi + Rpc via TanStack Start (`apps/web/src/server.ts`).
  */
-import { AuthApiPrefix, AuthMiddlewareLive, createAuthWebHandler } from "@{{projectName}}/auth"
+import {
+  AuthApiPrefix,
+  AuthHttpMiddlewareLive,
+  AuthMiddlewareLive,
+  createAuthWebHandler
+} from "@{{projectName}}/auth"
 import { BunHttpServer, BunRuntime } from "@effect/platform-bun"
 import { Effect, Layer } from "effect"
 import { HttpEffect, HttpMiddleware, HttpRouter } from "effect/http"
@@ -21,9 +26,12 @@ const AuthRoutes = HttpRouter.add(
   HttpEffect.fromWebHandler((request) => Promise.resolve(authWeb.handler(request)))
 )
 
+const authEnv = { envFile: new URL("../.env", import.meta.url) }
+
 const RoutesLive = Layer.mergeAll(HttpApiRoutes, RpcRoutes, AuthRoutes).pipe(
   Layer.provide(AppLive),
-  Layer.provide(AuthMiddlewareLive({ envFile: new URL("../.env", import.meta.url) }))
+  Layer.provide(AuthMiddlewareLive(authEnv)),
+  Layer.provide(AuthHttpMiddlewareLive(authEnv))
 )
 
 const ServerLive = Layer.unwrap(

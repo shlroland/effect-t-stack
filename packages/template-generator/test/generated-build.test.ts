@@ -50,6 +50,20 @@ describe("generated-build", () => {
     expect(fingerprint).toContain("\"database\": \"postgres\"")
   }, 900_000)
 
+  test("auth=better-auth installs, typechecks, and lints session-gated surfaces", async () => {
+    if (process.env["ETS_GENERATED_BUILD"] !== "1") return
+    const projectDir = await materializeAndCheck(temps, "smoke-ba", { auth: "better-auth" })
+    const todosApi = await readFile(join(projectDir, "packages/protocol/src/http-api/TodosApi.ts"), "utf8")
+    expect(todosApi).toContain("AuthHttpMiddleware")
+    const httpHandler = await readFile(
+      join(projectDir, "apps/server/src/http/createHttpApiWebHandler.ts"),
+      "utf8"
+    )
+    expect(httpHandler).toContain("AuthHttpMiddlewareLive")
+    const fingerprint = await readFile(join(projectDir, "ets.jsonc"), "utf8")
+    expect(fingerprint).toContain("\"auth\": \"better-auth\"")
+  }, 900_000)
+
   test("packageManager=npm installs, typechecks, and lints", async () => {
     if (process.env["ETS_GENERATED_BUILD"] !== "1") return
     if (!hasBinary("npm")) {

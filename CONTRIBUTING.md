@@ -47,7 +47,7 @@ bun run check
 ## Test tiers (Scaffold)
 
 1. **Contract** — `bun run --filter=create-effect-t-stack test` and `bun run --filter=@effect-t-stack/template-generator test` (no template-text snapshots)
-2. **Generated-build** — `ETS_GENERATED_BUILD=1 bun test packages/template-generator/test/generated-build.test.ts` (rpc default + `api=httpapi` + `database=postgres` + `packageManager=npm|pnpm` when those binaries are on PATH; install, check-types, lint) and `ETS_GENERATED_BUILD=1 bun test apps/cli/test/generated-build.smoke.test.ts` (CLI `--yes` and `--api httpapi` then check-types). npm/pnpm samples skip cleanly if the binary is missing; while `runtime=bun`, workspace `test` scripts still need Bun on PATH.
+2. **Generated-build** — `ETS_GENERATED_BUILD=1 bun test packages/template-generator/test/generated-build.test.ts` (rpc default + `api=httpapi` + `database=postgres` + `auth=better-auth` + `packageManager=npm|pnpm` when those binaries are on PATH; install, check-types, lint) and `ETS_GENERATED_BUILD=1 bun test apps/cli/test/generated-build.smoke.test.ts` (CLI `--yes`, `--api httpapi`, `--database postgres`, `--auth better-auth` then check-types). npm/pnpm samples skip cleanly if the binary is missing; while `runtime=bun`, workspace `test` scripts still need Bun on PATH.
 3. **Live** — manual `bun run create -- <name> --yes` then `bun run check-types` in the target; CI: Actions workflow **live-smoke** (`workflow_dispatch` / weekly)
 
 ## Publishing the CLI

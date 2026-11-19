@@ -1,0 +1,33 @@
+import { CurrentUser, Unauthorized } from "@{{projectName}}/domain"
+import { AuthHttpMiddleware } from "@{{projectName}}/protocol/http-api"
+import { loadServerEnv, type MakeServerEnvProviderOptions } from "@{{projectName}}/config"
+import { Effect, Layer } from "effect"
+import { HttpServerRequest } from "effect/http"
+import { createAuth } from "./createAuth.ts"
+import { headersToWeb, userFromSession } from "./session.ts"
+
+/** Live HttpApi session gate — Better Auth `getSession` from request cookies/headers. */
+export const AuthHttpMiddlewareLive = (options?: MakeServerEnvProviderOptions) =>
+  Layer.sync(AuthHttpMiddleware, () => {
+    const env = loadServerEnv(options)
+    const auth = createAuth({
+      databaseUrl: env.DATABASE_URL,
+      secret: env.AUTH_SECRET,
+      baseURL: env.BETTER_AUTH_URL,
+      trustedOrigins: env.CORS_ORIGINS
+    })
+
+    return AuthHttpMiddleware.of((httpEffect) =>
+      Effect.gen(function*() {
+        const request = yield* HttpServerRequest.HttpServerRequest
+        const session = yield* Effect.tryPromise({
+          try: () => auth.api.getSession({ headers: headersToWeb(request.headers) }),
+          catch: () => new Unauthorized({})
+        })
+        if (session === null || session.user === undefined) {
+          return yield* new Unauthorized({})
+        }
+        return yield* Effect.provideService(httpEffect, CurrentUser, userFromSession(session))
+      })
+    )
+  })

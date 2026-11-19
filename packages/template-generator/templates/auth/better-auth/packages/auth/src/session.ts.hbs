@@ -1,0 +1,24 @@
+import { AuthUser, type UserId } from "@{{projectName}}/domain"
+
+/** Convert Effect / Rpc header bags into WinterCG `Headers` for Better Auth. */
+export const headersToWeb = (headers: unknown): Headers => {
+  const web = new Headers()
+  if (headers === null || typeof headers !== "object") {
+    return web
+  }
+  for (const [key, value] of Object.entries(headers as Record<string, string>)) {
+    if (typeof value === "string") {
+      web.append(key, value)
+    }
+  }
+  return web
+}
+
+export const userFromSession = (session: {
+  readonly user: { readonly id: string; readonly email: string; readonly name: string }
+}): AuthUser =>
+  new AuthUser({
+    id: session.user.id as UserId,
+    email: session.user.email,
+    name: session.user.name
+  })
