@@ -2,7 +2,9 @@
   description = "Dev shell for effect-t-stack (Scaffold Product + create-effect-t-stack)";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    # 26.05 still supports Intel Mac (x86_64-darwin); nixpkgs-unstable 26.11 dropped it.
+    # Switch back to nixpkgs-unstable when this machine class is gone / support ends (EOL 2026).
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-26.05-darwin";
   };
 
   outputs = {nixpkgs, ...}: let

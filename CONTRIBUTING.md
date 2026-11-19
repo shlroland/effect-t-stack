@@ -19,7 +19,7 @@ Edit a template fragment or a post-processor, then prove it with a generated-bui
 
 ### Optional: Nix flake
 
-Root [`flake.nix`](./flake.nix) (Effect-style) pins a reproducible shell: Bun, Node LTS (`nodejs_24`), pnpm, yarn, git. Not required if those tools are already on PATH. Generated apps include the same `flake` addon by default.
+Root [`flake.nix`](./flake.nix) (Effect-style) pins a reproducible shell: Bun, Node LTS (`nodejs_24`), pnpm, yarn, git. Not required if those tools are already on PATH. Generated apps include the same `flake` addon by default. The flake input is `nixpkgs-26.05-darwin` so Intel Macs (`x86_64-darwin`) still work; `nixpkgs-unstable` 26.11 dropped that platform.
 
 ```sh
 # Enable flakes once (user config; not in this repo):
