@@ -3,16 +3,10 @@ import * as Effect from "effect/Effect"
 import type { CreateOptions } from "./CreateOptions.ts"
 import type { CreateResult } from "./CreateResult.ts"
 import { formatVerbose, makeCreateResult } from "./CreateResult.ts"
-
-const TITLE = `
-┌─────────────────────────────────────┐
-│     create-effect-t-stack           │
-│     Effect v4 · Rpc primary         │
-└─────────────────────────────────────┘
-`
+import { renderTitleText } from "./renderTitle.ts"
 
 export const printTitle = (options: CreateOptions): Effect.Effect<void> =>
-  options.renderTitle ? Console.log(TITLE.trim()) : Effect.void
+  options.renderTitle ? Console.log(renderTitleText()) : Effect.void
 
 export const printPlanSummary = (input: {
   readonly options: CreateOptions

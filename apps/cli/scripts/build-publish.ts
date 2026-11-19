@@ -30,7 +30,10 @@ const main = async () => {
       /^effect\//,
       /^@effect\//,
       "memfs",
-      "handlebars"
+      "handlebars",
+      "gradient-string",
+      "chalk",
+      "tinygradient"
     ]
   })
 
