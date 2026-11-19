@@ -161,12 +161,12 @@ describe("template generator contract", () => {
 
   test("auth=better-auth emits @auth overlay and env pins", () => {
     const tree = generateDefault("smoke-ba", { auth: "better-auth" }, "0.1.0")
-    // ADR-0008: Rpc AuthMiddleware + official /api/auth HTTP mount (no HttpApi auth gate in MVP).
+    // ADR-0008: /api/auth mount + Rpc AuthMiddleware; HttpApi Todos also session-gated.
     expect(treePaths(tree).includes("packages/auth/src/AuthMiddlewareLive.ts")).toBe(true)
+    expect(treePaths(tree).includes("packages/auth/src/AuthHttpMiddlewareLive.ts")).toBe(true)
     expect(treePaths(tree).includes("packages/auth/src/createAuthWebHandler.ts")).toBe(true)
     expect(treePaths(tree).includes("packages/protocol/src/rpc/AuthMiddleware.ts")).toBe(true)
-    expect(treePaths(tree).includes("packages/auth/src/AuthHttpMiddlewareLive.ts")).toBe(false)
-    expect(treePaths(tree).includes("packages/protocol/src/http-api/AuthHttpMiddleware.ts")).toBe(false)
+    expect(treePaths(tree).includes("packages/protocol/src/http-api/AuthHttpMiddleware.ts")).toBe(true)
     expect(treePaths(tree).includes("packages/auth/package.json")).toBe(true)
     const authPkg = JSON.parse(readTreeFile(tree, "packages/auth/package.json")) as {
       dependencies: Record<string, string>
@@ -184,8 +184,14 @@ describe("template generator contract", () => {
     expect(env).toContain("BETTER_AUTH_URL=")
     expect(readTreeFile(tree, "packages/auth/src/createAuth.ts")).toContain("tanstackStartCookies")
     expect(readTreeFile(tree, "packages/protocol/src/rpc/AppRpcs.ts")).toContain(".middleware(AuthMiddleware)")
+    expect(readTreeFile(tree, "packages/protocol/src/http-api/TodosApi.ts")).toContain(
+      ".middleware(AuthHttpMiddleware)"
+    )
     expect(readTreeFile(tree, "apps/web/src/server.ts")).toContain("isAuthRequestPath")
     expect(readTreeFile(tree, "apps/server/src/rpc/createRpcWebHandler.ts")).toContain("AuthMiddlewareLive")
+    expect(readTreeFile(tree, "apps/server/src/http/createHttpApiWebHandler.ts")).toContain(
+      "AuthHttpMiddlewareLive"
+    )
   })
 
   test("handlebars helpers see the project config", () => {
