@@ -193,11 +193,15 @@ describe("createProject (Effect)", () => {
       private?: boolean
       exports?: Record<string, string>
       dependencies?: Record<string, string>
+      peerDependencies?: Record<string, string>
+      devDependencies?: Record<string, string>
     }
     expect(rootPkg.name).toBe("greet")
     expect(rootPkg.private).toBeUndefined()
     expect(rootPkg.exports?.["."]).toBe("./src/index.ts")
-    expect(rootPkg.dependencies?.["effect"]).toBeDefined()
+    expect(rootPkg.dependencies?.["effect"]).toBeUndefined()
+    expect(rootPkg.peerDependencies?.["effect"]).toBeDefined()
+    expect(rootPkg.devDependencies?.["effect"]).toBeDefined()
     await expect(stat(join(result.targetDir, "src/Greeting.ts"))).resolves.toBeDefined()
     await expect(stat(join(result.targetDir, "apps/web"))).rejects.toThrow()
     await expect(stat(join(result.targetDir, "packages/domain"))).rejects.toThrow()
