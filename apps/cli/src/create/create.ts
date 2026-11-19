@@ -10,6 +10,7 @@ import { effectiveDirectoryConflict } from "./CreateOptions.ts"
 import { buildResult, emitResult, printPlanSummary, printTitle } from "./createReport.ts"
 import { loadGenerator } from "./loadGenerator.ts"
 import { materializeProject } from "./materialize.ts"
+import { promptInstall } from "./promptInstall.ts"
 import { promptPackageManager } from "./promptPackageManager.ts"
 import { promptProjectKind } from "./promptProjectKind.ts"
 import { resolveCreateContext } from "./resolveScope.ts"
@@ -55,9 +56,12 @@ const prepare = (options: CreateOptions) =>
       Effect.gen(function*() {
         const template = yield* promptProjectKind(options)
         const packageManager = yield* promptPackageManager(options)
-        const nextOptions = template === options.template && packageManager === options.packageManager
+        const install = yield* promptInstall(options)
+        const nextOptions = template === options.template &&
+            packageManager === options.packageManager &&
+            install === options.install
           ? options
-          : { ...options, template, packageManager }
+          : { ...options, template, packageManager, install }
         yield* validateCreateOptions(nextOptions)
         const scope = yield* confirmCreate(nextOptions, ctx.scope)
         return {
