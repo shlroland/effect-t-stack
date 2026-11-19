@@ -10,6 +10,7 @@ import { effectiveDirectoryConflict } from "./CreateOptions.ts"
 import { buildResult, emitResult, printPlanSummary, printTitle } from "./createReport.ts"
 import { loadGenerator } from "./loadGenerator.ts"
 import { materializeProject } from "./materialize.ts"
+import { promptGit } from "./promptGit.ts"
 import { promptInstall } from "./promptInstall.ts"
 import { promptPackageManager } from "./promptPackageManager.ts"
 import { promptProjectKind } from "./promptProjectKind.ts"
@@ -57,11 +58,13 @@ const prepare = (options: CreateOptions) =>
         const template = yield* promptProjectKind(options)
         const packageManager = yield* promptPackageManager(options)
         const install = yield* promptInstall(options)
+        const git = yield* promptGit(options)
         const nextOptions = template === options.template &&
             packageManager === options.packageManager &&
-            install === options.install
+            install === options.install &&
+            git === options.git
           ? options
-          : { ...options, template, packageManager, install }
+          : { ...options, template, packageManager, install, git }
         yield* validateCreateOptions(nextOptions)
         const scope = yield* confirmCreate(nextOptions, ctx.scope)
         return {

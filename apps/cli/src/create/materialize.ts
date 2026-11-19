@@ -62,7 +62,8 @@ const logWrote = (state: MaterializeInput) =>
 
 const maybeGit = (state: MaterializeInput) =>
   state.options.git
-    ? runCommand("git", ["init"], {
+    // `-b main` sets the initial branch and avoids Git's "master → main" advice.
+    ? runCommand("git", ["init", "-b", "main"], {
       cwd: state.targetDir,
       quiet: state.options.verbose
     }).pipe(Effect.as(withPhase(state, "git-init")))
